@@ -2,7 +2,7 @@
 <project>
 	<!-- _________________________ Application Settings _________________________ -->
 
-	<app title="Friday Night Funkin': Action Engine" file="ActionEngine" packageName="FNF - Action Engine" package="com.yutamon.actionengine" main="Main" version="0.0.1" company="YutamonGaming" />
+	<app title="Friday Night Funkin': Action Engine" file="ActionEngine" packageName="FNF - Action Engine" package="com.yutamon.actionengine" main="Main" version="0.2.9" company="YutamonGaming" />
 
 	<!--Switch Export with Unique ApplicationID and Icon-->
 	<set name="APP_ID" value="0x0100f6c013bbc000" />
