@@ -2,16 +2,16 @@
 Engine built off Psych Engine EK to add more LUA and Softcoded Functionality into the game... plus KEYS!
 
 ## Current plans for Engine:
-* Softcoded Options for LUA Scripts
-* JSON Menu Editing
-* Better Character Editor
-* Multi-Engine Mod Support
-* Stage Editor
-* Gimmick Notes (A Special type of Custom Note that acts outside of the chart for easier porting to other engines) with Custom Notetype support.
-* Streamer VS Chat - with LUA Support.
-* Better Chart Editor functionality - Better Section Management - Chart Offset - Deletion/Addition of Sections
-* Slightly more informative Crash Handler
-* kill the fish
+* [ ] Softcoded Options for LUA Scripts
+* [ ] JSON Menu Editing
+* [ ] Better Character Editor
+* [ ] Multi-Engine Mod Support
+* [ ] Stage Editor
+* [ ] Gimmick Notes (A Special type of Custom Note that acts outside of the chart for easier porting to other engines) with Custom Notetype support.
+* [ ] Streamer VS Chat - with LUA Support.
+* [ ] Better Chart Editor functionality - Better Section Management - Chart Offset - Deletion/Addition of Sections
+* [ ] Slightly more informative Crash Handler
+* [ ] kill the fish
 * (More ideas coming!)
 
 
