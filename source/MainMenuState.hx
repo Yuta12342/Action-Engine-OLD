@@ -8,6 +8,7 @@ import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.FlxCamera;
+import flixel.system.FlxSound;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.effects.FlxFlicker;
 import flixel.graphics.frames.FlxAtlasFrames;
@@ -21,7 +22,17 @@ import lime.app.Application;
 import Achievements;
 import editors.MasterEditorMenu;
 import flixel.input.keyboard.FlxKey;
+import flixel.util.FlxSave;
 
+import MenuLua;
+#if sys
+import sys.FileSystem;
+import sys.io.File;
+#end
+#if !flash 
+import flixel.addons.display.FlxRuntimeShader;
+import openfl.filters.ShaderFilter;
+#end
 using StringTools;
 
 class MainMenuState extends MusicBeatState
@@ -31,9 +42,12 @@ class MainMenuState extends MusicBeatState
 	public static var curSelected:Int = 0;
 	public static var launchChance:Dynamic = null;
 
+	public var bg:FlxSprite;
 	var menuItems:FlxTypedGroup<FlxSprite>;
-	private var camGame:FlxCamera;
-	private var camAchievement:FlxCamera;
+	public var camGame:FlxCamera;
+	public var camHUD:FlxCamera;
+	public var camOther:FlxCamera;
+	public var camAchievement:FlxCamera;
 	
 	var optionShit:Array<String> = [
 		'story_mode',
@@ -50,6 +64,19 @@ class MainMenuState extends MusicBeatState
 	var camFollowPos:FlxObject;
 	var debugKeys:Array<FlxKey>;
 
+	// Lua shit
+	public static var instance:MainMenuState;
+	public var luaArray:Array<MenuLua> = [];
+	private var luaDebugGroup:FlxTypedGroup<MenuDebugLuaText>;
+
+	public var variables:Map<String, Dynamic> = new Map();
+	public var modchartSprites:Map<String, MenuModchartSprite> = new Map();
+	public var modchartTweens:Map<String, FlxTween> = new Map();
+	public var modchartTimers:Map<String, FlxTimer> = new Map();
+	public var modchartSounds:Map<String, FlxSound> = new Map();
+	public var modchartTexts:Map<String, MenuModchartText> = new Map();
+	public var modchartSaves:Map<String, FlxSave> = new Map();
+
 	override function create()
 	{
 		#if MODS_ALLOWED
@@ -64,12 +91,56 @@ class MainMenuState extends MusicBeatState
 		debugKeys = ClientPrefs.copyKey(ClientPrefs.keyBinds.get('debug_1'));
 
 		camGame = new FlxCamera();
+		camOther = new FlxCamera();
 		camAchievement = new FlxCamera();
 		camAchievement.bgColor.alpha = 0;
 
 		FlxG.cameras.reset(camGame);
 		FlxG.cameras.add(camAchievement, false);
+		FlxG.cameras.add(camOther, false);
 		FlxG.cameras.setDefaultDrawTarget(camGame, true);
+		camOther.bgColor.alpha = 0;
+
+
+		// for lua
+		instance = this;
+
+		#if LUA_ALLOWED
+		luaDebugGroup = new FlxTypedGroup<MenuDebugLuaText>();
+		luaDebugGroup.cameras = [camOther];
+		add(luaDebugGroup);
+		#end
+
+		// "GLOBAL" SCRIPTS
+		#if LUA_ALLOWED
+		var filesPushed:Array<String> = [];
+		var foldersToCheck:Array<String> = [Paths.getPreloadPath('menuscripts/mainmenu/')];
+
+		#if MODS_ALLOWED
+		foldersToCheck.insert(0, Paths.mods('menuscripts/mainmenu/'));
+		if(Paths.currentModDirectory != null && Paths.currentModDirectory.length > 0)
+			foldersToCheck.insert(0, Paths.mods(Paths.currentModDirectory + '/menuscripts/mainmenu/'));
+
+		for(mod in Paths.getGlobalMods())
+			foldersToCheck.insert(0, Paths.mods(mod + '/menuscripts/mainmenu/'));
+		#end
+
+		for (folder in foldersToCheck)
+			{
+				if(FileSystem.exists(folder))
+				{
+					for (file in FileSystem.readDirectory(folder))
+					{
+						if(file.endsWith('.lua') && !filesPushed.contains(file))
+						{
+							luaArray.push(new MenuLua(folder + file));
+							filesPushed.push(file);
+						}
+					}
+				}
+			}
+			#end
+
 
 		transIn = FlxTransitionableState.defaultTransIn;
 		transOut = FlxTransitionableState.defaultTransOut;
@@ -77,13 +148,14 @@ class MainMenuState extends MusicBeatState
 		persistentUpdate = persistentDraw = true;
 
 		var yScroll:Float = Math.max(0.25 - (0.05 * (optionShit.length - 4)), 0.1);
-		var bg:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('menuBG'));
+		bg = new FlxSprite(-80).loadGraphic(Paths.image('menuBG'));
 		bg.scrollFactor.set(0, yScroll);
 		bg.setGraphicSize(Std.int(bg.width * 1.175));
 		bg.updateHitbox();
 		bg.screenCenter();
 		bg.antialiasing = ClientPrefs.globalAntialiasing;
 		add(bg);
+		//instance.add(bg);
 
 		camFollow = new FlxObject(0, 0, 1, 1);
 		camFollowPos = new FlxObject(0, 0, 1, 1);
@@ -168,7 +240,7 @@ class MainMenuState extends MusicBeatState
 			}
 		}
 		#end
-
+		callOnLuas('onCreatePost', []);
 		super.create();
 	}
 
@@ -217,8 +289,123 @@ class MainMenuState extends MusicBeatState
 
 	var selectedSomethin:Bool = false;
 
+	public function callOnLuas(event:String, args:Array<Dynamic>, ignoreStops = true, exclusions:Array<String> = null):Dynamic {
+		var returnVal:Dynamic = MenuLua.Function_Continue;
+		#if LUA_ALLOWED
+		if(exclusions == null) exclusions = [];
+		for (script in luaArray) {
+			if(exclusions.contains(script.scriptName))
+				continue;
+
+			var ret:Dynamic = script.call(event, args);
+			if(ret == MenuLua.Function_StopLua && !ignoreStops)
+				break;
+			
+			// had to do this because there is a bug in haxe where Stop != Continue doesnt work
+			var bool:Bool = ret == MenuLua.Function_Continue;
+			if(!bool && ret != 0) {
+				returnVal = cast ret;
+			}
+		}
+		#end
+		//trace(event, returnVal);
+		return returnVal;
+	}
+	public function setOnLuas(variable:String, arg:Dynamic) {
+		#if LUA_ALLOWED
+		for (i in 0...luaArray.length) {
+			luaArray[i].set(variable, arg);
+		}
+		#end
+	}
+	public function addTextToDebug(text:String, color:FlxColor) {
+		#if LUA_ALLOWED
+		luaDebugGroup.forEachAlive(function(spr:MenuDebugLuaText) {
+			spr.y += 20;
+		});
+
+		if(luaDebugGroup.members.length > 34) {
+			var blah = luaDebugGroup.members[34];
+			blah.destroy();
+			luaDebugGroup.remove(blah);
+		}
+		luaDebugGroup.insert(0, new MenuDebugLuaText(text, luaDebugGroup, color));
+		#end
+	}
+	#if (!flash && sys)
+	public var runtimeShaders:Map<String, Array<String>> = new Map<String, Array<String>>();
+	public function createRuntimeShader(name:String):FlxRuntimeShader
+	{
+		if(!ClientPrefs.shaders) return new FlxRuntimeShader();
+
+		#if (!flash && MODS_ALLOWED && sys)
+		if(!runtimeShaders.exists(name) && !initLuaShader(name))
+		{
+			FlxG.log.warn('Shader $name is missing!');
+			return new FlxRuntimeShader();
+		}
+
+		var arr:Array<String> = runtimeShaders.get(name);
+		return new FlxRuntimeShader(arr[0], arr[1]);
+		#else
+		FlxG.log.warn("Platform unsupported for Runtime Shaders!");
+		return null;
+		#end
+	}
+
+	public function initLuaShader(name:String, ?glslVersion:Int = 120)
+	{
+		if(!ClientPrefs.shaders) return false;
+
+		if(runtimeShaders.exists(name))
+		{
+			FlxG.log.warn('Shader $name was already initialized!');
+			return true;
+		}
+
+		var foldersToCheck:Array<String> = [Paths.mods('shaders/')];
+		if(Paths.currentModDirectory != null && Paths.currentModDirectory.length > 0)
+			foldersToCheck.insert(0, Paths.mods(Paths.currentModDirectory + '/shaders/'));
+
+		for(mod in Paths.getGlobalMods())
+			foldersToCheck.insert(0, Paths.mods(mod + '/shaders/'));
+		
+		for (folder in foldersToCheck)
+		{
+			if(FileSystem.exists(folder))
+			{
+				var frag:String = folder + name + '.frag';
+				var vert:String = folder + name + '.vert';
+				var found:Bool = false;
+				if(FileSystem.exists(frag))
+				{
+					frag = File.getContent(frag);
+					found = true;
+				}
+				else frag = null;
+
+				if (FileSystem.exists(vert))
+				{
+					vert = File.getContent(vert);
+					found = true;
+				}
+				else vert = null;
+
+				if(found)
+				{
+					runtimeShaders.set(name, [frag, vert]);
+					//trace('Found shader $name!');
+					return true;
+				}
+			}
+		}
+		FlxG.log.warn('Missing shader $name .frag AND .vert files!');
+		return false;
+	}
+	#end
 	override function update(elapsed:Float)
 	{
+		callOnLuas('onUpdate', [elapsed]);
 		if (FlxG.sound.music.volume < 0.8)
 		{
 			FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
@@ -319,7 +506,12 @@ class MainMenuState extends MusicBeatState
 			spr.screenCenter(X);
 		});
 	}
-
+	public function getLuaObject(tag:String, text:Bool=true):FlxSprite {
+		if(modchartSprites.exists(tag)) return modchartSprites.get(tag);
+		if(text && modchartTexts.exists(tag)) return modchartTexts.get(tag);
+		if(variables.exists(tag)) return variables.get(tag);
+		return null;
+	}
 	function changeItem(huh:Int = 0)
 	{
 		curSelected += huh;
@@ -328,6 +520,9 @@ class MainMenuState extends MusicBeatState
 			curSelected = 0;
 		if (curSelected < 0)
 			curSelected = menuItems.length - 1;
+
+		setOnLuas("menuCurSelected", curSelected);
+		callOnLuas('menuChangeItem', [curSelected]);
 
 		menuItems.forEach(function(spr:FlxSprite)
 		{

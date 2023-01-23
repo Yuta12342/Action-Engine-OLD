@@ -47,7 +47,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 	public function new()
 	{
 		super();
-
+		trace('Loaded: BaseOptionsMenu.hx');
 		if(title == null) title = 'Options';
 		if(rpcTitle == null) rpcTitle = 'Options Menu';
 		
