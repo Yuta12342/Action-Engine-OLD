@@ -47,6 +47,8 @@ import openfl.net.FileReference;
 import openfl.utils.Assets as OpenFlAssets;
 import openfl.utils.ByteArray;
 import haxe.io.Path;
+import lime.app.Application;
+
 
 using StringTools;
 #if sys
@@ -3061,7 +3063,7 @@ function updateGrid():Void
 		dateNow = dateNow.replace(" ", "_");
 		dateNow = dateNow.replace(":", "'");
 
-				path = "./backups/" + currentSongName + "/" + "chartBackup" + dateNow + ".json";
+				path = "./backups/" + currentSongName + "/" + "chartBackup_" + dateNow + ".json";
 		if (!FileSystem.exists("./backups/"))
 			FileSystem.createDirectory("./backups/");
 
@@ -3072,7 +3074,7 @@ function updateGrid():Void
 
 		Sys.println("Song Backed up.");
 		Sys.println("Backup was made in " + Path.normalize(path));
-
+		Application.current.window.alert("Autosave successful! \n" + path, "Autosave Notice");
 	}
 
 	function clearEvents() {
@@ -3082,6 +3084,7 @@ function updateGrid():Void
 
 	private function saveLevel()
 	{
+					autosaveSong();
 		if(_song.events != null && _song.events.length > 1) _song.events.sort(sortByTime);
 		var json = {
 			"song": _song
