@@ -4,6 +4,11 @@ Engine built off Psych Engine EK to add more LUA and Softcoded Functionality int
 ## Current plans for Engine:
 * [ ] Softcoded Options for LUA Scripts
 * [ ] JSON Menu Editing
+* [x] LUA Menu Use
+* [ ] LUA Menu Manipulation
+* [ ] LUA Menu States
+* [x] Better Autosave (Keep FNF Autosave but add additional Backup Folder after Autosave to ensure safety of files.)
+* [ ] Week / Week Menus Seperation for Mods (To prevent LUA Script conflicts)
 * [ ] Better Character Editor
 * [ ] Multi-Engine Mod Support
 * [ ] Stage Editor
@@ -14,8 +19,14 @@ Engine built off Psych Engine EK to add more LUA and Softcoded Functionality int
 * [ ] kill the fish
 * (More ideas coming!)
 
+## Unlikely ideas
+- Softcoded Extra Keys (Allow for as many keys as you want for a song in the engine, as long as a Noteskin supports it.)
 
+## Implementations
+* LUA in Menus
 
+## Bugs to fix
+- Asset Searching through multiple directory levels (assets/images, assets/shared/images, mods/images)
 
 
 
