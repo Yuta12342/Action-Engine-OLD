@@ -7,6 +7,7 @@ Engine built off Psych Engine EK to add more LUA and Softcoded Functionality int
 * [x] LUA Menu Use
 * [ ] LUA Menu Manipulation
 * [ ] LUA Menu States
+* [ ] Better Autosave (Keep FNF Autosave but add additional Backup Folder after Autosave to ensure safety of files.)
 * [ ] Week / Week Menus Seperation for Mods (To prevent LUA Script conflicts)
 * [ ] Better Character Editor
 * [ ] Multi-Engine Mod Support
