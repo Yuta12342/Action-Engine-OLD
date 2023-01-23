@@ -4,6 +4,9 @@ Engine built off Psych Engine EK to add more LUA and Softcoded Functionality int
 ## Current plans for Engine:
 * [ ] Softcoded Options for LUA Scripts
 * [ ] JSON Menu Editing
+* [x] LUA Menu Use
+* [ ] LUA Menu Manipulation
+* [ ] Week / Week Menus Seperation for Mods (To prevent LUA Script conflicts)
 * [ ] Better Character Editor
 * [ ] Multi-Engine Mod Support
 * [ ] Stage Editor
