@@ -25,6 +25,9 @@ Engine built off Psych Engine EK to add more LUA and Softcoded Functionality int
 ## Implementations
 * LUA in Menus
 
+## Bugs to fix
+- Asset Searching through multiple directory levels (assets/images, assets/shared/images, mods/images)
+
 
 
 ## Original Engine Info for Psych Engine
