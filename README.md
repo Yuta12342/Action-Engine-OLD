@@ -8,7 +8,7 @@ Engine built off Psych Engine EK to add more LUA and Softcoded Functionality int
 * [ ] LUA Menu Manipulation
 * [ ] LUA Menu States
 * [ ] GF Strum (Toggle) for both GF Sections and GF Notes
-* [ ] Duet Note (A note that duplicates to both sides), or a GF+ Note that allows for GF to duet with whoever's side the note is on.
+* [ ] GF+ Note that allows for GF to duet with whoever's side the note is on.
 * [x] Better Autosave (Keep FNF Autosave but add additional Backup Folder after Autosave to ensure safety of files.)
 * [ ] Week / Week Menus Seperation for Mods (To prevent LUA Script conflicts)
 * [ ] Better Character Editor
