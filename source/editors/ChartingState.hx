@@ -48,6 +48,7 @@ import openfl.utils.Assets as OpenFlAssets;
 import openfl.utils.ByteArray;
 import haxe.io.Path;
 import lime.app.Application;
+import openfl.net.FileFilter;
 
 
 using StringTools;
@@ -63,6 +64,7 @@ import sys.io.File;
 
 class ChartingState extends MusicBeatState
 {
+	var _load:FileReference;
 	public static var noteTypeList:Array<String> = //Used for backwards compatibility with 0.1 - 0.3.2 charts, though, you should add your hardcoded custom note types here too.
 	[
 		'',
@@ -470,6 +472,11 @@ class ChartingState extends MusicBeatState
 			}
 		});
 
+		var loadButton:FlxButton = new FlxButton(loadEventJson.x, loadEventJson.y + 30, "Load JSON", function()
+		{
+			load();
+		});
+
 		var saveEvents:FlxButton = new FlxButton(110, reloadSongJson.y, 'Save Events', function ()
 		{
 			saveEvents();
@@ -633,6 +640,7 @@ class ChartingState extends MusicBeatState
 		tab_group_song.add(clear_events);
 		tab_group_song.add(clear_notes);
 		tab_group_song.add(saveButton);
+		tab_group_song.add(loadButton);
 		tab_group_song.add(saveEvents);
 		tab_group_song.add(reloadSong);
 		tab_group_song.add(reloadSongJson);
@@ -3101,6 +3109,68 @@ function updateGrid():Void
 			_file.save(data.trim(), Paths.formatToSongPath(_song.song) + ".json");
 		}
 	}
+
+	private function load()
+	{
+		_load = new FileReference();
+		_load.addEventListener(Event.SELECT, selectFile);
+
+		var Filter = new FileFilter("JSON Files", "*.json");
+		_load.browse([Filter]);
+	}
+
+	function selectFile(_):Void
+	{
+		_load.addEventListener(Event.COMPLETE, onLoadComplete);
+		_load.addEventListener(IOErrorEvent.IO_ERROR, onLoadError);
+		_load.load();
+	}
+
+	function onLoadError(_):Void
+	{
+		_load.removeEventListener(Event.COMPLETE, onLoadComplete);
+		_load.removeEventListener(IOErrorEvent.IO_ERROR, onLoadError);
+		_load = null;
+		FlxG.log.error("Problem loading Level data");
+	}
+
+	function onLoadComplete(_):Void
+	{
+		_load.removeEventListener(Event.COMPLETE, onLoadComplete);
+		_load.removeEventListener(IOErrorEvent.IO_ERROR, onLoadError);
+
+		if ((_load.data != null) && (_load.data.length > 0))
+		{
+			var songName:String = _load.name;
+			songName = songName.substring(0, songName.length - 5);
+
+var fileToLoad:String  = _load.data.toString();
+			var cut = songName.lastIndexOf("-");
+
+			songName = songName.substring(0, cut);
+
+var path:String = "data/test.json";
+
+
+
+trace("File.");
+
+
+
+			trace(songName);
+			trace(cut);
+			PlayState.SONG = Song.parseJSONshit(_load.data.toString());
+
+
+
+			FlxG.resetState();
+			changeSection(0, true);
+			MusicBeatState.resetState();
+			FlxG.log.notice("Successfully loaded LEVEL DATA.");
+
+		}
+	}
+
 
 	function sortByTime(Obj1:Array<Dynamic>, Obj2:Array<Dynamic>):Int
 	{
