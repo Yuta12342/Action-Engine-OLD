@@ -3144,12 +3144,7 @@ function updateGrid():Void
 			var songName:String = _load.name;
 			songName = songName.substring(0, songName.length - 5);
 
-var fileToLoad:String  = _load.data.toString();
-			var cut = songName.lastIndexOf("-");
 
-			songName = songName.substring(0, cut);
-
-var path:String = "data/test.json";
 
 
 
@@ -3158,13 +3153,14 @@ trace("File.");
 
 
 			trace(songName);
-			trace(cut);
 			PlayState.SONG = Song.parseJSONshit(_load.data.toString());
+			_song = PlayState.SONG;
+
+
 
 
 
 			FlxG.resetState();
-			changeSection(0, true);
 			MusicBeatState.resetState();
 			FlxG.log.notice("Successfully loaded LEVEL DATA.");
 
