@@ -2472,7 +2472,7 @@ class PlayState extends MusicBeatState
 				{
 					var newEventNote:Array<Dynamic> = [event[0], event[1][i][0], event[1][i][1], event[1][i][2]];
 					var subEvent:EventNote = {
-						strumTime: newEventNote[0] + ClientPrefs.noteOffset,
+						strumTime: newEventNote[0] + ClientPrefs.noteOffset + SONG.offset,
 						event: newEventNote[1],
 						value1: newEventNote[2],
 						value2: newEventNote[3]
@@ -2572,7 +2572,7 @@ class PlayState extends MusicBeatState
 			{
 				var newEventNote:Array<Dynamic> = [event[0], event[1][i][0], event[1][i][1], event[1][i][2]];
 				var subEvent:EventNote = {
-					strumTime: newEventNote[0] + ClientPrefs.noteOffset,
+					strumTime: newEventNote[0] + ClientPrefs.noteOffset + SONG.offset,
 					event: newEventNote[1],
 					value1: newEventNote[2],
 					value2: newEventNote[3]
@@ -2985,7 +2985,7 @@ class PlayState extends MusicBeatState
 			#if desktop
 			if (startTimer != null && startTimer.finished)
 			{
-				DiscordClient.changePresence(detailsText, SONG.song + storyDifficultyText, iconP2.getCharacter(), true, songLength - Conductor.songPosition - ClientPrefs.noteOffset);
+				DiscordClient.changePresence(detailsText, SONG.song + storyDifficultyText, iconP2.getCharacter(), true, songLength - Conductor.songPosition - ClientPrefs.noteOffset - SONG.offset);
 			}
 			else
 			{
@@ -3004,7 +3004,7 @@ class PlayState extends MusicBeatState
 		{
 			if (Conductor.songPosition > 0.0)
 			{
-				DiscordClient.changePresence(detailsText, SONG.song + storyDifficultyText, iconP2.getCharacter(), true, songLength - Conductor.songPosition - ClientPrefs.noteOffset);
+				DiscordClient.changePresence(detailsText, SONG.song + storyDifficultyText, iconP2.getCharacter(), true, songLength - Conductor.songPosition - ClientPrefs.noteOffset - SONG.offset);
 			}
 			else
 			{
@@ -4099,7 +4099,7 @@ class PlayState extends MusicBeatState
 		if(ClientPrefs.noteOffset <= 0 || ignoreNoteOffset) {
 			finishCallback();
 		} else {
-			finishTimer = new FlxTimer().start(ClientPrefs.noteOffset / 1000, function(tmr:FlxTimer) {
+			finishTimer = new FlxTimer().start(ClientPrefs.noteOffset + SONG.offset / 1000, function(tmr:FlxTimer) {
 				finishCallback();
 			});
 		}

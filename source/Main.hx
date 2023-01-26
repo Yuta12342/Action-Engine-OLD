@@ -53,7 +53,6 @@ import openfl.utils.ByteArray;
 import haxe.io.Path;
 import lime.app.Application;
 import openfl.net.FileFilter;
-import openfl.media.Audio;
 
 
 using StringTools;
