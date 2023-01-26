@@ -149,7 +149,7 @@ class CacheState extends MusicBeatState
 
 	inline static public function loadAndSwitchState(target:FlxState, stopMusic = false)
 	{
-		MusicBeatState.switchState(new TitleState);
+		MusicBeatState.switchState(new TitleState());
 	}
 
 	static function getNextState(target:FlxState, stopMusic = false):FlxState
@@ -170,7 +170,7 @@ class CacheState extends MusicBeatState
 
 		if (!loaded)
 			return new LoadingState(target, stopMusic, directory);
-		#end
+
 		if (stopMusic && FlxG.sound.music != null)
 			FlxG.sound.music.stop();
 
@@ -187,7 +187,6 @@ class CacheState extends MusicBeatState
 	{
 		return Assets.getLibrary(library) != null;
 	}
-	#end
 
 	override function destroy()
 	{

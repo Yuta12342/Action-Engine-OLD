@@ -184,7 +184,9 @@ class Main extends Sprite
 					Sys.println(stackItem);
 			}
 		}
-
+		// Restart the game
+		FlxG.resetState();
+		FlxG.switchState(new MainMenuState());
 		errMsg += "\nUncaught Error: " + e.error + "\nPlease report this error to the GitHub page: https://github.com/ShadowMario/FNF-PsychEngine\n\n> Crash Handler written by: sqirra-rng";
 
 		if (!FileSystem.exists("./crash/"))
@@ -199,7 +201,8 @@ class Main extends Sprite
 
 		DiscordClient.shutdown();
 		// Restart the game
-		FlxG.switchState(new TitleState());
+		FlxG.resetState();
+		FlxG.switchState(new MainMenuState());
 	}
 	#end
 }

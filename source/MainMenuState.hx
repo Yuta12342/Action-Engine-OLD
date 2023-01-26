@@ -29,7 +29,7 @@ import MenuLua;
 import sys.FileSystem;
 import sys.io.File;
 #end
-#if !flash 
+#if !flash
 import flixel.addons.display.FlxRuntimeShader;
 import openfl.filters.ShaderFilter;
 #end
@@ -48,7 +48,7 @@ class MainMenuState extends MusicBeatState
 	public var camHUD:FlxCamera;
 	public var camOther:FlxCamera;
 	public var camAchievement:FlxCamera;
-	
+
 	var optionShit:Array<String> = [
 		'story_mode',
 		'freeplay',
@@ -171,7 +171,7 @@ class MainMenuState extends MusicBeatState
 		magenta.antialiasing = ClientPrefs.globalAntialiasing;
 		magenta.color = 0xFFfd719b;
 		add(magenta);
-		
+
 		// magenta.scrollFactor.set();
 
 		menuItems = new FlxTypedGroup<FlxSprite>();
@@ -204,7 +204,7 @@ class MainMenuState extends MusicBeatState
 		}
 
 		FlxG.camera.follow(camFollowPos, null, 1);
-		
+
 		if (FlxG.save.data.firstTimeUsing == null) {
 			FlxG.save.data.firstTimeUsing = true;
 		}
@@ -263,7 +263,7 @@ class MainMenuState extends MusicBeatState
 		];
 
 		var zeroShitArray:Array<String> = ["day","hour","minute","second"];
-		
+
 		var leftTime:String = "";
 
 		for (i in 0...shitArray.length) {
@@ -300,7 +300,7 @@ class MainMenuState extends MusicBeatState
 			var ret:Dynamic = script.call(event, args);
 			if(ret == MenuLua.Function_StopLua && !ignoreStops)
 				break;
-			
+
 			// had to do this because there is a bug in haxe where Stop != Continue doesnt work
 			var bool:Bool = ret == MenuLua.Function_Continue;
 			if(!bool && ret != 0) {
@@ -369,7 +369,7 @@ class MainMenuState extends MusicBeatState
 
 		for(mod in Paths.getGlobalMods())
 			foldersToCheck.insert(0, Paths.mods(mod + '/shaders/'));
-		
+
 		for (folder in foldersToCheck)
 		{
 			if(FileSystem.exists(folder))
