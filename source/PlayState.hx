@@ -209,6 +209,7 @@ class PlayState extends MusicBeatState
 	public var instakillOnMiss:Bool = false;
 	public var cpuControlled:Bool = false;
 	public var practiceMode:Bool = false;
+	public var chartModifier:String = 'Normal';
 
 	public var botplaySine:Float = 0;
 	public var botplayTxt:FlxText;
@@ -374,6 +375,7 @@ class PlayState extends MusicBeatState
 		instakillOnMiss = ClientPrefs.getGameplaySetting('instakill', false);
 		practiceMode = ClientPrefs.getGameplaySetting('practice', false);
 		cpuControlled = ClientPrefs.getGameplaySetting('botplay', false);
+		chartModifier = ClientPrefs.getGameplaySetting('chartModifier', 'Normal');
 
 		// var gameCam:FlxCamera = FlxG.camera;
 		camGame = new FlxCamera();
@@ -2497,6 +2499,20 @@ class PlayState extends MusicBeatState
 				{
 					gottaHitNote = !section.mustHitSection;
 				}
+
+switch (chartModifier)
+{
+case "Random":
+						daNoteData = FlxG.random.int(0, mania);
+
+case "Flip":
+if (gottaHitNote)
+{
+	daNoteData = mania - Std.int(songNotes[1] % Note.ammo[mania]);
+}
+
+}
+
 
 				var oldNote:Note;
 				if (unspawnNotes.length > 0)
