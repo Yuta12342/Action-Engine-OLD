@@ -2511,6 +2511,10 @@ if (gottaHitNote)
 	daNoteData = mania - Std.int(songNotes[1] % Note.ammo[mania]);
 }
 
+case "4K Only":
+daNoteData = daNoteData - Std.int(songNotes[1] % Note.ammo[mania]);
+
+
 }
 
 
