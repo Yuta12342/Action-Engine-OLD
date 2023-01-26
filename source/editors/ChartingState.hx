@@ -231,7 +231,8 @@ class ChartingState extends MusicBeatState
 				speed: 1,
 				stage: 'stage',
 				validScore: false,
-				mania: Note.defaultMania
+				mania: Note.defaultMania,
+				offset: 0
 			};
 			addSection();
 			PlayState.SONG = _song;
@@ -445,14 +446,26 @@ class ChartingState extends MusicBeatState
 
 		var reloadSongJson:FlxButton = new FlxButton(reloadSong.x, saveButton.y + 30, "Reload JSON", function()
 		{
+
 			openSubState(new Prompt('This action will clear current progress.\n\nProceed?', 0, function(){loadJson(_song.song.toLowerCase()); }, null,ignoreWarnings));
 		});
 
+// function reloadJson()
+// Add a check with prompt if file doesn't exist before loading - allow to create new folder/json file.
+
+function loadThatAutosave()
+{
+	PlayState.SONG = Song.parseJSONshit(FlxG.save.data.autosave);
+			MusicBeatState.resetState();
+			}
+
 		var loadAutosaveBtn:FlxButton = new FlxButton(reloadSongJson.x, reloadSongJson.y + 30, 'Load Autosave', function()
 		{
-			PlayState.SONG = Song.parseJSONshit(FlxG.save.data.autosave);
-			MusicBeatState.resetState();
+		openSubState(new Prompt('This action will clear current progress.\n\nProceed?', 0, function(){loadThatAutosave(); }, null,ignoreWarnings));
+
 		});
+
+
 
 		var loadEventJson:FlxButton = new FlxButton(loadAutosaveBtn.x, loadAutosaveBtn.y + 30, 'Load Events', function()
 		{
@@ -474,7 +487,8 @@ class ChartingState extends MusicBeatState
 
 		var loadButton:FlxButton = new FlxButton(loadEventJson.x, loadEventJson.y + 30, "Load JSON", function()
 		{
-			load();
+					openSubState(new Prompt('This action will clear current progress.\n\nProceed?', 0, function(){load(); }, null,ignoreWarnings));
+
 		});
 
 		var saveEvents:FlxButton = new FlxButton(110, reloadSongJson.y, 'Save Events', function ()
@@ -501,12 +515,17 @@ class ChartingState extends MusicBeatState
 		clear_notes.color = FlxColor.RED;
 		clear_notes.label.color = FlxColor.WHITE;
 
-		var stepperBPM:FlxUINumericStepper = new FlxUINumericStepper(10, 70, 1, 1, 1, 400, 3);
+		var stepperBPM:FlxUINumericStepper = new FlxUINumericStepper(10, 70, 1, 1, 1, 999, 3);
 		stepperBPM.value = Conductor.bpm;
 		stepperBPM.name = 'song_bpm';
 		blockPressWhileTypingOnStepper.push(stepperBPM);
 
-		var stepperSpeed:FlxUINumericStepper = new FlxUINumericStepper(10, stepperBPM.y + 35, 0.1, 1, 0.1, 10, 1);
+		var stepperOffset:FlxUINumericStepper = new FlxUINumericStepper(stepperBPM.x + 100, stepperBPM.y, 0.1, 1, 0, 999, 3);
+		stepperOffset.value = _song.offset;
+		stepperOffset.name = 'song_offset';
+		blockPressWhileTypingOnStepper.push(stepperOffset);
+
+		var stepperSpeed:FlxUINumericStepper = new FlxUINumericStepper(10, stepperBPM.y + 35, 0.1, 1, 0.1, 100, 1);
 		stepperSpeed.value = _song.speed;
 		stepperSpeed.name = 'song_speed';
 		blockPressWhileTypingOnStepper.push(stepperSpeed);
@@ -647,6 +666,7 @@ class ChartingState extends MusicBeatState
 		tab_group_song.add(loadAutosaveBtn);
 		tab_group_song.add(loadEventJson);
 		tab_group_song.add(stepperBPM);
+		tab_group_song.add(stepperOffset);
 		tab_group_song.add(stepperSpeed);
 		tab_group_song.add(stepperMania);
 		tab_group_song.add(reloadNotesButton);
@@ -1504,6 +1524,11 @@ class ChartingState extends MusicBeatState
 			{
 				vocals.volume = nums.value;
 			}
+			else if (wname == 'song_offset')
+      {
+			_song.offset = nums.value;
+			}
+
 		}
 		else if(id == FlxUIInputText.CHANGE_EVENT && (sender is FlxUIInputText)) {
 			if(sender == noteSplashesInputText) {
@@ -3151,13 +3176,14 @@ function updateGrid():Void
 trace("File.");
 
 
-
 			trace(songName);
 			PlayState.SONG = Song.parseJSONshit(_load.data.toString());
 			_song = PlayState.SONG;
 
 
-
+			PlayState.mania = _song.mania;
+			if (PlayState.mania < Note.minMania || PlayState.mania > Note.maxMania)
+				PlayState.mania = Note.defaultMania;
 
 
 			FlxG.resetState();
