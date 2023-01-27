@@ -90,6 +90,13 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 			true);
 		addOption(option);
 
+		var option:Option = new Option('Quaver Ratings',
+			"If checked, will base score and health gain on how well\nyou hit, using the Quaver Rating System.",
+			'quaverHit',
+			'bool',
+			false);
+		addOption(option);
+
 		var option:Option = new Option('Rating Offset',
 			'Changes how late/early you have to hit for a "Sick!"\nHigher values mean you have to hit later.',
 			'ratingOffset',
