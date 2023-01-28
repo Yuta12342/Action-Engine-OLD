@@ -159,6 +159,13 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 			true);
 		addOption(option);
 
+		var option:Option = new Option('Streamer VS Chat',
+			"If checked, if connected to YouTube or Twitch,\nyour chat will be able to interact with the game.",
+			'streamChat',
+			'bool',
+			false);
+		addOption(option);
+
 		super();
 	}
 

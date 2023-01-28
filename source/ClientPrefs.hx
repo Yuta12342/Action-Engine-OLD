@@ -23,14 +23,14 @@ class ClientPrefs {
 	public static var camMovement:Bool = true;
 	public static var hideHud:Bool = false;
 	public static var noteOffset:Int = 0;
-	public static var arrowHSV:Array<Array<Int>> = [[0, 0, 0], [0, 0, 0], 
-													[0, 0, 0], [0, 0, 0], 
-													[0, 0, 0], [0, 0, 0], 
-													[0, 0, 0], [0, 0, 0], 
+	public static var arrowHSV:Array<Array<Int>> = [[0, 0, 0], [0, 0, 0],
 													[0, 0, 0], [0, 0, 0],
-													[0, 0, 0], [0, 0, 0], 
-													[0, 0, 0], [0, 0, 0], 
-													[0, 0, 0], [0, 0, 0], 
+													[0, 0, 0], [0, 0, 0],
+													[0, 0, 0], [0, 0, 0],
+													[0, 0, 0], [0, 0, 0],
+													[0, 0, 0], [0, 0, 0],
+													[0, 0, 0], [0, 0, 0],
+													[0, 0, 0], [0, 0, 0],
 													[0, 0, 0], [0, 0, 0]]; // Fuck
 	public static var imagesPersist:Bool = false;
 	public static var ghostTapping:Bool = true;
@@ -43,11 +43,12 @@ class ClientPrefs {
 	public static var checkForUpdates:Bool = true;
 	public static var antimash:Bool = true;
 	public static var convertEK:Bool = true;
+	public static var streamChat:Bool = false;
 	public static var showKeybindsOnStart:Bool = true;
 	public static var comboStacking = true;
 	public static var gameplaySettings:Map<String, Dynamic> = [
 		'scrollspeed' => 1.0,
-		'scrolltype' => 'multiplicative', 
+		'scrolltype' => 'multiplicative',
 		// anyone reading this, amod is multiplicative speed mod, cmod is constant speed mod, and xmod is bpm based speed mod.
 		// an amod example would be chartSpeed * multiplier
 		// cmod would just be constantSpeed = chartSpeed
@@ -227,7 +228,7 @@ class ClientPrefs {
 		'note_1614'	=> [J, NONE],
 		'note_1615'	=> [K, NONE],
 		'note_1616'	=> [L, NONE],
-	
+
 		'note_171'	=> [A, NONE],
 		'note_172'	=> [S, NONE],
 		'note_173'	=> [D, NONE],
@@ -266,22 +267,22 @@ class ClientPrefs {
 		'note_1816'	=> [U, NONE],
 		'note_1817'	=> [I, NONE],
 		'note_1818'	=> [O, NONE],
-		
-		
+
+
 		'ui_left'		=> [A, LEFT],
 		'ui_down'		=> [S, DOWN],
 		'ui_up'			=> [W, UP],
 		'ui_right'		=> [D, RIGHT],
-		
+
 		'accept'		=> [SPACE, ENTER],
 		'back'			=> [BACKSPACE, ESCAPE],
 		'pause'			=> [ENTER, ESCAPE],
 		'reset'			=> [R, NONE],
-		
+
 		'volume_mute'	=> [ZERO, NONE],
 		'volume_up'		=> [NUMPADPLUS, PLUS],
 		'volume_down'	=> [NUMPADMINUS, MINUS],
-		
+
 		'debug_1'		=> [SEVEN, NONE],
 		'debug_2'		=> [EIGHT, NONE]
 	];
@@ -333,7 +334,7 @@ class ClientPrefs {
 		FlxG.save.data.convertEK = convertEK;
 		FlxG.save.data.comboStacking = comboStacking;
 		FlxG.save.data.showKeybindsOnStart = showKeybindsOnStart;
-	
+
 		FlxG.save.flush();
 
 		var save:FlxSave = new FlxSave();
@@ -423,7 +424,7 @@ class ClientPrefs {
 		if(FlxG.save.data.comboOffset != null) {
 			comboOffset = FlxG.save.data.comboOffset;
 		}
-		
+
 		if(FlxG.save.data.ratingOffset != null) {
 			ratingOffset = FlxG.save.data.ratingOffset;
 		}
@@ -453,7 +454,7 @@ class ClientPrefs {
 				gameplaySettings.set(name, value);
 			}
 		}
-		
+
 		// flixel automatically saves your volume!
 		if(FlxG.save.data.volume != null)
 		{

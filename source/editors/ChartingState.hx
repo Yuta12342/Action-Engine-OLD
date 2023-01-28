@@ -49,6 +49,8 @@ import openfl.utils.ByteArray;
 import haxe.io.Path;
 import lime.app.Application;
 import openfl.net.FileFilter;
+import lime.ui.Window;
+import lime.system.System;
 
 
 using StringTools;
@@ -1598,10 +1600,36 @@ function loadThatAutosave()
 		return daPos;
 	}
 
+
 	var lastConductorPos:Float;
 	var colorSine:Float = 0;
 	override function update(elapsed:Float)
 	{
+	Main.setExitHandler(function() {
+    trace("Quit on Chart Editor... Autosaving");
+			FlxG.save.data.autosave = Json.stringify({
+				"song": _song
+			});
+			FlxG.save.flush();
+			var path:String;
+			var dateNow:String = Date.now().toString();
+
+			dateNow = dateNow.replace(" ", "_");
+			dateNow = dateNow.replace(":", "'");
+
+					path = "./backups/" + currentSongName + "/" + "chartBackup_" + dateNow + ".json";
+			if (!FileSystem.exists("./backups/"))
+				FileSystem.createDirectory("./backups/");
+
+				if (!FileSystem.exists("./backups/" + currentSongName + "/"))
+					FileSystem.createDirectory("./backups/" + currentSongName + "/");
+
+			File.saveContent(path, FlxG.save.data.autosave);
+
+			Sys.println("Song Backed up.");
+			Sys.println("Backup was made in " + Path.normalize(path));
+			Sys.exit(8);
+			});
 		curStep = recalculateSteps();
 
 		PlayState.mania = _song.mania;
@@ -3083,6 +3111,11 @@ function updateGrid():Void
 		}
 		MusicBeatState.resetState();
 	}
+
+function onExit()
+{
+trace('Exit on Chart Editor...');
+}
 
 	function autosaveSong():Void
 	{

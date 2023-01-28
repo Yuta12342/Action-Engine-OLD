@@ -80,6 +80,7 @@ using StringTools;
 
 class PlayState extends MusicBeatState
 {
+	public static var commands:Array<String> = [];
 	public static var STRUM_X = 42;
 	public static var STRUM_X_MIDDLESCROLL = -278;
 

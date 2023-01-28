@@ -108,6 +108,19 @@ class Main extends Sprite
 		}
 	}
 
+	static public function setExitHandler(func:Void->Void):Void {
+	    #if openfl_legacy
+	    openfl.Lib.current.stage.onQuit = function() {
+	        func();
+	        openfl.Lib.close();
+	    };
+	    #else
+	    openfl.Lib.current.stage.application.onExit.add(function(code) {
+	        func();
+	    });
+	    #end
+	}
+
 	private function init(?E:Event):Void
 	{
 		if (hasEventListener(Event.ADDED_TO_STAGE))

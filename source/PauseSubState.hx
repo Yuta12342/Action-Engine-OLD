@@ -14,6 +14,7 @@ import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import flixel.FlxCamera;
 import flixel.util.FlxStringUtil;
+mport seedyrng.Random;
 
 class PauseSubState extends MusicBeatSubstate
 {
@@ -41,7 +42,7 @@ class PauseSubState extends MusicBeatSubstate
 		if(PlayState.chartingMode)
 		{
 			menuItemsOG.insert(2, 'Leave Charting Mode');
-			
+
 			var num:Int = 0;
 			if(!PlayState.instance.startingSong)
 			{
@@ -370,7 +371,7 @@ class PauseSubState extends MusicBeatSubstate
 		curSelected = 0;
 		changeSelection();
 	}
-	
+
 	function updateSkipTextStuff()
 	{
 		if(skipTimeText == null || skipTimeTracker == null) return;
