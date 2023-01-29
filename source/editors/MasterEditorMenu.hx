@@ -112,7 +112,7 @@ class MasterEditorMenu extends MusicBeatState
 		}
 		#end
 
-		if (controls.BACK)
+		if (controls.BACK && Main.args[0] != 'editorMode')
 		{
 			MusicBeatState.switchState(new MainMenuState());
 		}
