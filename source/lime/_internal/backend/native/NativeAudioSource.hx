@@ -10,7 +10,6 @@ import lime.media.vorbis.VorbisFile;
 import lime.media.AudioManager;
 import lime.media.AudioSource;
 import lime.utils.UInt8Array;
-import lime.audio.Audio;
 
 #if !lime_debug
 @:fileXml('tags="haxe,release"')

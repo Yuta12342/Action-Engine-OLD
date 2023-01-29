@@ -14,7 +14,6 @@ import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import flixel.FlxCamera;
 import flixel.util.FlxStringUtil;
-mport seedyrng.Random;
 
 class PauseSubState extends MusicBeatSubstate
 {
@@ -226,6 +225,9 @@ class PauseSubState extends MusicBeatSubstate
 				case "Restart Song":
 					restartSong();
 				case "Leave Charting Mode":
+				if (Main.args[0] == 'editorMode')
+				{MusicBeatState.switchState(new FreeplayState());}
+				else
 					restartSong();
 					PlayState.chartingMode = false;
 				case 'Skip Time':

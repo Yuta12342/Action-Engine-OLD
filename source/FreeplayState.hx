@@ -158,6 +158,8 @@ class FreeplayState extends MusicBeatState
 		FlxG.cameras.add(camOther, false);
 		FlxG.cameras.setDefaultDrawTarget(camGame, true);
 
+		if (Main.args[0] == 'editorMode')
+		{MusicBeatState.switchState(new MainMenuState());}
 		// for lua
 		instance = this;
 

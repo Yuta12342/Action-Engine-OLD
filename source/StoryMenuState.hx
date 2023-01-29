@@ -53,7 +53,8 @@ class StoryMenuState extends MusicBeatState
 	{
 		Paths.clearStoredMemory();
 		Paths.clearUnusedMemory();
-
+		if (Main.args[0] == 'editorMode')
+		{MusicBeatState.switchState(new FreeplayState());}
 		PlayState.isStoryMode = true;
 		WeekData.reloadWeekFiles(true);
 		if(curWeek >= WeekData.weeksList.length) curWeek = 0;
@@ -152,7 +153,7 @@ class StoryMenuState extends MusicBeatState
 			lastDifficultyName = CoolUtil.defaultDifficulty;
 		}
 		curDifficulty = Math.round(Math.max(0, CoolUtil.defaultDifficulties.indexOf(lastDifficultyName)));
-		
+
 		sprDifficulty = new FlxSprite(0, leftArrow.y);
 		sprDifficulty.antialiasing = ClientPrefs.globalAntialiasing;
 		difficultySelectors.add(sprDifficulty);
@@ -433,7 +434,7 @@ class StoryMenuState extends MusicBeatState
 				CoolUtil.difficulties = diffs;
 			}
 		}
-		
+
 		if(CoolUtil.difficulties.contains(CoolUtil.defaultDifficulty))
 		{
 			curDifficulty = Math.round(Math.max(0, CoolUtil.defaultDifficulties.indexOf(CoolUtil.defaultDifficulty)));
