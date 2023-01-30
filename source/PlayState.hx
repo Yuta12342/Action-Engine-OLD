@@ -3518,6 +3518,9 @@ daNoteData = daNoteData - Std.int(songNotes[1] % Note.ammo[mania]);
 		}
 		checkEventNote();
 
+
+
+
 		#if debug
 		if(!endingSong && !startingSong) {
 			if (FlxG.keys.justPressed.ONE) {
