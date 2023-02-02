@@ -53,7 +53,7 @@ import openfl.utils.ByteArray;
 import haxe.io.Path;
 import lime.app.Application;
 import openfl.net.FileFilter;
-
+import lime.system.Clipboard;
 
 using StringTools;
 #if sys

@@ -51,6 +51,7 @@ import lime.app.Application;
 import openfl.net.FileFilter;
 import lime.ui.Window;
 import lime.system.System;
+import lime.system.Clipboard;
 
 
 using StringTools;
@@ -419,6 +420,7 @@ class ChartingState extends MusicBeatState
 	var noteSplashesInputText:FlxUIInputText;
 	var stageDropDown:FlxUIDropDownMenuCustom;
 	var sliderRate:FlxUISlider;
+
 	function addSongUI():Void
 	{
 		UI_songTitle = new FlxUIInputText(10, 10, 70, _song.song, 8);
@@ -1801,6 +1803,15 @@ function loadThatAutosave()
 				}
 			}
 
+if (FlxG.keys.pressed.CONTROL && FlxG.keys.justPressed.V)
+{
+if (UI_songTitle.hasFocus)
+{UI_songTitle.text = UI_songTitle.text + Clipboard.text;}
+else if (noteSkinInputText.hasFocus)
+{noteSkinInputText.text = noteSkinInputText.text + Clipboard.text;}
+else if (noteSplashesInputText.hasFocus)
+{noteSplashesInputText.text = noteSplashesInputText.text + Clipboard.text;}
+}
 
 			if (FlxG.keys.justPressed.BACKSPACE) {
 				PlayState.chartingMode = false;

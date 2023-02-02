@@ -2422,6 +2422,7 @@ class PlayState extends MusicBeatState
 	}
 
 	var debugNum:Int = 0;
+	var stair:Int = 0;
 	private var noteTypeMap:Map<String, Bool> = new Map<String, Bool>();
 	private var eventPushedMap:Map<String, Bool> = new Map<String, Bool>();
 	private function generateSong(dataPath:String):Void
@@ -2516,6 +2517,42 @@ if (gottaHitNote)
 
 case "4K Only":
 daNoteData = daNoteData - Std.int(songNotes[1] % Note.ammo[mania]);
+
+case "Stairs":
+    daNoteData = stair % Note.ammo[mania];
+    stair++;
+
+		case "Wave":
+// Sketchie... WHY?!
+
+		var ammoFromFortnite:Int = Note.ammo[mania];
+		var luigiSex:Int = (ammoFromFortnite * 2 - 2);
+		var marioSex:Int = stair++ % luigiSex;
+
+		if (marioSex < ammoFromFortnite) {
+		    daNoteData = marioSex;
+		} else {
+		    daNoteData = luigiSex - marioSex;
+		}
+
+
+				case "What":
+				    switch (stair % (2 * Note.ammo[mania]))
+				    {
+				        case 0:
+				        case 1:
+				        case 2:
+				        case 3:
+				        case 4:
+				            daNoteData = stair % Note.ammo[mania];
+
+
+				        default:
+				            daNoteData = Note.ammo[mania] - 1 - (stair % Note.ammo[mania]);
+
+				    }
+
+				    stair++;
 
 
 }

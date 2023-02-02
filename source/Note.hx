@@ -8,6 +8,7 @@ import flixel.math.FlxMath;
 import flixel.util.FlxColor;
 import flash.display.BitmapData;
 import editors.ChartingState;
+import lime.system.Clipboard;
 
 using StringTools;
 
@@ -136,7 +137,7 @@ class Note extends FlxSprite
 	public var hitsoundDisabled:Bool = false;
 	public var changeAnim:Bool = true;
 	public var changeColSwap:Bool = true;
-	
+
 	public function resizeByRatio(ratio:Float) //haha funny twitter shit
 		{
 			if(isSustainNote && !animation.curAnim.name.endsWith('tail'))
@@ -301,7 +302,7 @@ class Note extends FlxSprite
 		if(prefix == null) prefix = '';
 		if(texture == null) texture = '';
 		if(suffix == null) suffix = '';
-		
+
 		var skin:String = texture;
 		if(texture.length < 1) {
 			skin = PlayState.SONG.arrowSkin;
@@ -345,12 +346,12 @@ class Note extends FlxSprite
 				offsetX += lastNoteOffsetXForPixelAutoAdjusting;
 				lastNoteOffsetXForPixelAutoAdjusting = (width - 7) * (PlayState.daPixelZoom / 2);
 				offsetX -= lastNoteOffsetXForPixelAutoAdjusting;
-				
+
 				/*if(animName != null && !animName.endsWith('tail'))
 				{
 					lastScaleY /= lastNoteScaleToo;
 					lastNoteScaleToo = (6 / height);
-					lastScaleY *= lastNoteScaleToo; 
+					lastScaleY *= lastNoteScaleToo;
 				}*/
 			}
 		} else {
@@ -376,14 +377,14 @@ class Note extends FlxSprite
 		for (i in 0...gfxLetter.length)
 			{
 				animation.addByPrefix(gfxLetter[i], gfxLetter[i] + '0');
-	
+
 				if (isSustainNote)
 				{
 					animation.addByPrefix(gfxLetter[i] + ' hold', gfxLetter[i] + ' hold');
 					animation.addByPrefix(gfxLetter[i] + ' tail', gfxLetter[i] + ' tail');
 				}
 			}
-				
+
 			ogW = width;
 			ogH = height;
 			if (!isSustainNote)
@@ -408,7 +409,7 @@ class Note extends FlxSprite
 
 	/*public function applyManiaChange()
 	{
-		if (isSustainNote) 
+		if (isSustainNote)
 			scale.y = 1;
 		reloadNote(texture);
 		if (isSustainNote)

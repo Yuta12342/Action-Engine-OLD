@@ -77,6 +77,7 @@ import flixel.addons.ui.FlxUITabMenu;
 import flixel.addons.ui.FlxUITooltip.FlxUITooltipStyle;
 import flixel.ui.FlxButton;
 import flixel.ui.FlxSpriteButton;
+import lime.system.Clipboard;
 
 import FreeplayLua;
 #if MODS_ALLOWED
@@ -508,6 +509,14 @@ class FreeplayState extends MusicBeatState
 	var holdTime:Float = 0;
 	override function update(elapsed:Float)
 		{
+		if (FlxG.keys.pressed.CONTROL && FlxG.keys.justPressed.V)
+		{
+		if (searchBar.hasFocus)
+		{searchBar.text = searchBar.text + Clipboard.text;}
+		}
+
+if (searchBar.hasFocus && searchBar.text == 'Search Songs')
+{searchBar.text = '';}
 			setOnLuas("curSelectedDifficulty", curDifficulty);
 			setOnLuas("curSelectedDifficultyString", lastDifficultyName);
 			setOnLuas("curSongSelected", songs[curSelected].songName);
@@ -607,7 +616,7 @@ class FreeplayState extends MusicBeatState
 			persistentUpdate = false;
 			openSubState(new GameplayChangersSubstate());
 		}
-		else if(space)
+		else if(space && !searchBar.hasFocus)
 		{
 			if(instPlaying != curSelected)
 
@@ -634,7 +643,7 @@ class FreeplayState extends MusicBeatState
 			}
 		}
 
-		else if (accepted)
+		else if (accepted && !searchBar.hasFocus)
 		{
 			FlxG.mouse.visible = false;
 			persistentUpdate = false;

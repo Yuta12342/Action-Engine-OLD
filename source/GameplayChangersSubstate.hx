@@ -70,7 +70,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		optionsArray.push(option);
 		#end
 
-		var goption:GameplayOption = new GameplayOption('Chart Modifier', 'chartModifier', 'string', 'Normal', ["Normal", "4K Only", "Flip", "Random"]);
+		var goption:GameplayOption = new GameplayOption('Chart Modifier', 'chartModifier', 'string', 'Normal', ["Normal", "4K Only", "Flip", "Random", "Stairs", "Wave"]);
 		optionsArray.push(goption);
 
 		var option:GameplayOption = new GameplayOption('Health Gain Multiplier', 'healthgain', 'float', 1);
