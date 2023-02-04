@@ -10,6 +10,7 @@ import flash.display.BitmapData;
 import editors.ChartingState;
 import lime.system.Clipboard;
 
+
 using StringTools;
 
 typedef EventNote = {
@@ -18,6 +19,7 @@ typedef EventNote = {
 	value1:String,
 	value2:String
 }
+
 
 class Note extends FlxSprite
 {
@@ -407,8 +409,10 @@ class Note extends FlxSprite
 		}
 	}
 
-	/*public function applyManiaChange()
+
+	public function applyManiaChange()
 	{
+	mania = PlayState.mania;
 		if (isSustainNote)
 			scale.y = 1;
 		reloadNote(texture);
@@ -421,7 +425,7 @@ class Note extends FlxSprite
 			animation.play(animToPlay);
 		}
 
-		/*if (isSustainNote && prevNote != null) someone please tell me why this wont work
+		if (isSustainNote && prevNote != null) //someone please tell me why this wont work
 		{
 			animation.play(Note.keysShit.get(mania).get('letters')[noteData % Note.ammo[mania]] + ' tail');
 			if (prevNote != null && prevNote.isSustainNote)
@@ -432,7 +436,7 @@ class Note extends FlxSprite
 		}
 
 		updateHitbox();
-	}*/
+	}
 
 
 	override function update(elapsed:Float)

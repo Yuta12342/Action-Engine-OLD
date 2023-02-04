@@ -61,6 +61,7 @@ import StageData;
 import FunkinLua;
 import DialogueBoxPsych;
 import Conductor.Rating;
+import Note;
 
 #if !flash
 import flixel.addons.display.FlxRuntimeShader;
@@ -2845,6 +2846,7 @@ case "Stairs":
 
 		note.scale.set(1, 1);
 		note.updateHitbox();
+		note.applyManiaChange();
 
 		/*
 		if (!isPixelStage) {
@@ -2962,7 +2964,6 @@ case "Stairs":
 
 		for (noteI in 0...unspawnNotes.length) {
 			var note:Note = unspawnNotes[noteI];
-
 			updateNote(note);
 		}
 
@@ -3967,6 +3968,7 @@ case "Stairs":
 				if(Math.isNaN(newMania) && newMania < 0 && newMania > 9)
 					newMania = 0;
 				changeMania(newMania, skipTween);
+
 
 			case 'Change Character':
 				var charType:Int = 0;

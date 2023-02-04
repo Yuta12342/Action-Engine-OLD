@@ -3123,6 +3123,23 @@ function updateGrid():Void
 		MusicBeatState.resetState();
 	}
 
+/*function saveJson(song:String):Void
+{
+var songToSave;
+if (CoolUtil.difficulties[PlayState.storyDifficulty] != CoolUtil.defaultDifficulty) {
+	if(CoolUtil.difficulties[PlayState.storyDifficulty] == null){
+		songToSave = Song.loadFromJson(song.toLowerCase(), song.toLowerCase());
+	}else{
+		songToSave = Song.loadFromJson(song.toLowerCase() + "-" + CoolUtil.difficulties[PlayState.storyDifficulty], song.toLowerCase());
+	}
+}else{
+songToSave = Song.loadFromJson(song.toLowerCase(), song.toLowerCase());
+
+var songPath = songToSave.toString();
+}
+File.saveContent(songPath, _song);
+} */
+
 function onExit()
 {
 trace('Exit on Chart Editor...');
