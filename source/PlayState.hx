@@ -3433,6 +3433,9 @@ case "Stairs":
 					var strumGroup:FlxTypedGroup<StrumNote> = playerStrums;
 					if(!daNote.mustPress) strumGroup = opponentStrums;
 
+					if (strumGroup.members[daNote.noteData] == null)
+						daNote.noteData = mania; // crash prevention ig?
+
 					var strumX:Float = strumGroup.members[daNote.noteData].x;
 					var strumY:Float = strumGroup.members[daNote.noteData].y;
 					var strumAngle:Float = strumGroup.members[daNote.noteData].angle;
