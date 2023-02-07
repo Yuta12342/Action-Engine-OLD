@@ -13,6 +13,7 @@ Engine built off Psych Engine EK to add more LUA and Softcoded Functionality int
 * [ ] Duet Section Toggle (Camera to middle, and zoom to both Character Cameras + Hitbox, or include Duet Camera in Stage JSON.)
 * [x] Better Autosave (Keep FNF Autosave but add additional Backup Folder after Autosave to ensure safety of files.)
 * [ ] Week / Week Menus Seperation for Mods (To prevent LUA Script conflicts)
+* [ ] Chart Editor Addons (LUA Scripts that can add Chart Variables specific to the mod or song, seperated by mini-menus. (Allows adding Chart Editor Buttons and switches for use in different charts.)
 * [ ] Better Character Editor
 * [ ] Multi-Engine Mod Support
 * [ ] Stage Editor
