@@ -16,6 +16,7 @@ Engine built off Psych Engine EK to add more LUA and Softcoded Functionality int
 * [ ] Chart Editor Addons (LUA Scripts that can add Chart Variables specific to the mod or song, seperated by mini-menus. (Allows adding Chart Editor Buttons and switches for use in different charts.)
 * [ ] Better Character Editor
 * [ ] Multi-Engine Mod Support
+* [ ] Mod Achievements in LUA.
 * [ ] Stage Editor
 * [ ] Gimmick Notes (A Special type of Custom Note that acts outside of the chart for easier porting to other engines) with Custom Notetype support.
 * [ ] Streamer VS Chat - with LUA Support.
