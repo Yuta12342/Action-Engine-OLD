@@ -4885,6 +4885,15 @@ case "Stairs":
 				char.holdTimer = 0;
 			}
 		}
+		var char:Character = dad;
+		var animToPlay:String = 'sing' + Note.keysShit.get(mania).get('anims')[note.noteData];
+		if(note.noteType == 'GF Duet')
+	 {
+	 gf.playAnim(animToPlay + note.animSuffix, true);
+	 gf.holdTimer = 0;
+	 dad.playAnim(animToPlay + note.animSuffix, true);
+	 dad.holdTimer = 0;
+	 }
 
 		if (SONG.needsVoices)
 			vocals.volume = 1;
@@ -4971,6 +4980,14 @@ case "Stairs":
 					boyfriend.playAnim(animToPlay + note.animSuffix, true);
 					boyfriend.holdTimer = 0;
 				}
+				var animToPlay:String = 'sing' + Note.keysShit.get(mania).get('anims')[note.noteData];
+				if(note.noteType == 'GF Duet')
+       {
+			 gf.playAnim(animToPlay + note.animSuffix, true);
+			 gf.holdTimer = 0;
+			 boyfriend.playAnim(animToPlay + note.animSuffix, true);
+			 boyfriend.holdTimer = 0;
+			 }
 
 				if(note.noteType == 'Hey!') {
 					if(boyfriend.animOffsets.exists('hey')) {
