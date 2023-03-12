@@ -34,7 +34,7 @@ import OptionsLua;
 import sys.FileSystem;
 import sys.io.File;
 #end
-#if !flash 
+#if !flash
 import flixel.addons.display.FlxRuntimeShader;
 import openfl.filters.ShaderFilter;
 #end
@@ -47,7 +47,7 @@ class OptionsState extends MusicBeatState
 	public var bg:FlxSprite;
 	var camFollow:FlxObject;
 	var camFollowPos:FlxObject;
-	
+
 	public var camGame:FlxCamera;
 	public var camHUD:FlxCamera;
 	public var camOther:FlxCamera;
@@ -64,7 +64,7 @@ class OptionsState extends MusicBeatState
 	public var modchartTexts:Map<String, OptionsModchartText> = new Map();
 	public var modchartSaves:Map<String, FlxSave> = new Map();
 
-	var options:Array<String> = ['Note Colors', 'Controls', 'Adjust Delay and Combo', 'Graphics', 'Visuals and UI', 'Gameplay'];
+	var options:Array<String> = ['Note Colors', 'Controls', 'Adjust Delay and Combo', 'Graphics', 'Visuals and UI', 'Gameplay', 'Mod Options', 'Dev Options'];
 	private var grpOptions:FlxTypedGroup<Alphabet>;
 	private static var curSelected:Int = 0;
 	public static var menuBG:FlxSprite;
@@ -80,7 +80,7 @@ class OptionsState extends MusicBeatState
 			var ret:Dynamic = script.call(event, args);
 			if(ret == OptionsLua.Function_StopLua && !ignoreStops)
 				break;
-			
+
 			// had to do this because there is a bug in haxe where Stop != Continue doesnt work
 			var bool:Bool = ret == OptionsLua.Function_Continue;
 			if(!bool && ret != 0) {
@@ -90,7 +90,7 @@ class OptionsState extends MusicBeatState
 		#end
 		//trace(event, returnVal);
 		return returnVal;
-	}	
+	}
 	public function getLuaObject(tag:String, text:Bool=true):FlxSprite {
 		if(modchartSprites.exists(tag)) return modchartSprites.get(tag);
 		if(text && modchartTexts.exists(tag)) return modchartTexts.get(tag);
@@ -155,7 +155,7 @@ class OptionsState extends MusicBeatState
 
 		for(mod in Paths.getGlobalMods())
 			foldersToCheck.insert(0, Paths.mods(mod + '/shaders/'));
-		
+
 		for (folder in foldersToCheck)
 		{
 			if(FileSystem.exists(folder))
@@ -319,7 +319,7 @@ class OptionsState extends MusicBeatState
 			openSelectedSubstate(options[curSelected]);
 		}
 	}
-	
+
 	function changeSelection(change:Int = 0) {
 		curSelected += change;
 		if (curSelected < 0)
@@ -330,10 +330,11 @@ class OptionsState extends MusicBeatState
 		var bullShit:Int = 0;
 
 		for (item in grpOptions.members) {
+		item.screenCenter();
 			item.targetY = bullShit - curSelected;
 			bullShit++;
 
-			item.alpha = 0.6;
+			item.alpha = 0;
 			if (item.targetY == 0) {
 				item.alpha = 1;
 				selectorLeft.x = item.x - 63;
