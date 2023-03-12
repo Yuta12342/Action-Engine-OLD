@@ -4,6 +4,6 @@ labels: [enhancement]
 body:
   - type: textarea
     attributes:
-      label: What feature do you want to get added on the **base** engine?
+      label: What feature do you want to get added to Action Engine?
     validations:
       required: true
