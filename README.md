@@ -25,6 +25,9 @@ Engine built off Psych Engine EK to add more LUA and Softcoded Functionality int
 * [ ] kill the fish
 * (More ideas coming!)
 
+## Future Ideas
+- Multi-Note Animation Native Support
+
 ## Unlikely ideas
 - Softcoded Extra Keys (Allow for as many keys as you want for a song in the engine, as long as a Noteskin supports it.)
 
