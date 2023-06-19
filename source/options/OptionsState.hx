@@ -28,6 +28,7 @@ import Controls;
 import flixel.system.FlxSound;
 import flixel.FlxCamera;
 import flixel.FlxObject;
+import lime.app.Application;
 
 import OptionsLua;
 #if MODS_ALLOWED
@@ -204,6 +205,10 @@ class OptionsState extends MusicBeatState
 				openSubState(new options.GameplaySettingsSubState());
 			case 'Adjust Delay and Combo':
 				LoadingState.loadAndSwitchState(new options.NoteOffsetState());
+			case 'Dev Options':
+			Application.current.window.alert("This is a feature coming soon that will allow you to affect settings related to most Editors,\nincluding the Chart and Character Editors!", "Feature Coming Soon...");
+      case 'Mod Options':
+			Application.current.window.alert("This is a feature coming soon that will allow Mods to have their own independant Options Menu!", "Feature Coming Soon...");
 		}
 	}
 

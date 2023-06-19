@@ -1603,6 +1603,19 @@ function loadThatAutosave()
 		return daPos;
 	}
 
+public function saveSession()
+{	if (!FileSystem.exists("./chartSession/"))
+		FileSystem.createDirectory("./chartSession/");
+
+var sessionData:String = Json.stringify({
+	"song": _song
+});
+
+				var path:String = "./chartSession/" + "sessionData" + ".json";
+
+			Sys.println(sessionData);
+
+	File.saveContent(path, sessionData); }
 
 	var lastConductorPos:Float;
 	var colorSine:Float = 0;
@@ -3238,7 +3251,8 @@ trace('Exit on Chart Editor...');
 trace("File.");
 
 
-			trace(songName);
+		try
+		{	trace(songName);
 			PlayState.SONG = Song.parseJSONshit(_load.data.toString());
 			_song = PlayState.SONG;
 
@@ -3251,7 +3265,11 @@ trace("File.");
 			FlxG.resetState();
 			MusicBeatState.resetState();
 			FlxG.log.notice("Successfully loaded LEVEL DATA.");
-
+			}
+catch (e:Dynamic)
+{
+		Application.current.window.alert("You may have tried to load an invalid JSON.", "Load");
+}
 		}
 	}
 
@@ -3337,6 +3355,8 @@ class AttachedFlxText extends FlxText
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
+
+
 
 		if (sprTracker != null) {
 			setPosition(sprTracker.x + xAdd, sprTracker.y + yAdd);

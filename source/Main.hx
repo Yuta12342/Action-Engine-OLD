@@ -189,7 +189,7 @@ public static var args = Sys.args();
 		dateNow = dateNow.replace(" ", "_");
 		dateNow = dateNow.replace(":", "'");
 
-		path = "./crash/" + "PsychEngine_" + dateNow + ".txt";
+		path = "./crash/" + "ActionEngine_" + dateNow + ".txt";
 
 		for (stackItem in callStack)
 		{

@@ -2538,6 +2538,41 @@ case "Stairs":
 		    daNoteData = luigiSex - marioSex;
 		}
 
+		case "Ew":
+// I hate that I used Sketchie's variables as a base for this... ;-;
+    var ammoFromFortnite:Int = Note.ammo[mania];
+    var luigiSex:Int = (ammoFromFortnite * 2 - 2);
+    var marioSex:Int = stair++ % luigiSex;
+
+    var noteIndex:Int = Std.int(marioSex / 2);
+    var noteDirection:Int = marioSex % 2 == 0 ? 1 : -1;
+    daNoteData = noteIndex + noteDirection;
+
+    // If the note index is out of range, wrap it around
+    if (daNoteData < 0) {
+        daNoteData = 1;
+    } else if (daNoteData >= ammoFromFortnite) {
+        daNoteData = ammoFromFortnite - 2;
+    }
+
+		case "Death":
+		    var ammoFromFortnite:Int = Note.ammo[mania];
+		    var luigiSex:Int = (ammoFromFortnite * 4 - 4);
+		    var marioSex:Int = stair++ % luigiSex;
+		    var step:Int = Std.int(luigiSex / 3);
+
+		    if (marioSex < ammoFromFortnite) {
+		        daNoteData = marioSex % step;
+		    } else if (marioSex < ammoFromFortnite * 2) {
+		        daNoteData = (marioSex - ammoFromFortnite) % step + step;
+		    } else if (marioSex < ammoFromFortnite * 3) {
+		        daNoteData = (marioSex - ammoFromFortnite * 2) % step + step * 2;
+		    } else {
+		        daNoteData = (marioSex - ammoFromFortnite * 3) % step + step * 3;
+		    }
+
+
+
 
 				case "What":
 				    switch (stair % (2 * Note.ammo[mania]))
