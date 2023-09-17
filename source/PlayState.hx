@@ -3152,11 +3152,16 @@ case "Stairs":
 function commandSend(command:String)
 {
 	if (paused)
-		return;
+		{return;}
 	if (endingSong)
-		return;
-callOnLuas('onStreamCommand', [command]);
-		commands = [];
+		{return;}
+		try {
+		        callOnLuas('onStreamCommand', [command]);
+						trace("Command sent: " + command);
+		    } catch (e:Dynamic) {
+		        trace("Error calling Lua function: " + e);
+		    }
+		    commands = [];
 }
 
 
@@ -3185,8 +3190,7 @@ callOnLuas('onStreamCommand', [command]);
 
 		callOnLuas('onUpdate', [elapsed]);
 
-callOnLuas('onStreamCommand', [commands[0]]);
-trace(commands);
+readChatData();
 
 		if(ClientPrefs.camMovement && !PlayState.isPixelStage) {
 			if(camlock) {
