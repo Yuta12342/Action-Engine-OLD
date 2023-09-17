@@ -65,7 +65,7 @@ class OptionsState extends MusicBeatState
 	public var modchartTexts:Map<String, OptionsModchartText> = new Map();
 	public var modchartSaves:Map<String, FlxSave> = new Map();
 
-	var options:Array<String> = ['Note Colors', 'Controls', 'Adjust Delay and Combo', 'Graphics', 'Visuals and UI', 'Gameplay', 'Mod Options', 'Dev Options'];
+	var options:Array<String> = ['Note Colors', 'Controls', 'Adjust Delay and Combo', 'Graphics', 'Visuals and UI', 'Gameplay', 'Mod Options', 'Dev Options', 'Streamer Options'];
 	private var grpOptions:FlxTypedGroup<Alphabet>;
 	private static var curSelected:Int = 0;
 	public static var menuBG:FlxSprite;
@@ -209,6 +209,8 @@ class OptionsState extends MusicBeatState
 			Application.current.window.alert("This is a feature coming soon that will allow you to affect settings related to most Editors,\nincluding the Chart and Character Editors!", "Feature Coming Soon...");
       case 'Mod Options':
 			Application.current.window.alert("This is a feature coming soon that will allow Mods to have their own independant Options Menu!", "Feature Coming Soon...");
+			case 'Streamer Options':
+			LoadingState.loadAndSwitchState(new streaming.SelectState());
 		}
 	}
 

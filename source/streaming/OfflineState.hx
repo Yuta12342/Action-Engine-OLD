@@ -1,5 +1,5 @@
 
-package;
+package streaming;
 
 import haxe.io.Error;
 import sys.io.File;
@@ -25,7 +25,7 @@ class OfflineState extends FlxState
 		Main.streamMethod = "offline";
 
 		tryRead();
-		FlxG.switchState(new TitleVidState());
+		FlxG.switchState(new TitleState());
 	}
 
 	public static function tryRead()

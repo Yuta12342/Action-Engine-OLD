@@ -3149,6 +3149,33 @@ case "Stairs":
 	var canPause:Bool = true;
 	var limoSpeed:Float = 0;
 
+function commandSend(command:String)
+{
+	if (paused)
+		return;
+	if (endingSong)
+		return;
+callOnLuas('onStreamCommand', [command]);
+		commands = [];
+}
+
+
+	function readChatData()
+	{
+		if (commands.length == 0)
+			return;
+
+		var choose = commands[Std.random(commands.length)];
+		trace(choose);
+		commandSend(choose);
+
+	}
+
+	function resetChatData()
+	{
+		commands = [];
+	}
+
 	override public function update(elapsed:Float)
 	{
 		/*if (FlxG.keys.justPressed.NINE)
@@ -3158,7 +3185,8 @@ case "Stairs":
 
 		callOnLuas('onUpdate', [elapsed]);
 
-
+callOnLuas('onStreamCommand', [commands[0]]);
+trace(commands);
 
 		if(ClientPrefs.camMovement && !PlayState.isPixelStage) {
 			if(camlock) {
@@ -5340,6 +5368,11 @@ case "Stairs":
 	{
 		super.beatHit();
 
+
+if(curBeat % 8 == 8)
+{
+readChatData();
+}
 		if(lastBeatHit >= curBeat) {
 			//trace('BEAT HIT: ' + curBeat + ', LAST HIT: ' + lastBeatHit);
 			return;

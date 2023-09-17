@@ -1,5 +1,5 @@
 
-package;
+package streaming;
 
 import haxe.io.Error;
 import sys.io.File;
@@ -13,6 +13,7 @@ import flixel.FlxState;
 import flixel.FlxSprite;
 import flixel.FlxG;
 import flixel.util.FlxTimer;
+import lime.app.Application;
 
 class TwitchState extends FlxState
 {
@@ -34,13 +35,13 @@ class TwitchState extends FlxState
 
 		log.text = "Attempting to get Twitch account details...\n";
 
-		if (!FileSystem.exists('scripts/setup-twitch.json'))
+		if (!FileSystem.exists('streamVsChat/setup-twitch.json'))
 		{
 			error("Can't find setup-twitch.json!");
 			return;
 		}
 
-		var rawJson:String = File.getContent('scripts/setup-twitch.json');
+		var rawJson:String = File.getContent('streamVsChat/setup-twitch.json');
 		StringTools.trim(rawJson);
 		rawJson = StringTools.replace(rawJson, "\"oauth-key\"", "\"oauth_key\"");
 		data = haxe.Json.parse(rawJson);
@@ -151,7 +152,7 @@ class TwitchState extends FlxState
 					new FlxTimer().start(1, function(tmr:FlxTimer)
 					{
 						tryRead();
-						FlxG.switchState(new TitleVidState());
+						FlxG.switchState(new TitleState());
 					});
 					break;
 				}
@@ -178,6 +179,10 @@ class TwitchState extends FlxState
 		print(stuff);
 		print("");
 		print("Program will now halt.");
+		print("Restarting Game...");
+		Application.current.window.alert(stuff, "Stream Method Error");
+		FlxG.switchState(new TitleState());
+
 	}
 
 	public static function tryRead()
@@ -186,7 +191,7 @@ class TwitchState extends FlxState
 		sys.thread.Thread.create(() ->
 		{
 			var check = new EReg("PRIVMSG #[a-zA-Z0-9_]+ :(.+)", "i");
-			var accepted = File.getContent('scripts/accepted_commands.txt');
+
 			while (true)
 			{
 				try
@@ -219,13 +224,12 @@ class TwitchState extends FlxState
 							var command = message.substring(0, realStop);
 							var check2:EReg = new EReg("(\\s|^)" + command + "(\\s|$)", "i");
 
-							if (check2.match(accepted))
-							{
+
 								StringTools.trim(command);
 								trace("COMMAND: " + command);
 								PlayState.commands.push(command.substring(1, command.length));
 								// trace("EVERYTHING: " + PlayState.commands + " LENGTH : " + PlayState.commands.length);
-							}
+
 						}
 					}
 					else if (StringTools.contains(output, "PING :tmi.twitch.tv"))

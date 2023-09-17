@@ -1,5 +1,5 @@
 
-package;
+package streaming;
 
 import haxe.io.Error;
 import sys.io.File;
@@ -13,6 +13,7 @@ import flixel.FlxState;
 import flixel.FlxSprite;
 import flixel.FlxG;
 import flixel.util.FlxTimer;
+import lime.app.Application;
 
 class YouTubeState extends FlxState
 {
@@ -33,7 +34,7 @@ class YouTubeState extends FlxState
 
 		log.text = "Attempting to get YouTube video ID details...\n";
 
-		if (!FileSystem.exists('scripts/setup-youtube.json'))
+		if (!FileSystem.exists('streamVsChat/setup-youtube.json'))
 		{
 			error("Can't find setup-youtube.json!");
 			return;
@@ -136,7 +137,7 @@ class YouTubeState extends FlxState
 					new FlxTimer().start(1, function(tmr:FlxTimer)
 					{
 						tryRead();
-						FlxG.switchState(new TitleVidState());
+						FlxG.switchState(new TitleState());
 					});
 					break;
 				}
@@ -163,6 +164,8 @@ class YouTubeState extends FlxState
 		print(stuff);
 		print("");
 		print("Program will now halt.");
+		Application.current.window.alert("No Setup File detected.");
+		FlxG.switchState(new TitleState());
 	}
 
 	public static function tryRead()
