@@ -20,7 +20,7 @@ Engine built off Psych Engine EK to add more LUA and Softcoded Functionality int
 * [ ] Mod Achievements in LUA.
 * [ ] Stage Editor
 * [ ] Gimmick Notes (A Special type of Custom Note that acts outside of the chart for easier porting to other engines) with Custom Notetype support.
-* [ ] Streamer VS Chat - with LUA Support.
+* [x] Streamer VS Chat - with LUA Support.
 * [ ] Better Chart Editor functionality - Better Section Management - Chart Offset - Deletion/Addition of Sections
 * [ ] Slightly more informative Crash Handler
 * [ ] kill the fish
