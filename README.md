@@ -16,6 +16,7 @@ Engine built off Psych Engine EK to add more LUA and Softcoded Functionality int
 * [ ] Chart Editor Addons (LUA Scripts that can add Chart Variables specific to the mod or song, seperated by mini-menus. (Allows adding Chart Editor Buttons and switches for use in different charts.)
 * [ ] Better Character Editor
 * [ ] (Character Editor+) Sprite Parts (The ability to connect multiple sprites as part of a character.)
+* [ ] 0.6.x - 0.7.x Cross-Mod Support.
 * [ ] Multi-Engine Mod Support
 * [ ] Mod Achievements in LUA.
 * [ ] Stage Editor
