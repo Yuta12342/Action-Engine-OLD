@@ -7,6 +7,7 @@ Engine built off Psych Engine EK to add more LUA and Softcoded Functionality int
 * [x] LUA Menu Use
 * [ ] LUA Menu Manipulation
 * [ ] LUA Menu States
+* [ ] Event Sustains
 * [ ] Global LUA Scripts (Runs on all states, excluding Editors.)
 * [ ] GF Strum (Toggle) for both GF Sections and GF Notes
 * [x] GF+ Note that allows for GF to duet with whoever's side the note is on.
@@ -16,11 +17,13 @@ Engine built off Psych Engine EK to add more LUA and Softcoded Functionality int
 * [ ] Chart Editor Addons (LUA Scripts that can add Chart Variables specific to the mod or song, seperated by mini-menus. (Allows adding Chart Editor Buttons and switches for use in different charts.)
 * [ ] Better Character Editor
 * [ ] (Character Editor+) Sprite Parts (The ability to connect multiple sprites as part of a character.)
+* [ ] 0.6.x - 0.7.x Cross-Mod Support.
 * [ ] Multi-Engine Mod Support
 * [ ] Mod Achievements in LUA.
 * [ ] Stage Editor
 * [ ] Gimmick Notes (A Special type of Custom Note that acts outside of the chart for easier porting to other engines) with Custom Notetype support.
-* [ ] Streamer VS Chat - with LUA Support.
+* [x] Streamer VS Chat - with LUA Support.
+* [ ] Archipelago Support.
 * [ ] Better Chart Editor functionality - Better Section Management - Chart Offset - Deletion/Addition of Sections
 * [ ] Slightly more informative Crash Handler
 * [ ] kill the fish
