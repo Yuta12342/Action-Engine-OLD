@@ -7,6 +7,7 @@ Engine built off Psych Engine EK to add more LUA and Softcoded Functionality int
 * [x] LUA Menu Use
 * [ ] LUA Menu Manipulation
 * [ ] LUA Menu States
+* [ ] Event Sustains
 * [ ] Global LUA Scripts (Runs on all states, excluding Editors.)
 * [ ] GF Strum (Toggle) for both GF Sections and GF Notes
 * [x] GF+ Note that allows for GF to duet with whoever's side the note is on.
