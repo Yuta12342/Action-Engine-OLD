@@ -102,6 +102,9 @@ public static var args = Sys.args();
 	{
 		super();
 
+addEventListener(openfl.events.Event.ACTIVATE, OnActivate);
+addEventListener(openfl.events.Event.DEACTIVATE, OnDeactivate);
+
 		if (stage != null)
 		{
 			init();
@@ -110,6 +113,14 @@ public static var args = Sys.args();
 		{
 			addEventListener(Event.ADDED_TO_STAGE, init);
 		}
+	}
+
+	public function OnActivate(e:openfl.events.Event) {
+	    trace('activate' + e);
+	}
+
+	public function OnDeactivate(e:openfl.events.Event) {
+	    trace('deactivate' + e);
 	}
 
 	static public function setExitHandler(func:Void->Void):Void {

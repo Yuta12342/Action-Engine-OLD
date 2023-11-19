@@ -1,6 +1,7 @@
 package editors;
 
 #if desktop
+// @:native("../oggbpm.cpp")
 import Discord.DiscordClient;
 #end
 import flash.geom.Rectangle;

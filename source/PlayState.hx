@@ -3161,7 +3161,7 @@ function commandSend(command:String)
 		    } catch (e:Dynamic) {
 		        trace("Error calling Lua function: " + e);
 		    }
-		    commands = [];
+		    commands.remove(command);
 }
 
 
@@ -3169,6 +3169,7 @@ function commandSend(command:String)
 	{
 		if (commands.length == 0)
 			return;
+
 
 		var choose = commands[Std.random(commands.length)];
 		trace(choose);
