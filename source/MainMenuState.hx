@@ -23,6 +23,8 @@ import Achievements;
 import editors.MasterEditorMenu;
 import flixel.input.keyboard.FlxKey;
 import flixel.util.FlxSave;
+import flixel.ui.FlxButton;
+import archipelago.APEntryState;
 
 import MenuLua;
 #if sys
@@ -49,6 +51,8 @@ class MainMenuState extends MusicBeatState
 	public var camOther:FlxCamera;
 	public var camAchievement:FlxCamera;
 
+	var versionShit:FlxText;
+
 	var optionShit:Array<String> = [
 		'story_mode',
 		'freeplay',
@@ -63,6 +67,7 @@ class MainMenuState extends MusicBeatState
 	var camFollow:FlxObject;
 	var camFollowPos:FlxObject;
 	var debugKeys:Array<FlxKey>;
+	var archButton:FlxButton;
 
 	// Lua shit
 	public static var instance:MainMenuState;
@@ -216,11 +221,12 @@ class MainMenuState extends MusicBeatState
 			"Psych Engine v" + psychEngineVersion,
 			"Psych Engine Extra Keys v" + extraKeysVersion,
 			"Happy Aniversary Extra Keys!",
+			"Z11 was here",
 			"EK ANIVERSARY BUILD",
 		];
 
 		for (i in 0...texts.length) {
-			var versionShit:FlxText = new FlxText(12, (FlxG.height - 24) - (18 * i), 0, texts[i], 12);
+			versionShit = new FlxText(12, (FlxG.height - 24) - (18 * i), 0, texts[i], 12);
 			versionShit.scrollFactor.set();
 			versionShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 			add(versionShit);
@@ -244,6 +250,8 @@ class MainMenuState extends MusicBeatState
 		#end
 		callOnLuas('onCreatePost', []);
 		super.create();
+
+		archButton = new FlxButton(versionShit.x - 500, versionShit.y, 'Archipelago Login', function(){FlxG.switchState(new APEntryState());} );
 	}
 
 	function qatarShit():String {

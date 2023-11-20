@@ -11,7 +11,7 @@ import openfl.display.BitmapData;
 import openfl.geom.Rectangle;
 
 /**
- * ...
+ * ...f
  * @author 
  */
 class Prompt extends MusicBeatSubstate
