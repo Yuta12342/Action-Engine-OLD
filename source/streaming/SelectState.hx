@@ -71,7 +71,7 @@ class SelectState extends FlxState
 				// case 2:
 				// 	FlxG.switchState(new DiscordState());
 				case 2:
-					FlxG.switchState(new OfflineState());
+					FlxG.switchState(new options.OptionsState());
 			}
 		}
 

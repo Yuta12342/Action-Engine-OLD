@@ -1,8 +1,9 @@
 package archipelago;
 
-import ap.Client
+import flixel.FlxState;
+import ap.Client;
 
-Class Archipelago extends FlxState {
+class GameState extends FlxState {
 
 
 }
