@@ -219,6 +219,7 @@ class APEntryState extends FlxState
 				FNF.close();
 
 				//FlxG.switchState(new APGameState(ap, slotData));
+                FlxG.switchState(new MainMenuState());
 			}
 
 			connectSubState.onCancel.add(() ->
