@@ -25,7 +25,7 @@ class APEntryState extends FlxState
 
 	override function create()
 	{
-		_t = BumpStikGame.g().i18n.tr;
+		//_t = BumpStikGame.g().i18n.tr;
 
 		// TODO: save last game's settings as default; Reset button to return to base default
 		var FNF = new FlxSave();
@@ -135,7 +135,7 @@ class APEntryState extends FlxState
 	function onPlay()
 	{
 		inline function postError(str:String, ?vars:Map<String, Dynamic>)
-			openSubState(new Prompt("Error: " + daReason, 0, function(){close();}, null, false));
+			openSubState(new Prompt("Error: " + daReason, 0, null, null, false));
 
 		var port = Std.parseInt(_portInput.text);
 		if (_hostInput.text == "")

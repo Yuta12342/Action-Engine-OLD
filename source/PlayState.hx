@@ -2552,9 +2552,6 @@ case "Stairs":
 		    daNoteData = luigiSex - marioSex;
 		}
 
-		case "SpeedRando":
-		unspawnNotes[0].multSpeed = FlxG.random.float(0.1, 2);
-
 		case "Ew":
 // I hate that I used Sketchie's variables as a base for this... ;-;
     var ammoFromFortnite:Int = Note.ammo[mania];
@@ -2707,6 +2704,34 @@ case "Stairs":
 		}
 		checkEventNote();
 		generatedMusic = true;
+		var curNote:Note = null;
+		var curNote2:Note = null;
+		if (chartModifier == 'SpeedRando')
+		{
+			for (i in 0...unspawnNotes.length)
+			{
+				if (unspawnNotes[i].mustPress)
+				{
+					if (!unspawnNotes[i].isSustainNote)
+					{
+						unspawnNotes[i].multSpeed = FlxG.random.float(0.1, 2);
+						curNote = unspawnNotes[i];
+					}
+					else
+						unspawnNotes[i].multSpeed = curNote.multSpeed;
+				}
+				if (!unspawnNotes[i].mustPress)
+				{
+					if (!unspawnNotes[i].isSustainNote)
+					{
+						unspawnNotes[i].multSpeed = FlxG.random.float(0.1, 2);
+						curNote2 = unspawnNotes[i];
+					}
+					else
+						unspawnNotes[i].multSpeed = curNote2.multSpeed;
+				}
+			}
+		}
 	}
 
 	function eventPushed(event:EventNote) {

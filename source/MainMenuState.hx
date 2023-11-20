@@ -250,7 +250,9 @@ class MainMenuState extends MusicBeatState
 		callOnLuas('onCreatePost', []);
 		super.create();
 
-	//	archButton = new FlxButton(versionShit.x - 500, versionShit.y, 'Archipelago Login', function(){FlxG.switchState(new APEntryState());} );
+		/*archButton = new FlxButton(versionShit.x, versionShit.y - 300, 'Archipelago Login', function(){FlxG.switchState(new archipelago.APEntryState());});
+		archButton.scrollFactor.set();
+		add(archButton);*/
 	}
 
 	function qatarShit():String {
