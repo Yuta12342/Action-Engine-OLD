@@ -2706,33 +2706,33 @@ case "Stairs":
 		generatedMusic = true;
 		var curNote:Note = null;
 		var curNote2:Note = null;
-		if (chartModifier == 'SpeedRando')
-		{
-			for (i in 0...unspawnNotes.length)
-			{
-				if (unspawnNotes[i].mustPress)
-				{
-					if (!unspawnNotes[i].isSustainNote)
-					{
-						unspawnNotes[i].multSpeed = FlxG.random.float(0.1, 2);
-						curNote = unspawnNotes[i];
-					}
-					else
-						unspawnNotes[i].multSpeed = curNote.multSpeed;
-				}
-				if (!unspawnNotes[i].mustPress)
-				{
-					if (!unspawnNotes[i].isSustainNote)
-					{
-						unspawnNotes[i].multSpeed = FlxG.random.float(0.1, 2);
-						curNote2 = unspawnNotes[i];
-					}
-					else
-						unspawnNotes[i].multSpeed = curNote2.multSpeed;
-				}
-			}
+
+		if (chartModifier == 'SpeedRando') {
+		    for (i in 0...unspawnNotes.length) {
+		        if (unspawnNotes[i].mustPress) {
+		            if (!unspawnNotes[i].isSustainNote) {
+		                unspawnNotes[i].multSpeed = FlxG.random.float(0.1, 2);
+		                curNote = unspawnNotes[i];
+		            } else {
+		                if (curNote != null && curNote.noteData == unspawnNotes[i].noteData) {
+		                    unspawnNotes[i].multSpeed = curNote.multSpeed;
+		                }
+		            }
+		        }
+
+		        if (!unspawnNotes[i].mustPress) {
+		            if (!unspawnNotes[i].isSustainNote) {
+		                unspawnNotes[i].multSpeed = FlxG.random.float(0.1, 2);
+		                curNote2 = unspawnNotes[i];
+		            } else {
+		                if (curNote2 != null && curNote2.noteData == unspawnNotes[i].noteData) {
+		                    unspawnNotes[i].multSpeed = curNote2.multSpeed;
+		                }
+		            }
+		        }
+		    }
 		}
-	}
+
 
 	function eventPushed(event:EventNote) {
 		switch(event.event) {
