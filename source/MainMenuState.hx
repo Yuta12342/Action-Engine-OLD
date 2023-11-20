@@ -24,7 +24,6 @@ import editors.MasterEditorMenu;
 import flixel.input.keyboard.FlxKey;
 import flixel.util.FlxSave;
 import flixel.ui.FlxButton;
-import archipelago.APEntryState;
 
 import MenuLua;
 #if sys
@@ -251,7 +250,7 @@ class MainMenuState extends MusicBeatState
 		callOnLuas('onCreatePost', []);
 		super.create();
 
-		archButton = new FlxButton(versionShit.x - 500, versionShit.y, 'Archipelago Login', function(){FlxG.switchState(new APEntryState());} );
+	//	archButton = new FlxButton(versionShit.x - 500, versionShit.y, 'Archipelago Login', function(){FlxG.switchState(new APEntryState());} );
 	}
 
 	function qatarShit():String {

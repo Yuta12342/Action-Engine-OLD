@@ -73,7 +73,7 @@ import sys.FileSystem;
 import sys.io.File;
 #end
 
-#if VIDEOS_ALLOWED 
+#if VIDEOS_ALLOWED
 #if (hxCodec >= "3.0.0") import hxcodec.flixel.FlxVideo as VideoHandler;
 #elseif (hxCodec >= "2.6.1") import hxcodec.VideoHandler as VideoHandler;
 #elseif (hxCodec == "2.6.0") import VideoHandler;
@@ -2551,6 +2551,9 @@ case "Stairs":
 		} else {
 		    daNoteData = luigiSex - marioSex;
 		}
+
+		case "SpeedRando":
+		unspawnNotes[0].multSpeed = FlxG.random.float(0.1, 2);
 
 		case "Ew":
 // I hate that I used Sketchie's variables as a base for this... ;-;
