@@ -136,7 +136,7 @@
 	<haxelib name="linc_luajit" if="LUA_ALLOWED"/>
 	<haxelib name="hxCodec" if="VIDEOS_ALLOWED"/>
 	<haxelib name="faxe" if='switch'/>
-	<haxelib name="hxArchipelago" if='ARCHIPELAGO_SUPPORT'/>
+	<haxelib name="hxArchipelago"/>
 	<haxelib name="helder.set" />
 	<!--<haxelib name="polymod"/> -->
 	<haxelib name="discord_rpc" if="desktop"/>

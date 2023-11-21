@@ -1,4 +1,5 @@
 package animateatlas;
+#if !macro
 import flixel.util.FlxDestroyUtil;
 import openfl.geom.Rectangle;
 import flixel.math.FlxPoint;
@@ -123,3 +124,4 @@ class AtlasFrameMaker extends FlxFramesCollection
 		return daFramez;
 	}
 }
+#end

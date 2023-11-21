@@ -1,5 +1,6 @@
 package;
 
+#if !macro
 import animateatlas.AtlasFrameMaker;
 import flixel.math.FlxPoint;
 import flixel.graphics.frames.FlxFrame.FlxFrameAngle;
@@ -511,3 +512,4 @@ class Paths
 	}
 	#end
 }
+#end
