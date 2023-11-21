@@ -1,0 +1,15 @@
+{
+  "name": "hxArchipelago",
+  "url": "https://github.com/FelicitusNeko/hxArchipelago/",
+  "license": "MIT",
+  "tags": ["ws", "archipelago"],
+  "description": "Haxe client for Archipelago Multiworld",
+  "version": "0.6.0",
+  "releasenote": "Various fixes to data parsing and connection",
+  "contributors": ["FelicitusNeko"],
+  "dependencies": {
+    "hxWebSockets": "",
+    "helder.set": "",
+    "json2object": ""
+  }
+}

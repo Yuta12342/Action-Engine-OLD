@@ -14,6 +14,9 @@ import tink.Json as TJson;
 #if sys
 import sys.FileSystem;
 import sys.io.File;
+import sys.thread.Mutex;
+#else
+import ap.PseudoMutex;
 #end
 #if (lime && !AP_NO_LIME)
 import lime.app.Event;
@@ -114,13 +117,21 @@ class Client {
 	private var _packetQueue:Array<IncomingPacket> = [];
 
 	/** Locks access to `_packetQueue` to either the websocket client or the game. **/
-	private var _msgLock = new RLock();
+	#if sys
+	private var _msgMutex = new Mutex();
+	#else
+	private var _msgMutex = new PseudoMutex();
+	#end
 
 	/** The list of packets queued to be sent since the last `poll()`. **/
 	private var _sendQueue:Array<OutgoingPacket> = [];
 
 	/** Locks access to `_sendQueue` to either the websocket client or the game. **/
-	private var _sendLock = new RLock();
+	#if sys
+	private var _sendMutex = new Mutex();
+	#else
+	private var _sendMutex = new PseudoMutex();
+	#end
 
 	private var _hasTriedWSS = false;
 	private var _hasBeenConnected = false;
@@ -218,17 +229,20 @@ class Client {
 	inline function _hOnSocketConnected()
 		return onSocketConnected.dispatch();
 
-	inline function _hOnSocketDisconnected()
+	public dynamic function _hOnSocketDisconnected()
 		return onSocketDisconnected.dispatch();
 
-	inline function _hOnSlotConnected(slotData)
+	public dynamic function _hOnSlotConnected(slotData)
 		return onSlotConnected.dispatch(slotData);
 
 	inline function _hOnSlotDisconnected()
 		return onSlotDisconnected.dispatch();
 
-	inline function _hOnSlotRefused(errors)
+	public dynamic function _hOnSlotRefused(errors)
 		return onSlotRefused.dispatch(errors);
+
+	public dynamic function _hOnRoomInfo()
+		return onRoomInfo.dispatch();
 
 	inline function _hOnItemsReceived(items)
 		return onItemsReceived.dispatch(items);
@@ -243,7 +257,7 @@ class Client {
 		return onPrint.dispatch(text);
 
 	inline function _hOnPrintJson(data, item, receiving)
-		return onPrintJson.dispatch(data, item, receiving);
+		return onPrintJSON.dispatch(data, item, receiving);
 
 	inline function _hOnBounced(data)
 		return onBounced.dispatch(data);
@@ -280,7 +294,7 @@ class Client {
 	public var _hOnSlotRefused(null, default):Array<String>->Void = (_) -> {};
 
 	/** Write-only. Called when a RoomInfo packet is received. **/
-	public var _hOnRoomInfo(null, default):Void->Void = () -> {};
+	public var _hOnRoomInfo(null, default):Void->Void = null;
 
 	/** Write-only. Called when an ItemsReceived packet is received. **/
 	public var _hOnItemsReceived(null, default):Array<NetworkItem>->Void = (_) -> {};
@@ -567,7 +581,8 @@ class Client {
 	**/
 	private inline function InternalSend(packet:OutgoingPacket):Bool {
 		if (packet == null) {
-			_hOnThrow("InternalSend", new Exception("Something tried to queue a null packet"));
+			if (_hOnThrow != null)
+				_hOnThrow("InternalSend", new Exception("Something tried to queue a null packet"));
 			return false;
 		}
 
@@ -575,8 +590,17 @@ class Client {
 		trace("> " + packet);
 		#end
 
-		_sendLock.execute(() -> _sendQueue.push(packet));
-
+		#if sys
+		_sendMutex.acquire();
+		#else
+		_sendMutex.acquire("internal_send");
+		#end
+		_sendQueue.push(packet);
+		#if sys
+		_sendMutex.release();
+		#else
+		_sendMutex.release("internal_send");
+		#end
 		return true;
 	}
 
@@ -745,19 +769,35 @@ class Client {
 	/** Processes the packets currently in the queue. **/
 	private function process_queue() {
 		if (_sendQueue.length > 0) {
-			_sendLock.execute(() -> {
-				#if debug
-				trace('Sending ${_sendQueue.length} queued packet(s)');
-				#end
-				_ws.send(TJson.stringify(_sendQueue));
-				_sendQueue = [];
-			});
+			#if sys
+			_sendMutex.acquire();
+			#else
+			_sendMutex.acquire("process_queue");
+			#end
+			#if debug
+			trace('Sending ${_sendQueue.length} queued packet(s)');
+			#end
+			_ws.send(TJson.stringify(_sendQueue/*.filter(i -> i != null)*/));
+			_sendQueue = [];
+			#if sys
+			_sendMutex.release();
+			#else
+			_sendMutex.release("process_queue");
+			#end
 		}
 
-		_msgLock.acquire();
+		#if sys
+		_msgMutex.acquire();
+		#else
+		_msgMutex.acquire("process_queue");
+		#end
 		var grabQueue = _packetQueue.slice(0);
 		_packetQueue = [];
-		_msgLock.release();
+		#if sys
+		_msgMutex.release();
+		#else
+		_msgMutex.release("process_queue");
+		#end
 
 		#if debug
 		if (grabQueue.length > 0)
@@ -769,7 +809,6 @@ class Client {
 				case RoomInfo(version, _, tags, password, permissions, hint_cost, location_check_points, games, _, datapackage_versions,
 					datapackage_checksums, seed_name, time):
 					localConnectTime = Timer.stamp();
-					_hasBeenConnected = true;
 					serverConnectTime = time;
 					seed = seed_name;
 					hintCostPercent = hint_cost;
@@ -777,7 +816,8 @@ class Client {
 					_tags = tags;
 					if (state < State.ROOM_INFO)
 						state = State.ROOM_INFO;
-					_hOnRoomInfo();
+					if (_hOnRoomInfo != null)
+						_hOnRoomInfo();
 
 					dataPackageValid = true;
 					var include:Array<String> = [];
@@ -808,10 +848,10 @@ class Client {
 					#end
 
 				case ConnectionRefused(errors):
-					_hOnSlotRefused(errors);
+					if (_hOnSlotRefused != null)
+						_hOnSlotRefused(errors);
 
 				case Connected(team, slot, players, missing_locations, checked_locations, slot_data, slot_info, hint_points):
-					connectAttempts = 0;
 					state = State.SLOT_CONNECTED;
 					this.clientStatus = ClientStatus.CONNECTED;
 					this.team = team;
@@ -826,24 +866,29 @@ class Client {
 							alias: player.alias,
 							name: player.name
 						});
-					_hOnSlotConnected(slot_data);
+					if (_hOnSlotConnected != null)
+						_hOnSlotConnected(slot_data);
 					// TODO: [upstream] store checked/missing locations
-					_hOnLocationChecked(checked_locations);
+					if (_hOnLocationChecked != null)
+						_hOnLocationChecked(checked_locations);
 
 				case ReceivedItems(index, items):
 					var index:Int = index;
 					for (item in items)
 						item.index = index++;
-					_hOnItemsReceived(items);
+					if (_hOnItemsReceived != null)
+						_hOnItemsReceived(items);
 
 				case LocationInfo(locations):
-					_hOnLocationInfo(locations);
+					if (_hOnLocationInfo != null)
+						_hOnLocationInfo(locations);
 
 				case RoomUpdate(_, tags, _, _, _, _, _, _, _, _, _, _, hint_points, _, checked_locations, missing_locations):
 					// TODO: [upstream] store checked/missing locations
 					hintPoints = hint_points;
 					_tags = tags;
-					_hOnLocationChecked(checked_locations);
+					if (_hOnLocationChecked != null)
+						_hOnLocationChecked(checked_locations);
 
 				case DataPackage(pdata):
 					var data:DataPackageObject = {
@@ -854,13 +899,16 @@ class Client {
 					dataPackageValid = false;
 					set_data_package(data);
 					dataPackageValid = true;
-					_hOnDataPackageChanged(_dataPackage);
+					if (_hOnDataPackageChanged != null)
+						_hOnDataPackageChanged([_dataPackage]);
 
 				case Print(text):
-					_hOnPrint(text);
+					if (_hOnPrint != null)
+						_hOnPrint(text);
 
 				case PrintJSON(data, type, receiving, item, found, team, slot, message, tags, countdown):
-					_hOnPrintJson(data, item, receiving);
+					if (_hOnPrintJson != null)
+						_hOnPrintJson(data, item, receiving);
 
 				case Bounced(games, slots, tags, data):
 					if (games != null && !games.contains(game))
@@ -874,20 +922,23 @@ class Client {
 						if (!tagMatch)
 							break;
 					}
-					_hOnBounced(data);
+					if (_hOnBounced != null)
+						_hOnBounced(data);
 
 				// BUG: "Cannot access non-static abstract field statically" on extracting "keys"
 				// case Retrieved(keys):
-				//	_hOnRetrieved(keys);
+				// 	if (_hOnRetrieved != null)
+				// 		_hOnRetrieved(keys);
 
 				case SetReply(key, value, original_value):
-					_hOnSetReply(key, value, original_value);
+					if (_hOnSetReply != null)
+						_hOnSetReply(key, value, original_value);
 
 				case x:
 					#if debug
 					trace('unhandled cmd ${x.getName()}');
 					#end
-					_hOnThrow("process_queue", x);
+					_hOnThrow("process_queue", new Exception("Somethin idk"));
 			}
 		}
 	}
@@ -950,7 +1001,11 @@ class Client {
 		#end
 		switch (msg) {
 			case StrMessage(content):
-				_msgLock.acquire();
+				#if sys
+				_msgMutex.acquire();
+				#else
+				_msgMutex.acquire("onmessage");
+				#end
 				try {
 					#if debug
 					trace(content);
@@ -961,9 +1016,14 @@ class Client {
 						_packetQueue.push(newPacket);
 				} catch (e) {
 					trace("EXCEPTION: " + e);
-					_hOnThrow("onmessage", e);
+					if (_hOnThrow != null)
+						_hOnThrow("onmessage", e);
 				}
-				_msgLock.release();
+				#if sys
+				_msgMutex.release();
+				#else
+				_msgMutex.release("onmessage");
+				#end
 
 			default:
 		}

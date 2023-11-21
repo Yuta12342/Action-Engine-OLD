@@ -1,5 +1,6 @@
 package archipelago;
 
+import flixel.FlxSprite;
 import haxe.DynamicAccess;
 import haxe.Timer;
 import ap.Client;
@@ -38,6 +39,8 @@ class APEntryState extends FlxState
 				slot: ""
 			};
 		FNF.destroy();
+
+		var bg = new FlxSprite().loadGraphic(Paths.image("cry_about_it"));
 
 		var titleText = new FlxText(20, 0, 0, "Archipelago", 22);
 		titleText.alignment = CENTER;
@@ -164,7 +167,7 @@ class APEntryState extends FlxState
 
 			var ap = new Client('FNF-${_slotInput.text}', "Friday Night Funkin", uri);
 
-			ap._hOnRoomInfo = () ->
+			ap._hOnRoomInfo = () -> 
 			{
 				trace("Got room info - sending connect packet");
 
@@ -173,7 +176,7 @@ class APEntryState extends FlxState
 				#else
 				var tags = ["AP", "Testing"];
 				#end
-				ap.ConnectSlot(_slotInput.text, _pwInput.text.length > 0 ? _pwInput.text : null, 0x7, tags, {major: 0, minor: 4, build: 2});
+				ap.ConnectSlot(_slotInput.text, _pwInput.text.length > 0 ? _pwInput.text : null, 0x7, tags, {major: 0, minor: 8, build: 2});
 			};
 
 			ap._hOnSlotRefused = (errors:Array<String>) ->

@@ -88,6 +88,9 @@ class MainMenuState extends MusicBeatState
 		#end
 		WeekData.loadTheFirstEnabledMod();
 
+		FlxG.mouse.visible = true;
+		FlxG.mouse.useSystemCursor = false;
+
 
 		#if desktop
 		// Updating Discord Rich Presence
@@ -250,9 +253,9 @@ class MainMenuState extends MusicBeatState
 		callOnLuas('onCreatePost', []);
 		super.create();
 
-		/*archButton = new FlxButton(versionShit.x, versionShit.y - 300, 'Archipelago Login', function(){FlxG.switchState(new archipelago.APEntryState());});
+		archButton = new FlxButton(versionShit.x, versionShit.y - 300, 'Archipelago Login', function(){FlxG.switchState(new archipelago.APEntryState());});
 		archButton.scrollFactor.set();
-		add(archButton);*/
+		add(archButton);
 	}
 
 	function qatarShit():String {

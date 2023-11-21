@@ -1,0 +1,14 @@
+{
+    "name": "haxe-concurrent",
+    "url": "https://github.com/vegardit/haxe-concurrent",
+    "license": "Apache",
+    "classPath": "src/",
+    "tags": ["utility","vegardit","cross","cpp","cs","flash","hashlink","java","js","lua","neko","nodejs","phantomjs","php","php7","python"],
+    "description": "A haxelib with cross-platform concurrency functions and classes (thread-pool, task executor/scheduler, re-entrant lock, semaphore, atomic int/bool, thread-safe collections/queues)",
+    "contributors": [
+        "vegardit"
+    ],
+    "releasenote": "See https://github.com/vegardit/haxe-concurrent/blob/master/CHANGELOG.md",
+    "version": "2.0.0",
+    "dependencies": { }
+}
