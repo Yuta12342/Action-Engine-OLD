@@ -2732,6 +2732,7 @@ case "Stairs":
 		        }
 		    }
 		}
+	}
 
 
 	function eventPushed(event:EventNote) {
