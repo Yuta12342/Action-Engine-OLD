@@ -19,3 +19,9 @@ export/*
 !.vscode/launch.json
 !.vscode/extensions.json
 .haxelib/lime/.current
+.haxelib/lime/.current
+.haxelib/linc_luajit/git/
+.haxelib/hxCodec/git/
+.haxelib/discord_rpc/git/
+.haxelib/lime/.current
+.haxelib/lime/.current
