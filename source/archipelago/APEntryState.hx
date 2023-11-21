@@ -40,15 +40,18 @@ class APEntryState extends FlxState
 			};
 		FNF.destroy();
 
-		var bg = new FlxSprite().loadGraphic(Paths.image("cry_about_it"));
+		var bg = new FlxSprite().loadGraphic(Paths.image("menuBG"));
+		bg.screenCenter();
+		add(bg);
 
-		var titleText = new FlxText(20, 0, 0, "Archipelago", 22);
+		var titleText = new FlxText(20, 0, 0, "FRIDAY NIGHT FUNKIN: ARCHIPELAGO", 22);
+		titleText.setFormat(Paths.font("FridayNightFunkin.ttf"), 32, FlxColor.BLACK);
 		titleText.alignment = CENTER;
 		titleText.screenCenter(X);
 		add(titleText);
 
 		var playButton = new FlxButton(0, 0, "Play", onPlay);
-		// playButton.onUp.sound = FlxG.sound.load(AssetPaths.select__wav);
+		playButton.onUp.sound = FlxG.sound.load(Paths.sound('confirmMenu'));
 		playButton.x = (FlxG.width / 2) - 10 - playButton.width;
 		playButton.y = FlxG.height - playButton.height - 10;
 		add(playButton);
@@ -130,7 +133,7 @@ class APEntryState extends FlxState
                 daReason = "No server was found at \""+_hostInput.text+"\".";
 
             case 'default':
-                daReason = "man idk.";
+                daReason = "Slot name cannot be empty. (That's your name on your YAML configuration file.)";
         }
         return daReason;
     }
