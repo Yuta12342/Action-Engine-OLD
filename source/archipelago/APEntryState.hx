@@ -141,7 +141,7 @@ class APEntryState extends FlxState
 	function onPlay()
 	{
 		inline function postError(str:String, ?vars:Map<String, Dynamic>)
-			openSubState(new Prompt("Error: " + daReason, 0, null, null, false));
+			openSubState(new Prompt("Error: " + errDesc(str), 0, null, null, false));
 
 		var port = Std.parseInt(_portInput.text);
 		if (_hostInput.text == "")
