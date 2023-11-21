@@ -179,7 +179,7 @@ class APEntryState extends FlxState
 				#else
 				var tags = ["AP", "Testing"];
 				#end
-				ap.ConnectSlot(_slotInput.text, _pwInput.text.length > 0 ? _pwInput.text : null, 0x7, tags, {major: 0, minor: 8, build: 2});
+				ap.ConnectSlot(_slotInput.text, _pwInput.text.length > 0 ? _pwInput.text : null, 0x7, tags, {major: 0, minor: 4, build: 3});
 			};
 
 			ap._hOnSlotRefused = (errors:Array<String>) ->
