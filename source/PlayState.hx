@@ -202,6 +202,7 @@ class PlayState extends MusicBeatState
 	public var bads:Int = 0;
 	public var shits:Int = 0;
 	public static var mania:Int = 0;
+	public static var EKMode:Null<Bool> = true;
 
 	private var generatedMusic:Bool = false;
 	public var endingSong:Bool = false;
@@ -409,6 +410,10 @@ class PlayState extends MusicBeatState
 		mania = SONG.mania;
 		if (mania < Note.minMania || mania > Note.maxMania)
 			mania = Note.defaultMania;
+
+		EKMode = SONG.EKSkin;
+		if (mania != Note.defaultMania || EKMode == null)
+		 {EKMode = true;}
 
 		trace("song keys: " + (mania + 1) + " / mania value: " + mania);
 

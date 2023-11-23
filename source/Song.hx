@@ -28,6 +28,7 @@ typedef SwagSong =
 	var stage:String;
 
 	var mania:Null<Int>;
+	var EKSkin:Null<Bool>;
 
 
 	var arrowSkin:String;
@@ -45,6 +46,7 @@ class Song
 	public var needsVoices:Bool = true;
 	public var arrowSkin:String;
 	public var splashSkin:String;
+	public var EKSkin:Bool = true;
 	public var speed:Float = 1;
 	public var stage:String;
 	public var player1:String = 'bf';

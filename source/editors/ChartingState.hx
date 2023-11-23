@@ -237,6 +237,7 @@ class ChartingState extends MusicBeatState
 				stage: 'stage',
 				validScore: false,
 				mania: Note.defaultMania,
+				EKSkin: true,
 				offset: 0
 			};
 			addSection();
