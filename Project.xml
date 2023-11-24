@@ -138,6 +138,7 @@
 	<haxelib name="faxe" if='switch'/>
 	<haxelib name="hxArchipelago"/>
 	<haxelib name="helder.set" />
+	<haxelib name="yaml" />
 	<!--<haxelib name="polymod"/> -->
 	<haxelib name="discord_rpc" if="desktop"/>
 
