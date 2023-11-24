@@ -247,6 +247,7 @@ class ChartingState extends MusicBeatState
 		// Paths.clearMemory();
 
 		PlayState.mania = _song.mania;
+		PlayState.EKMode = _song.EKSkin;
 
 		#if desktop
 		// Updating Discord Rich Presence
@@ -653,6 +654,15 @@ function loadThatAutosave()
 		noteSplashesInputText.focusGained = () -> FlxG.stage.window.textInputEnabled = true;
 		blockPressWhileTypingOn.push(noteSplashesInputText);
 
+		var check_EK = new FlxUICheckBox(noteSkinInputText.x + 180, noteSkinInputText.y, null, null, "EK Skin?", 100);
+		check_EK.checked = _song.EKSkin;
+		// _song.EKSkin = check_EK.checked;
+		check_EK.callback = function()
+		{
+			_song.EKSkin = check_EK.checked;
+			//trace('CHECKED!');
+		};
+
 		var reloadNotesButton:FlxButton = new FlxButton(noteSplashesInputText.x + 5, noteSplashesInputText.y + 20, 'Change Notes', function() {
 			_song.arrowSkin = noteSkinInputText.text;
 			updateGrid();
@@ -679,6 +689,7 @@ function loadThatAutosave()
 		tab_group_song.add(reloadNotesButton);
 		tab_group_song.add(noteSkinInputText);
 		tab_group_song.add(noteSplashesInputText);
+		tab_group_song.add(check_EK);
 		tab_group_song.add(new FlxText(stepperBPM.x, stepperBPM.y - 15, 0, 'Song BPM:'));
 		tab_group_song.add(new FlxText(stepperBPM.x + 100, stepperBPM.y - 15, 0, 'Song Offset:'));
 		tab_group_song.add(new FlxText(stepperSpeed.x, stepperSpeed.y - 15, 0, 'Song Speed:'));

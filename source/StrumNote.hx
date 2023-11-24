@@ -52,9 +52,9 @@ class StrumNote extends FlxSprite
 		}
 		return value;
 	}
-	
+
 	private var player:Int;
-	
+
 	public var texture(default, set):String = null;
 	private function set_texture(value:String):String {
 		if(texture != value) {
@@ -75,7 +75,7 @@ class StrumNote extends FlxSprite
 		animationArray[0] = Note.keysShit.get(PlayState.mania).get('strumAnims')[leData];
 		animationArray[1] = Note.keysShit.get(PlayState.mania).get('letters')[leData];
 		animationArray[2] = Note.keysShit.get(PlayState.mania).get('letters')[leData]; // jic
-
+    var EKStrum:Bool = PlayState.EKMode;
 		var skin:String = 'NOTE_assets';
 		//if(PlayState.isPixelStage) skin = 'PIXEL_' + skin;
 		if(PlayState.SONG.arrowSkin != null && PlayState.SONG.arrowSkin.length > 1) skin = PlayState.SONG.arrowSkin;
@@ -115,7 +115,7 @@ class StrumNote extends FlxSprite
 				antialiasing = ClientPrefs.globalAntialiasing;
 
 				setGraphicSize(Std.int(width * Note.scales[PlayState.mania]));
-		
+
 				animation.addByPrefix('static', 'arrow' + animationArray[0]);
 				animation.addByPrefix('pressed', animationArray[1] + ' press', 24, false);
 				animation.addByPrefix('confirm', animationArray[1] + ' confirm', 24, false);
@@ -148,7 +148,7 @@ class StrumNote extends FlxSprite
 		}
 
 		x += Note.xtra[PlayState.mania];
-	
+
 		x += 50;
 		x += ((FlxG.width / 2) * player);
 		ID = noteData;

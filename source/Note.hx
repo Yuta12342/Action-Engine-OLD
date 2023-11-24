@@ -246,8 +246,13 @@ class Note extends FlxSprite
 			x += swagWidth * (noteData % Note.ammo[mania]);
 			if(!isSustainNote && noteData > -1 && noteData < Note.maxManiaUI_integer) { //Doing this 'if' check to fix the warnings on Senpai songs
 				var animToPlay:String = '';
-				animToPlay = Note.keysShit.get(mania).get('letters')[noteData];
-				animation.play(animToPlay);
+				if (isNewEngine())
+				{animToPlay = Note.keysShit.get(mania).get('letters')[noteData];
+				animation.play(animToPlay);}
+				else {
+				animToPlay = colArray[noteData % 4];
+				animation.play(animToPlay + 'Scroll');
+				}
 			}
 		}
 
@@ -262,8 +267,10 @@ class Note extends FlxSprite
 
 			offsetX += width / 2;
 			copyAngle = false;
-
-			animation.play(Note.keysShit.get(mania).get('letters')[noteData] + ' tail');
+     if (isNewEngine())
+			{animation.play(Note.keysShit.get(mania).get('letters')[noteData] + ' tail');}
+			else
+			{animation.play(colArray[noteData % 4] + 'holdend');}
 
 			updateHitbox();
 
@@ -274,8 +281,10 @@ class Note extends FlxSprite
 
 			if (prevNote.isSustainNote)
 			{
-				prevNote.animation.play(Note.keysShit.get(mania).get('letters')[prevNote.noteData] + ' hold');
-
+			if (isNewEngine())
+				{prevNote.animation.play(Note.keysShit.get(mania).get('letters')[prevNote.noteData] + ' hold');}
+				else
+        {prevNote.animation.play(colArray[prevNote.noteData % 4] + 'hold');}
 				prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.05;
 				if(PlayState.instance != null)
 				{
