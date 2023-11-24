@@ -12,6 +12,8 @@ import flixel.text.FlxText;
 import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
 import flixel.util.FlxSave;
+import flixel.addons.display.FlxBackdrop;
+import flixel.util.FlxGradient;
 
 class APEntryState extends FlxState
 {
@@ -23,6 +25,10 @@ class APEntryState extends FlxState
 	private var _pwInput:FlxInputText;
 
 	private var _tabOrder:Array<FlxInputText> = [];
+
+	var checker:FlxBackdrop = new FlxBackdrop(Paths.image('Main_Checker'), XY, Std.int(0.2), Std.int(0.2));
+
+	var gradientBar:FlxSprite = new FlxSprite(0, 0).makeGraphic(FlxG.width, 300, 0x83B700FF);
 
 	override function create()
 	{
@@ -43,6 +49,17 @@ class APEntryState extends FlxState
 		var bg = new FlxSprite().loadGraphic(Paths.image("menuBG"));
 		bg.screenCenter();
 		add(bg);
+
+		if (!ClientPrefs.lowQuality)
+		{
+			gradientBar = FlxGradient.createGradientFlxSprite(Math.round(FlxG.width), 512, [0x00ff0000, 0x675967E4, 0xFD62FF19], 1, 90, true);
+			gradientBar.y = FlxG.height - gradientBar.height;
+			add(gradientBar);
+			gradientBar.scrollFactor.set(0, 0);
+
+			add(checker);
+			checker.scrollFactor.set(0, 0.07);
+		}
 
 		var titleText = new FlxText(20, 0, 0, "FRIDAY NIGHT FUNKIN: ARCHIPELAGO", 22);
 		titleText.setFormat(Paths.font("FridayNightFunkin.ttf"), 32, FlxColor.BLACK);
@@ -87,6 +104,8 @@ class APEntryState extends FlxState
 		_tabOrder = [_hostInput, _portInput, _slotInput, _pwInput];
 
 		super.create();
+
+		
 	}
 
     var daReason:String = "man idk";
@@ -242,36 +261,13 @@ class APEntryState extends FlxState
 		FlxG.switchState(new MainMenuState());
 	}
 
-	// override function update(elapsed:Float)
-	// {
-	// 	super.update(elapsed);
-	// 	if (FlxG.keys.anyJustPressed([TAB, ENTER]))
-	// 	{
-	// 		var curFocus:Null<FlxInputText> = null;
-	// 		for (textbox in _tabOrder)
-	// 			if (textbox.hasFocus)
-	// 				curFocus = textbox;
-	// 		if (curFocus != null)
-	// 		{
-	// 			if (FlxG.keys.anyJustPressed([ENTER]))
-	// 			{
-	// 				// connect to the server
-	// 			}
-	// 			else // it's TAB
-	// 			{
-	// 				var focusIndex = _tabOrder.indexOf(curFocus);
-	// 				trace('Focus found on TAB event at index $focusIndex');
-	// 				if (FlxG.keys.checkStatus(SHIFT, PRESSED))
-	// 					focusIndex += _tabOrder.length - 1;
-	// 				else
-	// 					focusIndex++;
-	// 				curFocus.hasFocus = false;
-	// 				curFocus.text = curFocus.text.substr(0, curFocus.text.length - 1);
-	// 				_tabOrder[focusIndex % _tabOrder.length].hasFocus = true;
-	// 			}
-	// 		}
-	// 		else
-	// 			trace("Focus not found");
-	// 	}
-	// }
+	override function update(elapsed:Float)
+	{
+		if (!ClientPrefs.lowQuality)
+		{
+			checker.x -= 0.45 / (ClientPrefs.framerate / 60);
+			checker.y -= 0.16 / (ClientPrefs.framerate / 60);
+		}
+		super.update(elapsed);
+	}
 }
