@@ -388,9 +388,9 @@ class Note extends FlxSprite
 	}
 
 	private function isNewEngine():Bool {
-	trace(PlayState.EKMode);
+		//trace(PlayState.EKMode);
 		return PlayState.EKMode;
-		}
+	}
 
 	public function loadNoteAnims():Void {
 			if (isNewEngine()) {
