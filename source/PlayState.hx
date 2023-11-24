@@ -413,7 +413,7 @@ class PlayState extends MusicBeatState
 
 		EKMode = SONG.EKSkin;
 		if (mania != Note.defaultMania || EKMode == null)
-		 {EKMode = false;}
+		 {EKMode = true;}
 
 		trace("song keys: " + (mania + 1) + " / mania value: " + mania);
 
