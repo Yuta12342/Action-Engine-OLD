@@ -143,6 +143,9 @@ class Note extends FlxSprite
 	public var changeAnim:Bool = true;
 	public var changeColSwap:Bool = true;
 
+	//Archipelago
+	public var isCheck:Bool = false;
+
 	public function resizeByRatio(ratio:Float) //haha funny twitter shit
 		{
 			if(isSustainNote && !animation.curAnim.name.endsWith('tail'))
@@ -206,6 +209,11 @@ class Note extends FlxSprite
 				case 'No Animation':
 					noAnimation = true;
 					noMissAnimation = true;
+				case 'Check Note':
+					isCheck = true;
+					colorSwap.hue = 40;
+					colorSwap.saturation = 50;
+					colorSwap.brightness = 50;
 				case 'GF Sing':
 					gfNote = true;
 			}

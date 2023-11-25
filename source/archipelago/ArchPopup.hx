@@ -189,7 +189,7 @@ class ArchPopup extends openfl.display.Sprite {
             popup.intendedY += 150;
 		}
 
-		var newPop:ArchPopup = new ArchPopup(massage, desc, image, endFunc);
+		var newPop:ArchPopup = new ArchPopup(massage, desc, null, image, endFunc);
 		_popups.push(newPop);
 		//trace('Giving achievement ' + achieve);
 	}

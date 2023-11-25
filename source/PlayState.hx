@@ -62,6 +62,7 @@ import FunkinLua;
 import DialogueBoxPsych;
 import Conductor.Rating;
 import Note;
+import archipelago.ArchPopup;
 
 #if !flash
 import flixel.addons.display.FlxRuntimeShader;
@@ -1095,6 +1096,9 @@ class PlayState extends MusicBeatState
 
 		opponentStrums = new FlxTypedGroup<StrumNote>();
 		playerStrums = new FlxTypedGroup<StrumNote>();
+
+		itemAmount = FlxG.random.int(1, 10);
+		trace('itemAmount:' + itemAmount);
 
 		// startCountdown();
 
@@ -2738,7 +2742,28 @@ case "Stairs":
 		    }
 		}
 
+		if (did < itemAmount) {
+			while (did < itemAmount) {
+				trace('itemAmount:' + itemAmount);
+				for (i in 0...unspawnNotes.length) {
+					if (did < unspawnNotes.length) {
+						//trace('Making a note a check...');
+						if (unspawnNotes[i].mustPress && unspawnNotes[i].noteType == '' && !unspawnNotes[i].isSustainNote && !unspawnNotes[i].animation.curAnim.name.endsWith('tail') && FlxG.random.bool(1)) 
+						{
+							unspawnNotes[i].isCheck = true;
+							unspawnNotes[i].noteType = 'Check Note';
+							did++;
+							trace('Found One! ' + did + '/' + itemAmount);
+						}
+					}
+				}
+			}
+		}
+
 	}
+
+	public var did:Int = 0;
+	public var itemAmount:Int = 1;
 
 
 
@@ -5006,18 +5031,18 @@ readChatData();
 		var char:Character = dad;
 		var animToPlay:String = 'sing' + Note.keysShit.get(mania).get('anims')[note.noteData];
 		if(note.noteType == 'GF Duet')
-	 {
-	 gf.playAnim(animToPlay + note.animSuffix, true);
-	 gf.holdTimer = 0;
-	 dad.playAnim(animToPlay + note.animSuffix, true);
-	 dad.holdTimer = 0;
-	 }
+		{
+			gf.playAnim(animToPlay + note.animSuffix, true);
+			gf.holdTimer = 0;
+			dad.playAnim(animToPlay + note.animSuffix, true);
+			dad.holdTimer = 0;
+		}
 
 		if (SONG.needsVoices)
 			vocals.volume = 1;
 
 		var time:Float = 0.15;
-if (note.isSustainNote && !(note.animation.curAnim.name.endsWith('tail') || note.animation.curAnim.name.endsWith('end'))) {
+		if (note.isSustainNote && !(note.animation.curAnim.name.endsWith('tail') || note.animation.curAnim.name.endsWith('end'))) {
 			time += 0.15;
 		}
 		StrumPlayAnim(true, Std.int(Math.abs(note.noteData)) % Note.ammo[mania], time);
@@ -5034,8 +5059,16 @@ if (note.isSustainNote && !(note.animation.curAnim.name.endsWith('tail') || note
 
 	}
 
+	public var check:Int = 0;
+
 	function goodNoteHit(note:Note):Void
 	{
+		if (note.isCheck)
+		{
+			check++;
+			ArchPopup.startPopupCustom('You Found A Check!', check + '/' + itemAmount, 'Color'); // test
+			trace(check + '/' + itemAmount);
+		}
 		if (!note.wasGoodHit)
 		{
 			if(cpuControlled && (note.ignoreNote || note.hitCausesMiss)) return;
@@ -5100,12 +5133,12 @@ if (note.isSustainNote && !(note.animation.curAnim.name.endsWith('tail') || note
 				}
 				var animToPlay:String = 'sing' + Note.keysShit.get(mania).get('anims')[note.noteData];
 				if(note.noteType == 'GF Duet')
-       {
-			 gf.playAnim(animToPlay + note.animSuffix, true);
-			 gf.holdTimer = 0;
-			 boyfriend.playAnim(animToPlay + note.animSuffix, true);
-			 boyfriend.holdTimer = 0;
-			 }
+				{
+					gf.playAnim(animToPlay + note.animSuffix, true);
+					gf.holdTimer = 0;
+					boyfriend.playAnim(animToPlay + note.animSuffix, true);
+					boyfriend.holdTimer = 0;
+				}
 
 				if(note.noteType == 'Hey!') {
 					if(boyfriend.animOffsets.exists('hey')) {
@@ -5124,7 +5157,7 @@ if (note.isSustainNote && !(note.animation.curAnim.name.endsWith('tail') || note
 
 			if(cpuControlled) {
 				var time:Float = 0.15;
-if (note.isSustainNote && !(note.animation.curAnim.name.endsWith('tail') || note.animation.curAnim.name.endsWith('end'))) {
+				if (note.isSustainNote && !(note.animation.curAnim.name.endsWith('tail') || note.animation.curAnim.name.endsWith('end'))) {
 					time += 0.15;
 				}
 				StrumPlayAnim(false, Std.int(Math.abs(note.noteData)) % Note.ammo[mania], time);
