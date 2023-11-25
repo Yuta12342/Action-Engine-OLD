@@ -17,7 +17,7 @@ class ArchPopup extends openfl.display.Sprite {
 	var lastScale:Float = 1;
     public static var daUnlockSong:String = 'Nothing lol';
 
-	public function new(name:String, desc:String, song:String, image:String, ?onFinish:Void->Void)
+	public function new(name:String, desc:String, ?song:String, ?image:String, ?onFinish:Void->Void)
 	{
 		super();
 
@@ -189,7 +189,7 @@ class ArchPopup extends openfl.display.Sprite {
             popup.intendedY += 150;
 		}
 
-		var newPop:ArchPopup = new ArchPopup(massage, desc, daSong, image, endFunc);
+		var newPop:ArchPopup = new ArchPopup(massage, desc, image, endFunc);
 		_popups.push(newPop);
 		//trace('Giving achievement ' + achieve);
 	}
