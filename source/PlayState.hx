@@ -1097,7 +1097,7 @@ class PlayState extends MusicBeatState
 		opponentStrums = new FlxTypedGroup<StrumNote>();
 		playerStrums = new FlxTypedGroup<StrumNote>();
 
-		itemAmount = FlxG.random.int(1, 10);
+		itemAmount = FlxG.random.int(0, 99);
 		trace('itemAmount:' + itemAmount);
 
 		// startCountdown();
@@ -2742,19 +2742,27 @@ case "Stairs":
 		    }
 		}
 
-		if (did < itemAmount) {
-			while (did < itemAmount) {
-				trace('itemAmount:' + itemAmount);
-				for (i in 0...unspawnNotes.length) {
-					if (did < unspawnNotes.length) {
-						//trace('Making a note a check...');
-						if (unspawnNotes[i].mustPress && unspawnNotes[i].noteType == '' && !unspawnNotes[i].isSustainNote && !unspawnNotes[i].animation.curAnim.name.endsWith('tail') && FlxG.random.bool(1)) 
-						{
-							unspawnNotes[i].isCheck = true;
-							unspawnNotes[i].noteType = 'Check Note';
-							did++;
-							trace('Found One! ' + did + '/' + itemAmount);
-						}
+		trace('itemAmount:' + itemAmount);
+		trace('Notes Amount:' + unspawnNotes.length);
+		var trueLength:Int = 0;
+		for (i in 0...unspawnNotes.length) {if (unspawnNotes[i].mustPress) trueLength +=1;}
+		trace('True Notes Amount:' + trueLength);
+		while (itemAmount > unspawnNotes.length) 
+		{
+			trace('Too Many Items! Removing Some...');
+			itemAmount = trueLength - 1;
+		}
+		while (did < itemAmount) {
+			//trace('itemAmount:' + itemAmount);
+			for (i in 0...unspawnNotes.length) {
+				if (did < itemAmount)
+				{
+					if (unspawnNotes[i].mustPress && unspawnNotes[i].noteType == '' && !unspawnNotes[i].isSustainNote && !unspawnNotes[i].animation.curAnim.name.endsWith('tail') && FlxG.random.bool(1)) 
+					{
+						unspawnNotes[i].isCheck = true;
+						unspawnNotes[i].noteType = 'Check Note';
+						did++;
+						trace('Found One! ' + did + '/' + itemAmount);
 					}
 				}
 			}
