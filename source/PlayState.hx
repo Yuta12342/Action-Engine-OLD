@@ -4383,6 +4383,11 @@ readChatData();
 		}
 		#end
 
+		if (check == itemAmount)
+		{
+			FreeplayState.giveSong = true;
+		}
+
 		var ret:Dynamic = callOnLuas('onEndSong', [], false);
 		if(ret != FunkinLua.Function_Stop && !transitioning) {
 			if (SONG.validScore)

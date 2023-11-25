@@ -116,6 +116,8 @@ class FreeplayState extends MusicBeatState
 
 	private var iconArray:Array<HealthIcon> = [];
 
+	public static var giveSong:Bool = false;
+
 	public var bg:FlxSprite;
 	var intendedColor:Int;
 	var colorTween:FlxTween;
@@ -138,6 +140,8 @@ class FreeplayState extends MusicBeatState
 	public var modchartSounds:Map<String, FlxSound> = new Map();
 	public var modchartTexts:Map<String, FreeplayModchartText> = new Map();
 	public var modchartSaves:Map<String, FlxSave> = new Map();
+
+	public var doOnce:Bool = false;
 
 	//search bar stuff
 	var searchBar:FlxUIInputText;
@@ -209,8 +213,23 @@ class FreeplayState extends MusicBeatState
 		DiscordClient.changePresence("In the Menus", null);
 		#end
 
+		if (!doOnce)
+		{
+			for (i in 0...WeekData.weeksList.length) {
+				var leWeek:WeekData = WeekData.weeksLoaded.get(WeekData.weeksList[i]);
+				
+				for (song in leWeek.songs)
+				{
+					APEntryState.unlockable.remove(song[0]); // To remove dups
+					APEntryState.unlockable.push(song[0]);
+				}
+			}
+			doOnce = true;
+			trace(APEntryState.unlockable);
+		}
+
 		for (i in 0...WeekData.weeksList.length) {
-			if(weekIsLocked(WeekData.weeksList[i])) continue;
+			//if(weekIsLocked(WeekData.weeksList[i])) continue;
 
 			var leWeek:WeekData = WeekData.weeksLoaded.get(WeekData.weeksList[i]);
 			var leSongs:Array<String> = [];
@@ -369,6 +388,12 @@ class FreeplayState extends MusicBeatState
 		playButton.x = (FlxG.width / 2) - 10 - playButton.width;
 		playButton.y = FlxG.height - playButton.height - 10;
 		add(playButton);
+
+		if (giveSong)
+		{
+			onAddSong();
+			giveSong = false;
+		}
 	}
 	function onAddSong()
 	{	

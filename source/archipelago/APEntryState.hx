@@ -82,14 +82,6 @@ class APEntryState extends FlxState
 
 	override function create()
 	{
-		for (i in 0...WeekData.weeksList.length) {
-			var leWeek:WeekData = WeekData.weeksLoaded.get(WeekData.weeksList[i]);
-			
-			for (song in leWeek.songs)
-			{
-				FreeplayState.curUnlocked.push(song[0]);
-			}
-		}
 
 		swagShader = new ColorSwap();
 
