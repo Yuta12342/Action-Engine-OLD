@@ -1097,7 +1097,7 @@ class PlayState extends MusicBeatState
 		opponentStrums = new FlxTypedGroup<StrumNote>();
 		playerStrums = new FlxTypedGroup<StrumNote>();
 
-		itemAmount = FlxG.random.int(0, 99);
+		itemAmount = FlxG.random.int(1, 99);
 		trace('itemAmount:' + itemAmount);
 
 		// startCountdown();
@@ -2742,37 +2742,45 @@ case "Stairs":
 		    }
 		}
 
-		trace('itemAmount:' + itemAmount);
+		while (did < itemAmount && !stuck) {
+		    var foundOne:Bool = false;
 
+		    for (i in 0...unspawnNotes.length) {
+		        if (did >= itemAmount) {
+		            break; // exit the loop if the required number of notes are created
+		        }
 
-		// Filter notes based on mustPress attribute
-		var mustPressNotes:Array<Note> = unspawnNotes.filter(function(note:Note):Bool {
-		trace('Notes Amount:' + note.mustPress);
-		    return note.mustPress;
-		});
+		        if (unspawnNotes[i].mustPress && unspawnNotes[i].noteType == '' && !unspawnNotes[i].isSustainNote && !unspawnNotes[i].animation.curAnim.name.endsWith('tail') && FlxG.random.bool(1) && unspawnNotes.filter(function(note:Note):Bool { return note.mustPress && note.noteType == '' && !note.isSustainNote; }).length != 0) {
+		            unspawnNotes[i].isCheck = true;
+		            unspawnNotes[i].noteType = 'Check Note';
+		            did++;
+		            foundOne = true;
+		            trace('Found One! ' + did + '/' + itemAmount);
+		        } else if (unspawnNotes.filter(function(note:Note):Bool { return note.mustPress && note.noteType == '' && !note.isSustainNote; }).length == 0) {
+		            trace('Stuck!');
+		            stuck = true;
+		            // Additional handling for when it gets stuck
+		        }
+		    }
 
-		trace('True Notes Amount:' + mustPressNotes.length);
-		itemAmount = Std.int(Math.min(itemAmount, mustPressNotes.length));
-		while (did < itemAmount) {
-			//trace('itemAmount:' + itemAmount);
-			for (i in 0...unspawnNotes.length) {
-				if (did < itemAmount)
-				{
-					if (unspawnNotes[i].mustPress && unspawnNotes[i].noteType == '' && !unspawnNotes[i].isSustainNote && !unspawnNotes[i].animation.curAnim.name.endsWith('tail') && FlxG.random.bool(1))
-					{
-						unspawnNotes[i].isCheck = true;
-						unspawnNotes[i].noteType = 'Check Note';
-						did++;
-						trace('Found One! ' + did + '/' + itemAmount);
-					}
-				}
-			}
+		    // Check if there are no more mustPress notes of type '' and not isSustainNote
+		    if (stuck) {
+		        trace('No more mustPress notes of type \'\' found. Breaking the loop.');
+		        break; // exit the loop if no more mustPress notes of type '' are found
+		    }
 		}
+
+
+
+
+
+
 
 	}
 
 	public var did:Int = 0;
 	public var itemAmount:Int = 1;
+	public var stuck:Bool = false;
 
 
 
