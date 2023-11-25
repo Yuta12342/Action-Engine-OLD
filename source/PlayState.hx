@@ -2743,21 +2743,22 @@ case "Stairs":
 		}
 
 		trace('itemAmount:' + itemAmount);
-		trace('Notes Amount:' + unspawnNotes.length);
-		var trueLength:Int = 0;
-		for (i in 0...unspawnNotes.length) {if (unspawnNotes[i].mustPress) trueLength +=1;}
-		trace('True Notes Amount:' + trueLength);
-		while (itemAmount > unspawnNotes.length) 
-		{
-			trace('Too Many Items! Removing Some...');
-			itemAmount = trueLength - 1;
-		}
+
+
+		// Filter notes based on mustPress attribute
+		var mustPressNotes:Array<Note> = unspawnNotes.filter(function(note:Note):Bool {
+		trace('Notes Amount:' + note.mustPress);
+		    return note.mustPress;
+		});
+
+		trace('True Notes Amount:' + mustPressNotes.length);
+		itemAmount = Std.int(Math.min(itemAmount, mustPressNotes.length));
 		while (did < itemAmount) {
 			//trace('itemAmount:' + itemAmount);
 			for (i in 0...unspawnNotes.length) {
 				if (did < itemAmount)
 				{
-					if (unspawnNotes[i].mustPress && unspawnNotes[i].noteType == '' && !unspawnNotes[i].isSustainNote && !unspawnNotes[i].animation.curAnim.name.endsWith('tail') && FlxG.random.bool(1)) 
+					if (unspawnNotes[i].mustPress && unspawnNotes[i].noteType == '' && !unspawnNotes[i].isSustainNote && !unspawnNotes[i].animation.curAnim.name.endsWith('tail') && FlxG.random.bool(1))
 					{
 						unspawnNotes[i].isCheck = true;
 						unspawnNotes[i].noteType = 'Check Note';
