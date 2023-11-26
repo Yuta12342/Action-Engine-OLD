@@ -413,8 +413,11 @@ class PlayState extends MusicBeatState
 			mania = Note.defaultMania;
 
 		EKMode = SONG.EKSkin;
-		if (mania != Note.defaultMania || EKMode == null)
+		if (mania != Note.defaultMania && EKMode != null)
 		 {EKMode = true;}
+	// else if (mania == null)
+
+
 
 		trace("song keys: " + (mania + 1) + " / mania value: " + mania);
 
@@ -1287,6 +1290,51 @@ class PlayState extends MusicBeatState
 			}
 		}
 		#end
+		trace("Checking for missing Items...");
+		if (stuck) {
+		    stuck = false;
+
+		    trace("Trying with any hittable notes...");
+		    while (did < itemAmount && !stuck) {
+		        var foundOne:Bool = false;
+
+		        for (i in 0...unspawnNotes.length) {
+		            if (did >= itemAmount) {
+		                break; // exit the loop if the required number of notes are created
+		            }
+
+		            if (unspawnNotes[i].mustPress && !unspawnNotes[i].ignoreNote && !unspawnNotes[i].isSustainNote && !unspawnNotes[i].animation.curAnim.name.endsWith('tail') && FlxG.random.bool(1) && unspawnNotes.filter(function(note:Note):Bool { return note.mustPress && !note.ignoreNote && !note.isSustainNote && (note.noteType != 'Check Note' || !note.isCheck); }).length != 0) {
+		                unspawnNotes[i].isCheck = true;
+		                did++;
+		                foundOne = true;
+		                trace('Found One! ' + did + '/' + itemAmount);
+		            } else if (unspawnNotes.filter(function(note:Note):Bool { return note.mustPress && !note.ignoreNote && !note.isSustainNote && (note.noteType != 'Check Note' || !note.isCheck); }).length == 0) {
+		                trace('Stuck!');
+		                stuck = true;
+		                // Additional handling for when it gets stuck
+		            }
+		        }
+
+		        // Check if there are no more mustPress notes with ignoreNote=false and not isSustainNote
+		        if (stuck) {
+		            trace('No more suitable notes found. Breaking the loop.');
+		            break; // exit the loop if no more suitable notes are found
+		        }
+		    }
+		}
+
+		trace("Note Generation complete.");
+
+		for (i in 0...unspawnNotes.length) {
+		    if (unspawnNotes[i].isCheck && unspawnNotes[i].noteType != 'Check Note') {
+		        trace('Making extra note noticable as Check...');
+		        unspawnNotes[i].colorSwap.hue = 40;
+		        unspawnNotes[i].colorSwap.saturation = 50;
+		        unspawnNotes[i].colorSwap.brightness = 50;
+		    }
+		}
+
+
 
 		var daSong:String = Paths.formatToSongPath(curSong);
 		if (isStoryMode && !seenCutscene)
@@ -2741,7 +2789,7 @@ case "Stairs":
 		        }
 		    }
 		}
-
+trace("Generating Checks...");
 		while (did < itemAmount && !stuck) {
 		    var foundOne:Bool = false;
 
@@ -2765,7 +2813,8 @@ case "Stairs":
 
 		    // Check if there are no more mustPress notes of type '' and not isSustainNote
 		    if (stuck) {
-		        trace('No more mustPress notes of type \'\' found. Breaking the loop.');
+		        trace('No more mustPress notes of type \'\' found. Pausing Note Generation...');
+						trace('Waiting for Note Scripts...');
 		        break; // exit the loop if no more mustPress notes of type '' are found
 		    }
 		}
@@ -5089,7 +5138,7 @@ readChatData();
 		{
 			check++;
 			ArchPopup.startPopupCustom('You Found A Check!', check + '/' + itemAmount, 'Color'); // test
-			trace(check + '/' + itemAmount);
+			trace('Got: ' + check + '/' + itemAmount);
 		}
 		if (!note.wasGoodHit)
 		{
