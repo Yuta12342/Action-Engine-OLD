@@ -134,6 +134,8 @@ class TitleState extends MusicBeatState
 
 		FlxG.save.bind('funkin', 'tposejank');
 
+		if (FlxG.save.data.doOnce == null || FlxG.save.data.doOnce == true) FlxG.save.data.doOnce = false;
+
 		ClientPrefs.loadPrefs();
 
 		#if CHECK_FOR_UPDATES

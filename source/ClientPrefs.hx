@@ -8,6 +8,7 @@ import Controls;
 
 class ClientPrefs {
 	public static var downScroll:Bool = false;
+	public static var notePopup:Bool = false;
 	public static var middleScroll:Bool = false;
 	public static var opponentStrums:Bool = true;
 	public static var showFPS:Bool = true;
@@ -65,6 +66,7 @@ class ClientPrefs {
 		'instakill' => false,
 		'practice' => false,
 		'botplay' => false,
+		'archMode' => false,
 		'opponentplay' => false
 	];
 
@@ -296,6 +298,7 @@ class ClientPrefs {
 
 	public static function saveSettings() {
 		FlxG.save.data.downScroll = downScroll;
+		FlxG.save.data.notePopup = notePopup;
 		FlxG.save.data.middleScroll = middleScroll;
 		FlxG.save.data.opponentStrums = opponentStrums;
 		FlxG.save.data.showFPS = showFPS;
@@ -348,6 +351,9 @@ class ClientPrefs {
 	public static function loadPrefs() {
 		if(FlxG.save.data.downScroll != null) {
 			downScroll = FlxG.save.data.downScroll;
+		}
+		if(FlxG.save.data.notePopup != null) {
+			notePopup = FlxG.save.data.notePopup;
 		}
 		if(FlxG.save.data.middleScroll != null) {
 			middleScroll = FlxG.save.data.middleScroll;

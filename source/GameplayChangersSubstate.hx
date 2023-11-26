@@ -97,6 +97,9 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 
 		var option:GameplayOption = new GameplayOption('Botplay', 'botplay', 'bool', false);
 		optionsArray.push(option);
+
+		var option:GameplayOption = new GameplayOption('Archipelago Mode', 'archMode', 'bool', false);
+		optionsArray.push(option);
 	}
 
 	public function getOptionByName(name:String)

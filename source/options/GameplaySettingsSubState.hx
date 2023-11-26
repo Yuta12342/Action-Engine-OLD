@@ -166,6 +166,13 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 			false);
 		addOption(option);
 
+		var option:Option = new Option('Send Popup Per Note Check',
+			"If checked, a popup will appear on the top right of the screen to inform you of how many checks are left.\nWARNING: NOTE THAT THE POPUPS CAN STACK BELOW EACH OTHER.",
+			'notePopup',
+			'bool',
+			false);
+		addOption(option);
+
 		super();
 	}
 

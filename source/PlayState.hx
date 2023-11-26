@@ -339,14 +339,15 @@ class PlayState extends MusicBeatState
 	public static var lastScore:Array<FlxSprite> = [];
 
 	public var activeItems:Array<Int> = [0, 0, 0, 0]; // Shield, Curse, MHP, Traps
+	public var archMode:Bool = false;
 
 	override public function create()
 	{
-		activeItems[0] = FlxG.random.int(0, 5);
-		activeItems[1] = FlxG.random.int(0, 1);
-		activeItems[2] = FlxG.random.int(0, 2);
-		activeItems[3] = FlxG.random.int(0, 5);
-		trace(activeItems);
+		if (ClientPrefs.getGameplaySetting('archMode', false))
+		{
+			if (FlxG.save.data.activeItems != null) activeItems = FlxG.save.data.activeItems;
+			if (FlxG.save.data.activeItems == null) activeItems[3] = FlxG.random.int(0, 5);
+		}
 		if (Main.args[0] == 'editorMode') {chartingMode = true;}
 		//trace('Playback Rate: ' + playbackRate);
 		Paths.clearStoredMemory();
@@ -393,20 +394,28 @@ class PlayState extends MusicBeatState
 		practiceMode = ClientPrefs.getGameplaySetting('practice', false);
 		cpuControlled = ClientPrefs.getGameplaySetting('botplay', false);
 		chartModifier = ClientPrefs.getGameplaySetting('chartModifier', 'Normal');
+		archMode = ClientPrefs.getGameplaySetting('archMode', false);
 
-		if (activeItems[3] != 0)
+		if (archMode)
 		{
-			switch activeItems[3]
+			if (FlxG.save.data.activeItems == null)
 			{
-				case 1: chartModifier = 'Flip';
-				case 2: chartModifier = 'Random';
-				case 3: chartModifier = 'Stairs';
-				case 4: chartModifier = 'Wave';
-				case 5: chartModifier = 'SpeedRando';
+				if (activeItems[3] != 0)
+				{
+					switch activeItems[3]
+					{
+						case 1: chartModifier = 'Flip';
+						case 2: chartModifier = 'Random';
+						case 3: chartModifier = 'Stairs';
+						case 4: chartModifier = 'Wave';
+						case 5: chartModifier = 'SpeedRando';
+					}
+					ArchPopup.startPopupCustom('You Got an Item!', "Chart Modifier Trap (" + chartModifier + ")", 'Color');
+				}
+
+				maxHealth += activeItems[2];
 			}
 		}
-
-		maxHealth += activeItems[2];
 
 		// var gameCam:FlxCamera = FlxG.camera;
 		camGame = new FlxCamera();
@@ -1118,8 +1127,11 @@ class PlayState extends MusicBeatState
 		opponentStrums = new FlxTypedGroup<StrumNote>();
 		playerStrums = new FlxTypedGroup<StrumNote>();
 
-		itemAmount = FlxG.random.int(1, 99);
-		trace('itemAmount:' + itemAmount);
+		if (archMode)
+		{
+			itemAmount = FlxG.random.int(1, 99);
+			trace('itemAmount:' + itemAmount);
+		}
 
 		// startCountdown();
 
@@ -2385,6 +2397,7 @@ class PlayState extends MusicBeatState
 			});
 		}
 		callOnLuas('onUpdateScore', [miss]);
+		scoreTxt.text += ' | Checks Left: ' + check + '/' + did;
 	}
 
 	public function setSongTime(time:Float)
@@ -2768,32 +2781,36 @@ case "Stairs":
 		    }
 		}
 
-		while (did < itemAmount && !stuck) {
-		    var foundOne:Bool = false;
+		if (archMode)
+		{
+			if (PlayState.SONG.song.toLowerCase().contains('resistance') || PlayState.SONG.song.toLowerCase() == 'resistalovania') itemAmount = 69; trace("RESISTANCE OVERRIDE!"); //what are the chances
+			while (did < itemAmount && !stuck) {
+				var foundOne:Bool = false;
 
-		    for (i in 0...unspawnNotes.length) {
-		        if (did >= itemAmount) {
-		            break; // exit the loop if the required number of notes are created
-		        }
+				for (i in 0...unspawnNotes.length) {
+					if (did >= itemAmount) {
+						break; // exit the loop if the required number of notes are created
+					}
 
-		        if (unspawnNotes[i].mustPress && unspawnNotes[i].noteType == '' && !unspawnNotes[i].isSustainNote && !unspawnNotes[i].animation.curAnim.name.endsWith('tail') && FlxG.random.bool(1) && unspawnNotes.filter(function(note:Note):Bool { return note.mustPress && note.noteType == '' && !note.isSustainNote; }).length != 0) {
-		            unspawnNotes[i].isCheck = true;
-		            unspawnNotes[i].noteType = 'Check Note';
-		            did++;
-		            foundOne = true;
-		            trace('Found One! ' + did + '/' + itemAmount);
-		        } else if (unspawnNotes.filter(function(note:Note):Bool { return note.mustPress && note.noteType == '' && !note.isSustainNote; }).length == 0) {
-		            trace('Stuck!');
-		            stuck = true;
-		            // Additional handling for when it gets stuck
-		        }
-		    }
+					if (unspawnNotes[i].mustPress && unspawnNotes[i].noteType == '' && !unspawnNotes[i].isSustainNote && !unspawnNotes[i].animation.curAnim.name.endsWith('tail') && FlxG.random.bool(1) && unspawnNotes.filter(function(note:Note):Bool { return note.mustPress && note.noteType == '' && !note.isSustainNote; }).length != 0) {
+						unspawnNotes[i].isCheck = true;
+						unspawnNotes[i].noteType = 'Check Note';
+						did++;
+						foundOne = true;
+						trace('Found One! ' + did + '/' + itemAmount);
+					} else if (unspawnNotes.filter(function(note:Note):Bool { return note.mustPress && note.noteType == '' && !note.isSustainNote; }).length == 0) {
+						trace('Stuck!');
+						stuck = true;
+						// Additional handling for when it gets stuck
+					}
+				}
 
-		    // Check if there are no more mustPress notes of type '' and not isSustainNote
-		    if (stuck) {
-		        trace('No more mustPress notes of type \'\' found. Breaking the loop.');
-		        break; // exit the loop if no more mustPress notes of type '' are found
-		    }
+				// Check if there are no more mustPress notes of type '' and not isSustainNote
+				if (stuck) {
+					trace('No more mustPress notes of type \'\' found. Breaking the loop.');
+					break; // exit the loop if no more mustPress notes of type '' are found
+				}
+			}
 		}
 
 
@@ -3306,18 +3323,41 @@ function commandSend(command:String)
 		{
 			iconP1.swapOldIcon();
 		}*/
-
-		callOnLuas('onUpdate', [elapsed]);
-
-		if (activeItems[0] > 0 && health <= 0)
+		if (archMode)
 		{
-			health = 1;
-			activeItems[0]--;
+			if (!endingSong) FlxG.save.data.activeItems = activeItems;
+
+			for (i in activeItems)
+				if (i == 0) FlxG.save.data.activeItems = null;
+
+			if (FlxG.keys.justPressed.F)
+			{
+				switch (FlxG.random.int(0, 2))
+				{
+					case 0: 
+						activeItems[0] = FlxG.random.int(0, 5);
+						ArchPopup.startPopupCustom('You Got an Item!', '+1 Shield', 'Color');
+					case 1: 
+						activeItems[1] = FlxG.random.int(0, 1);
+						ArchPopup.startPopupCustom('You Got an Item!', "Blue Ball's Curse", 'Color');
+					case 2: 
+						activeItems[2] = FlxG.random.int(0, 2);
+						ArchPopup.startPopupCustom('You Got an Item!', "Max HP Up!", 'Color');
+				}
+			}
+
+			if (activeItems[0] > 0 && health <= 0)
+			{
+				health = 1;
+				activeItems[0]--;
+			}
+
+			if (activeItems[1] == 1) doDeathCheck(true, true);
 		}
 
-		readChatData();
+			callOnLuas('onUpdate', [elapsed]);
 
-		if (activeItems[1] == 1) doDeathCheck(true, true);
+			readChatData();
 
 		if(ClientPrefs.camMovement && !PlayState.isPixelStage) {
 			if(camlock) {
@@ -3823,36 +3863,39 @@ function commandSend(command:String)
 
 	public var isDead:Bool = false; //Don't mess with this on Lua!!!
 	function doDeathCheck(?skipHealthCheck:Bool = false, instaKill:Bool = false) { 
-		if ((((skipHealthCheck && instakillOnMiss) || health <= 0 && activeItems[0] >= 0) && !practiceMode && !isDead) || instaKill)
+		if (archMode && activeItems[0] >= 0) 
 		{
-			var ret:Dynamic = callOnLuas('onGameOver', [], false);
-			if(ret != FunkinLua.Function_Stop) {
-				boyfriend.stunned = true;
-				deathCounter++;
+			if ((((skipHealthCheck && instakillOnMiss) || health <= 0) && !practiceMode && !isDead) || instaKill)
+			{
+				var ret:Dynamic = callOnLuas('onGameOver', [], false);
+				if(ret != FunkinLua.Function_Stop) {
+					boyfriend.stunned = true;
+					deathCounter++;
 
-				paused = true;
+					paused = true;
 
-				vocals.stop();
-				FlxG.sound.music.stop();
+					vocals.stop();
+					FlxG.sound.music.stop();
 
-				persistentUpdate = false;
-				persistentDraw = false;
-				for (tween in modchartTweens) {
-					tween.active = true;
+					persistentUpdate = false;
+					persistentDraw = false;
+					for (tween in modchartTweens) {
+						tween.active = true;
+					}
+					for (timer in modchartTimers) {
+						timer.active = true;
+					}
+					openSubState(new GameOverSubstate(boyfriend.getScreenPosition().x - boyfriend.positionArray[0], boyfriend.getScreenPosition().y - boyfriend.positionArray[1], camFollowPos.x, camFollowPos.y));
+
+					// MusicBeatState.switchState(new GameOverState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
+
+					#if desktop
+					// Game Over doesn't get his own variable because it's only used here
+					DiscordClient.changePresence("Game Over - " + detailsText, SONG.song + storyDifficultyText, iconP2.getCharacter());
+					#end
+					isDead = true;
+					return true;
 				}
-				for (timer in modchartTimers) {
-					timer.active = true;
-				}
-				openSubState(new GameOverSubstate(boyfriend.getScreenPosition().x - boyfriend.positionArray[0], boyfriend.getScreenPosition().y - boyfriend.positionArray[1], camFollowPos.x, camFollowPos.y));
-
-				// MusicBeatState.switchState(new GameOverState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
-
-				#if desktop
-				// Game Over doesn't get his own variable because it's only used here
-				DiscordClient.changePresence("Game Over - " + detailsText, SONG.song + storyDifficultyText, iconP2.getCharacter());
-				#end
-				isDead = true;
-				return true;
 			}
 		}
 		return false;
@@ -4872,6 +4915,74 @@ function commandSend(command:String)
 		//trace('pressed: ' + controlArray);
 	}
 
+	/**
+		This needs to have two different keybinds since that's how ninjamuffin wanted it like bruh.
+
+		yeah this is like 10X better than what it was before lmao
+	**/
+	var TemporaryKeys:Map<String, Map<String, Array<FlxKey>>> = [
+		"dfjk" => [
+			'note_left' => [D, D],
+			'note_down'	=> [F, F],
+			'note_up'	=> [J, J],
+			'note_right'=> [K, K]
+		],
+		"cvjk" => [
+			'note_left'		=> [C, C],
+			'note_down'		=> [V, V],
+			'note_up'		=> [J, J],
+			'note_right'	=> [K, K]
+		],
+		"sdjk" => [
+			'note_left'		=> [S,S],
+			'note_down'		=> [D, D],
+			'note_up'		=> [J, J],
+			'note_right'	=> [K, K]
+		],
+		"normal" => [
+			'note_left' => ClientPrefs.keyBinds['note_left'],
+			'note_down' => ClientPrefs.keyBinds['note_down'],
+			'note_up' => ClientPrefs.keyBinds['note_up'],
+			'note_right' => ClientPrefs.keyBinds['note_right']
+		]
+	];
+
+	var switched:Bool = false;
+	function keybindswitch(keybind:String = 'normal'):Void
+	{
+		switched = true;
+		function switchKeys(newbinds:String) {
+			var bindstable:Array<String> = newbinds.split("");
+			midSwitched = true;
+			for (i in 0...3) {
+				var spr:StrumNote = playerStrums.members[i];
+				spr.playSwitch(bindstable[i]);
+			}
+			keysArray = [];
+			ClientPrefs.keyBinds = TemporaryKeys[newbinds];
+			keysArray = [ 
+				(ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_left'))),
+				(ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_down'))),
+				(ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_up'))),
+				(ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_right')))
+			];
+		}
+		switch(keybind)
+		{
+			case 'dfjk':
+				switchKeys("dfjk");
+			case 'cvjk':
+				switchKeys("cvjk");
+			case 'sdjk':
+				switchKeys("sdjk");
+			case 'normal':
+				switchKeys("dfkl");
+			default:
+				switchKeys("normal");
+		}
+		ClientPrefs.reloadControls();
+	}
+
 	function sortHitNotes(a:Note, b:Note):Int
 	{
 		if (a.lowPriority && !b.lowPriority)
@@ -5122,11 +5233,14 @@ function commandSend(command:String)
 
 	function goodNoteHit(note:Note):Void
 	{
-		if (note.isCheck)
+		if (archMode)
 		{
-			check++;
-			ArchPopup.startPopupCustom('You Found A Check!', check + '/' + itemAmount, 'Color'); // test
-			trace(check + '/' + itemAmount);
+			if (note.isCheck)
+			{
+				check++;
+				if (ClientPrefs.notePopup) ArchPopup.startPopupCustom('You Found A Check!', check + '/' + itemAmount, 'Color'); // test
+				trace(check + '/' + itemAmount);
+			}
 		}
 		if (!note.wasGoodHit)
 		{

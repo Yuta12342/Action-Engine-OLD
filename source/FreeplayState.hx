@@ -213,19 +213,24 @@ class FreeplayState extends MusicBeatState
 		DiscordClient.changePresence("In the Menus", null);
 		#end
 
-		if (!doOnce)
+		if (ClientPrefs.getGameplaySetting('archMode', false))
 		{
-			for (i in 0...WeekData.weeksList.length) {
-				var leWeek:WeekData = WeekData.weeksLoaded.get(WeekData.weeksList[i]);
-				
-				for (song in leWeek.songs)
-				{
-					APEntryState.unlockable.remove(song[0]); // To remove dups
-					APEntryState.unlockable.push(song[0]);
+
+			if (!FlxG.save.data.doOnce)
+			{
+				for (i in 0...WeekData.weeksList.length) {
+					var leWeek:WeekData = WeekData.weeksLoaded.get(WeekData.weeksList[i]);
+					
+					for (song in leWeek.songs)
+					{
+						APEntryState.unlockable.remove(song[0]); // To remove dups
+						APEntryState.unlockable.push(song[0]);
+						APEntryState.unlockable.remove('Tutorial'); // To remove Tutorial because it keeps re-adding itself
+					}
 				}
+				FlxG.save.data.doOnce = true;
+				FlxG.save.flush();
 			}
-			doOnce = true;
-			trace(APEntryState.unlockable);
 		}
 
 		for (i in 0...WeekData.weeksList.length) {
@@ -249,11 +254,15 @@ class FreeplayState extends MusicBeatState
 				{
 					colors = [146, 113, 253];
 				}
-				for (ii in 0...curUnlocked.length)
+				if (ClientPrefs.getGameplaySetting('archMode', false))
 				{
-					if (song[0] == curUnlocked[ii])
-						addSong(curUnlocked[ii], i, song[1], FlxColor.fromRGB(colors[0], colors[1], colors[2]));
+					for (ii in 0...curUnlocked.length)
+					{
+						if (song[0] == curUnlocked[ii])
+							addSong(curUnlocked[ii], i, song[1], FlxColor.fromRGB(colors[0], colors[1], colors[2]));
+					}
 				}
+				else addSong(song[0], i, song[1], FlxColor.fromRGB(colors[0], colors[1], colors[2]));
 			}
 		}
 		WeekData.loadTheFirstEnabledMod();
@@ -383,16 +392,19 @@ class FreeplayState extends MusicBeatState
 		callOnLuas('onCreatePost', []);
 		super.create();
 
-		var playButton = new FlxButton(0, 0, "Get Random Song", onAddSong);
-		//playButton.onUp.sound = FlxG.sound.load(Paths.sound('confirmMenu'));
-		playButton.x = (FlxG.width / 2) - 10 - playButton.width;
-		playButton.y = FlxG.height - playButton.height - 10;
-		add(playButton);
-
-		if (giveSong)
+		if (ClientPrefs.getGameplaySetting('archMode', false))
 		{
-			onAddSong();
-			giveSong = false;
+			var playButton = new FlxButton(0, 0, "Get Random Song", onAddSong);
+			//playButton.onUp.sound = FlxG.sound.load(Paths.sound('confirmMenu'));
+			playButton.x = (FlxG.width / 2) - 10 - playButton.width;
+			playButton.y = FlxG.height - playButton.height - 10;
+			add(playButton);
+
+			if (giveSong)
+			{
+				onAddSong();
+				giveSong = false;
+			}
 		}
 	}
 	function onAddSong()
@@ -403,6 +415,7 @@ class FreeplayState extends MusicBeatState
 			ArchPopup.startPopupSong(daSong, 'Color');
 			reloadSongs();
 		}
+		trace(APEntryState.unlockable);
 	}
 	public function callOnLuas(event:String, args:Array<Dynamic>, ignoreStops = true, exclusions:Array<String> = null):Dynamic {
 		var returnVal:Dynamic = FreeplayLua.Function_Continue;

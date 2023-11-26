@@ -57,7 +57,9 @@ class APEntryState extends FlxState
 
 	var titleText:FlxText;
 
-	public static var unlockable:Array<String> = 
+	public static var unlockable:Array<String> = [];
+
+	public static var baseGame:Array<String> = 
 	['Bopeebo', 'Fresh', 'Dad Battle',
 	 'Spookeez', 'South', 'Monster',
 	 'Pico', 'Philly Nice', 'Blammed',
