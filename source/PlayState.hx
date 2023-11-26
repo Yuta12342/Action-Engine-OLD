@@ -187,7 +187,7 @@ class PlayState extends MusicBeatState
 	public var gfSpeed:Int = 1;
 	public var health:Float = 1;
 	public var maxHealth:Float = 2;
-  public var startHealth:Float = 1;
+	public var startHealth:Float = 1;
 	public var combo:Int = 0;
 
 	private var healthBarBG:AttachedSprite;
@@ -338,8 +338,15 @@ class PlayState extends MusicBeatState
 	// stores the last combo score objects in an array
 	public static var lastScore:Array<FlxSprite> = [];
 
+	public var activeItems:Array<Int> = [0, 0, 0, 0]; // Shield, Curse, MHP, Traps
+
 	override public function create()
 	{
+		activeItems[0] = FlxG.random.int(0, 5);
+		activeItems[1] = FlxG.random.int(0, 1);
+		activeItems[2] = FlxG.random.int(0, 2);
+		activeItems[3] = FlxG.random.int(0, 5);
+		trace(activeItems);
 		if (Main.args[0] == 'editorMode') {chartingMode = true;}
 		//trace('Playback Rate: ' + playbackRate);
 		Paths.clearStoredMemory();
@@ -386,6 +393,20 @@ class PlayState extends MusicBeatState
 		practiceMode = ClientPrefs.getGameplaySetting('practice', false);
 		cpuControlled = ClientPrefs.getGameplaySetting('botplay', false);
 		chartModifier = ClientPrefs.getGameplaySetting('chartModifier', 'Normal');
+
+		if (activeItems[3] != 0)
+		{
+			switch activeItems[3]
+			{
+				case 1: chartModifier = 'Flip';
+				case 2: chartModifier = 'Random';
+				case 3: chartModifier = 'Stairs';
+				case 4: chartModifier = 'Wave';
+				case 5: chartModifier = 'SpeedRando';
+			}
+		}
+
+		maxHealth += activeItems[2];
 
 		// var gameCam:FlxCamera = FlxG.camera;
 		camGame = new FlxCamera();
@@ -1144,7 +1165,7 @@ class PlayState extends MusicBeatState
 		if(ClientPrefs.downScroll) healthBarBG.y = 0.11 * FlxG.height;
 
 		healthBar = new FlxBar(healthBarBG.x + 4, healthBarBG.y + 4, RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8), this,
-			'health', 0, 2);
+			'health', 0, maxHealth);
 		healthBar.scrollFactor.set();
 		// healthBar
 		healthBar.visible = !ClientPrefs.hideHud;
@@ -1287,51 +1308,6 @@ class PlayState extends MusicBeatState
 			}
 		}
 		#end
-		trace("Checking for missing Items...");
-		if (stuck) {
-		    stuck = false;
-
-		    trace("Trying with any hittable notes...");
-		    while (did < itemAmount && !stuck) {
-		        var foundOne:Bool = false;
-
-		        for (i in 0...unspawnNotes.length) {
-		            if (did >= itemAmount) {
-		                break; // exit the loop if the required number of notes are created
-		            }
-
-		            if (unspawnNotes[i].mustPress && !unspawnNotes[i].ignoreNote && !unspawnNotes[i].isSustainNote && !unspawnNotes[i].animation.curAnim.name.endsWith('tail') && FlxG.random.bool(1) && unspawnNotes.filter(function(note:Note):Bool { return note.mustPress && !note.ignoreNote && !note.isSustainNote && (note.noteType != 'Check Note' || !note.isCheck); }).length != 0) {
-		                unspawnNotes[i].isCheck = true;
-		                did++;
-		                foundOne = true;
-		                trace('Found One! ' + did + '/' + itemAmount);
-		            } else if (unspawnNotes.filter(function(note:Note):Bool { return note.mustPress && !note.ignoreNote && !note.isSustainNote && (note.noteType != 'Check Note' || !note.isCheck); }).length == 0) {
-		                trace('Stuck!');
-		                stuck = true;
-		                // Additional handling for when it gets stuck
-		            }
-		        }
-
-		        // Check if there are no more mustPress notes with ignoreNote=false and not isSustainNote
-		        if (stuck) {
-		            trace('No more suitable notes found. Breaking the loop.');
-		            break; // exit the loop if no more suitable notes are found
-		        }
-		    }
-		}
-
-		trace("Note Generation complete.");
-
-		for (i in 0...unspawnNotes.length) {
-		    if (unspawnNotes[i].isCheck && unspawnNotes[i].noteType != 'Check Note') {
-		        trace('Making extra note noticable as Check...');
-		        unspawnNotes[i].colorSwap.hue = 40;
-		        unspawnNotes[i].colorSwap.saturation = 50;
-		        unspawnNotes[i].colorSwap.brightness = 50;
-		    }
-		}
-
-
 
 		var daSong:String = Paths.formatToSongPath(curSong);
 		if (isStoryMode && !seenCutscene)
@@ -2490,6 +2466,11 @@ class PlayState extends MusicBeatState
 		#end
 		setOnLuas('songLength', songLength);
 		callOnLuas('onSongStart', []);
+
+		new FlxTimer().start(FlxG.random.float(5, FlxG.sound.music.length), function(deadTime:FlxTimer)
+		{
+			FlxG.camera.fade(FlxColor.WHITE, 1.6, false);
+		});
 	}
 
 	var debugNum:Int = 0;
@@ -2786,7 +2767,7 @@ case "Stairs":
 		        }
 		    }
 		}
-trace("Generating Checks...");
+
 		while (did < itemAmount && !stuck) {
 		    var foundOne:Bool = false;
 
@@ -2810,8 +2791,7 @@ trace("Generating Checks...");
 
 		    // Check if there are no more mustPress notes of type '' and not isSustainNote
 		    if (stuck) {
-		        trace('No more mustPress notes of type \'\' found. Pausing Note Generation...');
-						trace('Waiting for Note Scripts...');
+		        trace('No more mustPress notes of type \'\' found. Breaking the loop.');
 		        break; // exit the loop if no more mustPress notes of type '' are found
 		    }
 		}
@@ -3329,7 +3309,15 @@ function commandSend(command:String)
 
 		callOnLuas('onUpdate', [elapsed]);
 
-readChatData();
+		if (activeItems[0] > 0 && health <= 0)
+		{
+			health = 1;
+			activeItems[0]--;
+		}
+
+		readChatData();
+
+		if (activeItems[1] == 1) doDeathCheck(true, true);
 
 		if(ClientPrefs.camMovement && !PlayState.isPixelStage) {
 			if(camlock) {
@@ -3522,6 +3510,9 @@ readChatData();
 
 		if (health > maxHealth)
 			health = maxHealth;
+
+		if (health < 0)
+			health = 0;
 
 		if (healthBar.percent < 20)
 			iconP1.animation.curAnim.curFrame = 1;
@@ -3831,8 +3822,8 @@ readChatData();
 	}
 
 	public var isDead:Bool = false; //Don't mess with this on Lua!!!
-	function doDeathCheck(?skipHealthCheck:Bool = false) {
-		if (((skipHealthCheck && instakillOnMiss) || health <= 0) && !practiceMode && !isDead)
+	function doDeathCheck(?skipHealthCheck:Bool = false, instaKill:Bool = false) { 
+		if ((((skipHealthCheck && instakillOnMiss) || health <= 0 && activeItems[0] >= 0) && !practiceMode && !isDead) || instaKill)
 		{
 			var ret:Dynamic = callOnLuas('onGameOver', [], false);
 			if(ret != FunkinLua.Function_Stop) {
@@ -5135,7 +5126,7 @@ readChatData();
 		{
 			check++;
 			ArchPopup.startPopupCustom('You Found A Check!', check + '/' + itemAmount, 'Color'); // test
-			trace('Got: ' + check + '/' + itemAmount);
+			trace(check + '/' + itemAmount);
 		}
 		if (!note.wasGoodHit)
 		{

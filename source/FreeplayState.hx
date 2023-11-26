@@ -252,7 +252,7 @@ class FreeplayState extends MusicBeatState
 				for (ii in 0...curUnlocked.length)
 				{
 					if (song[0] == curUnlocked[ii])
-						addSong(song[0], i, song[1], FlxColor.fromRGB(colors[0], colors[1], colors[2]));
+						addSong(curUnlocked[ii], i, song[1], FlxColor.fromRGB(colors[0], colors[1], colors[2]));
 				}
 			}
 		}

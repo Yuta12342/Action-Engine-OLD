@@ -80,7 +80,7 @@ using StringTools;
 
 class Main extends Sprite
 {
-public static var args = Sys.args();
+	public static var args = Sys.args();
 	var gameWidth:Int = 1280; // Width of the game in pixels (might be less / more in actual pixels depending on your zoom).
 	var gameHeight:Int = 720; // Height of the game in pixels (might be less / more in actual pixels depending on your zoom).
 	var initialState:Class<FlxState> = TitleState; // The FlxState the game starts with.
@@ -96,7 +96,7 @@ public static var args = Sys.args();
 
 	public static function main():Void
 	{
-	trace(args);
+		trace(args);
 		Lib.current.addChild(new Main());
 	}
 
@@ -104,8 +104,8 @@ public static var args = Sys.args();
 	{
 		super();
 
-addEventListener(openfl.events.Event.ACTIVATE, OnActivate);
-addEventListener(openfl.events.Event.DEACTIVATE, OnDeactivate);
+		addEventListener(openfl.events.Event.ACTIVATE, OnActivate);
+		addEventListener(openfl.events.Event.DEACTIVATE, OnDeactivate);
 
 		if (stage != null)
 		{
@@ -139,8 +139,8 @@ addEventListener(openfl.events.Event.DEACTIVATE, OnDeactivate);
 	}
 
 	private static function onStateSwitch(state:FlxState):Void {
-trace(state);
-}
+		trace(state);
+	}
 
 
 	public static var audioDisconnected:Bool = false;
@@ -171,7 +171,6 @@ trace(state);
 
 		//ClientPrefs.loadDefaultKeys();
 		addChild(new FlxGame(gameWidth, gameHeight, initialState, #if (flixel < "5.0.0") zoom, #end framerate, framerate, skipSplash, startFullscreen));
-
 		#if !mobile
 		fpsVar = new FPS(10, 3, 0xFFFFFF);
 		addChild(fpsVar);
@@ -181,6 +180,76 @@ trace(state);
 			fpsVar.visible = ClientPrefs.showFPS;
 		}
 		#end
+
+		FlxGraphic.defaultPersist = false;
+		FlxG.signals.preStateSwitch.add(function()
+		{
+
+			//i tihnk i finally fixed it
+
+			@:privateAccess
+			for (key in FlxG.bitmap._cache.keys())
+			{
+				var obj = FlxG.bitmap._cache.get(key);
+				if (obj != null)
+				{
+					lime.utils.Assets.cache.image.remove(key);
+					openfl.Assets.cache.removeBitmapData(key);
+					FlxG.bitmap._cache.remove(key);
+					//obj.destroy(); //breaks the game lol
+				}
+			}
+
+			//idk if this helps because it looks like just clearing it does the same thing
+			for (k => f in lime.utils.Assets.cache.font)
+				lime.utils.Assets.cache.font.remove(k);
+			for (k => s in lime.utils.Assets.cache.audio)
+				lime.utils.Assets.cache.audio.remove(k);
+
+			/*
+			@:privateAccess
+			{
+				for (k => f in openfl.Assets.cache._font)
+					openfl.Assets.cache._font.removeFont(k);
+				for (k => s in openfl.Assets.cache._audio)
+					openfl.Assets.cache.audio.removeSound(k);
+			}
+			*/
+
+
+
+
+			//Paths.clearMemory();
+			lime.utils.Assets.cache.clear();
+
+			openfl.Assets.cache.clear();
+
+			FlxG.bitmap.dumpCache();
+
+			#if polymod
+			polymod.Polymod.clearCache();
+
+			#end
+
+			#if cpp
+			cpp.vm.Gc.enable(true);
+			#end
+
+			#if sys
+			openfl.system.System.gc();
+			#end
+		});
+
+		FlxG.signals.postStateSwitch.add(function()
+		{
+			#if cpp
+			cpp.vm.Gc.enable(true);
+			#end
+
+			#if sys
+			openfl.system.System.gc();
+			#end
+		});
 
 		#if html5
 		FlxG.autoPause = false;
