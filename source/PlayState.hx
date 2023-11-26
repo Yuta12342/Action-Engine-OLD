@@ -4383,7 +4383,7 @@ readChatData();
 		}
 		#end
 
-		if (check == itemAmount)
+		if (check == did)
 		{
 			FreeplayState.giveSong = true;
 		}

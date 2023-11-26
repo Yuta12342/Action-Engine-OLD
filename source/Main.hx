@@ -54,6 +54,8 @@ import haxe.io.Path;
 import lime.app.Application;
 import openfl.net.FileFilter;
 import lime.system.Clipboard;
+import lime.media.AudioManager;
+
 
 using StringTools;
 #if sys
@@ -135,6 +137,13 @@ addEventListener(openfl.events.Event.DEACTIVATE, OnDeactivate);
 	    });
 	    #end
 	}
+
+	private static function onStateSwitch(state:FlxState):Void {
+trace(state);
+}
+
+
+	public static var audioDisconnected:Bool = false;
 
 	private function init(?E:Event):Void
 	{
