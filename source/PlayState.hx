@@ -340,6 +340,7 @@ class PlayState extends MusicBeatState
 
 	public var activeItems:Array<Int> = [0, 0, 0, 0]; // Shield, Curse, MHP, Traps
 	public var archMode:Bool = false;
+	public var midSwitched:Bool = false;
 
 	override public function create()
 	{
@@ -4954,10 +4955,7 @@ function commandSend(command:String)
 		function switchKeys(newbinds:String) {
 			var bindstable:Array<String> = newbinds.split("");
 			midSwitched = true;
-			for (i in 0...3) {
-				var spr:StrumNote = playerStrums.members[i];
-				spr.playSwitch(bindstable[i]);
-			}
+			changeMania(3);
 			keysArray = [];
 			ClientPrefs.keyBinds = TemporaryKeys[newbinds];
 			keysArray = [ 
