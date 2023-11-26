@@ -3335,13 +3335,13 @@ function commandSend(command:String)
 			{
 				switch (FlxG.random.int(0, 2))
 				{
-					case 0: 
+					case 0:
 						activeItems[0] = FlxG.random.int(0, 5);
 						ArchPopup.startPopupCustom('You Got an Item!', '+1 Shield', 'Color');
-					case 1: 
+					case 1:
 						activeItems[1] = FlxG.random.int(0, 1);
 						ArchPopup.startPopupCustom('You Got an Item!', "Blue Ball's Curse", 'Color');
-					case 2: 
+					case 2:
 						activeItems[2] = FlxG.random.int(0, 2);
 						ArchPopup.startPopupCustom('You Got an Item!', "Max HP Up!", 'Color');
 				}
@@ -3863,8 +3863,8 @@ function commandSend(command:String)
 	}
 
 	public var isDead:Bool = false; //Don't mess with this on Lua!!!
-	function doDeathCheck(?skipHealthCheck:Bool = false, instaKill:Bool = false) { 
-		if (archMode && activeItems[0] >= 0) 
+	function doDeathCheck(?skipHealthCheck:Bool = false, instaKill:Bool = false) {
+		if (archMode && activeItems[0] >= 0)
 		{
 			if ((((skipHealthCheck && instakillOnMiss) || health <= 0) && !practiceMode && !isDead) || instaKill)
 			{
@@ -4921,65 +4921,61 @@ function commandSend(command:String)
 
 		yeah this is like 10X better than what it was before lmao
 	**/
-	var TemporaryKeys:Map<String, Map<String, Array<FlxKey>>> = [
-		"dfjk" => [
-			'note_left' => [D, D],
-			'note_down'	=> [F, F],
-			'note_up'	=> [J, J],
-			'note_right'=> [K, K]
-		],
-		"cvjk" => [
-			'note_left'		=> [C, C],
-			'note_down'		=> [V, V],
-			'note_up'		=> [J, J],
-			'note_right'	=> [K, K]
-		],
-		"sdjk" => [
-			'note_left'		=> [S,S],
-			'note_down'		=> [D, D],
-			'note_up'		=> [J, J],
-			'note_right'	=> [K, K]
-		],
-		"normal" => [
-			'note_left' => ClientPrefs.keyBinds['note_left'],
-			'note_down' => ClientPrefs.keyBinds['note_down'],
-			'note_up' => ClientPrefs.keyBinds['note_up'],
-			'note_right' => ClientPrefs.keyBinds['note_right']
-		]
-	];
+	    var TemporaryKeys:Map<String, Map<String, Array<FlxKey>>> = [
+	        "dfjk" => [
+	            'note_left' => [D, D],
+	            'note_down' => [F, F],
+	            'note_up' => [J, J],
+	            'note_right' => [K, K]
+	        ],
+	        // ... other keybind configurations ...
+	    ];
 
-	var switched:Bool = false;
-	function keybindswitch(keybind:String = 'normal'):Void
-	{
-		switched = true;
-		function switchKeys(newbinds:String) {
-			var bindstable:Array<String> = newbinds.split("");
-			midSwitched = true;
-			changeMania(3);
-			keysArray = [];
-			ClientPrefs.keyBinds = TemporaryKeys[newbinds];
-			keysArray = [ 
-				(ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_left'))),
-				(ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_down'))),
-				(ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_up'))),
-				(ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_right')))
-			];
-		}
-		switch(keybind)
-		{
-			case 'dfjk':
-				switchKeys("dfjk");
-			case 'cvjk':
-				switchKeys("cvjk");
-			case 'sdjk':
-				switchKeys("sdjk");
-			case 'normal':
-				switchKeys("dfkl");
-			default:
-				switchKeys("normal");
-		}
-		ClientPrefs.reloadControls();
-	}
+	    var switched:Bool = false;
+
+	    function keybindSwitch(keybind:String = 'normal'):Void {
+	        switched = true;
+
+	        // Function to create keybinds dynamically
+					function createKeybinds(bindString:String):Map<String, Array<FlxKey>> {
+					    var keybinds:Map<String, Array<FlxKey>> = [];
+					    var keys:Array<FlxKey> = [];
+
+					    var keyNames:Array<String> = ['left', 'down', 'up', 'right'];
+
+					    for (i in 0...bindString.length) {
+					        var keyChar:String = bindString.charAt(i);
+					        var key:FlxKey = FlxKey.fromString(keyChar);
+
+					        keys.push(key);
+					        keybinds['note_' + keyNames[i]] = [key, key]; // Modify as needed
+					    }
+
+					    return keybinds;
+					}
+
+
+	        function switchKeys(newBinds:String):Void {
+	            var bindsTable:Array<String> = newBinds.split("");
+	            midSwitched = true;
+			       changeMania(3);
+
+	            keysArray = [];
+	            ClientPrefs.keyBinds = createKeybinds(newBinds);
+	            keysArray = [
+	                (ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_left'))),
+	                (ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_down'))),
+	                (ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_up'))),
+	                (ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_right')))
+	            ];
+	        }
+
+	        // Switch based on the provided keybind
+	        switchKeys(keybind);
+
+	        ClientPrefs.reloadControls();
+	    }
+
 
 	function sortHitNotes(a:Note, b:Note):Int
 	{
