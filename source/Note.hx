@@ -506,6 +506,17 @@ class Note extends FlxSprite
 		}
 		*/
 
+
+		if (ignoreNote && isCheck)
+		{
+		trace("What the heck??? INVALID CHECK??? REMOVE!!!");
+		PlayState.instance.did--;
+		trace("Removed Check: " + PlayState.instance.did);
+		isCheck = false;
+		colorSwap.hue = 0;
+		colorSwap.saturation = 0;
+		colorSwap.brightness = 0;
+		}
 		if (mustPress)
 		{
 			// ok river

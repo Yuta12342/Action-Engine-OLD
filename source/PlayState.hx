@@ -1322,43 +1322,7 @@ class PlayState extends MusicBeatState
 		}
 		#end
 
-		trace("Checking for missing Items...");
-if (stuck) {
-		stuck = false;
-		trace("Trying with any hittable notes...");
-		while (did < itemAmount && !stuck) {
-				var foundOne:Bool = false;
-				for (i in 0...unspawnNotes.length) {
-						if (did >= itemAmount) {
-								break; // exit the loop if the required number of notes are created
-						}
-						if (unspawnNotes[i].mustPress && !unspawnNotes[i].ignoreNote && !unspawnNotes[i].isSustainNote && !unspawnNotes[i].animation.curAnim.name.endsWith('tail') && FlxG.random.bool(1) && unspawnNotes.filter(function(note:Note):Bool { return note.mustPress && !note.ignoreNote && !note.isSustainNote && (note.noteType != 'Check Note' || !note.isCheck); }).length != 0) {
-								unspawnNotes[i].isCheck = true;
-								did++;
-								foundOne = true;
-								trace('Found One! ' + did + '/' + itemAmount);
-						} else if (unspawnNotes.filter(function(note:Note):Bool { return note.mustPress && !note.ignoreNote && !note.isSustainNote && (note.noteType != 'Check Note' || !note.isCheck); }).length == 0) {
-								trace('Stuck!');
-								stuck = true;
-								// Additional handling for when it gets stuck
-						}
-				}
-				// Check if there are no more mustPress notes with ignoreNote=false and not isSustainNote
-				if (stuck) {
-						trace('No more suitable notes found. Breaking the loop.');
-						break; // exit the loop if no more suitable notes are found
-				}
-		}
-}
-trace("Note Generation complete.");
-for (i in 0...unspawnNotes.length) {
-		if (unspawnNotes[i].isCheck && unspawnNotes[i].noteType != 'Check Note') {
-				trace('Making extra note noticable as Check...');
-				unspawnNotes[i].colorSwap.hue = 40;
-				unspawnNotes[i].colorSwap.saturation = 50;
-				unspawnNotes[i].colorSwap.brightness = 50;
-		}
-}
+
 
 
 		var daSong:String = Paths.formatToSongPath(curSong);
@@ -1460,6 +1424,8 @@ for (i in 0...unspawnNotes.length) {
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPress);
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyRelease);
 		callOnLuas('onCreatePost', []);
+
+
 
 		super.create();
 
@@ -2211,6 +2177,55 @@ for (i in 0...unspawnNotes.length) {
 
 	public function startCountdown():Void
 	{
+	trace("Checking for missing Items...");
+
+	if (stuck) {
+	    if (PlayState.SONG.song.toLowerCase().contains('resistance') || PlayState.SONG.song.toLowerCase() == 'resistalovania') itemAmount = 69;
+	    trace("RESISTANCE OVERRIDE!");
+			stuck = false;
+
+	    while (did < itemAmount && !stuck) {
+	        var foundOne:Bool = false;
+
+	        for (i in 0...unspawnNotes.length) {
+	            if (did >= itemAmount) {
+	                break; // exit the loop if the required number of notes are created
+	            }
+
+	            if (unspawnNotes[i].mustPress && !unspawnNotes[i].isSustainNote && !unspawnNotes[i].animation.curAnim.name.endsWith('tail') && FlxG.random.bool(1) && !unspawnNotes[i].isCheck && !unspawnNotes[i].ignoreNote && unspawnNotes.filter(function(note:Note):Bool { return note.mustPress && !note.isSustainNote && !note.isCheck && !note.ignoreNote; }).length != 0) {
+	                unspawnNotes[i].isCheck = true;
+	                did++;
+	                foundOne = true;
+	                trace('Found One! ' + did + '/' + itemAmount);
+	            } else if (unspawnNotes.filter(function(note:Note):Bool { return note.mustPress && !note.isSustainNote && !note.isCheck && !note.ignoreNote; }).length == 0) {
+	                trace('Stuck!');
+	                stuck = true;
+	                // Additional handling for when it gets stuck
+	            }
+	        }
+
+	        // Check if there are no more mustPress notes that are not sustain notes, not isCheck, and not ignoreNote
+	        if (stuck) {
+	            trace('No more suitable notes found. Stopping current Generation...');
+	            trace('Waiting for Song Generator...');
+	            break; // exit the loop if no more suitable notes are found
+	        }
+	    }
+	}
+
+
+	trace("Note Generation complete.");
+
+
+
+for (i in 0...unspawnNotes.length) {
+	if (unspawnNotes[i].isCheck && unspawnNotes[i].noteType != 'Check Note') {
+			trace('Making extra note noticable as Check...');
+			unspawnNotes[i].colorSwap.hue = 40;
+			unspawnNotes[i].colorSwap.saturation = 50;
+			unspawnNotes[i].colorSwap.brightness = 50;
+	}
+}
 		if(startedCountdown) {
 			callOnLuas('onStartCountdown', []);
 			return;
