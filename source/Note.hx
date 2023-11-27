@@ -211,7 +211,6 @@ class Note extends FlxSprite
 					noMissAnimation = true;
 				case 'Check Note':
 					isCheck = true;
-					ignoreNote = true;
 					colorSwap.hue = 40;
 					colorSwap.saturation = 50;
 					colorSwap.brightness = 50;

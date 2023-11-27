@@ -1130,7 +1130,7 @@ class PlayState extends MusicBeatState
 
 		if (archMode)
 		{
-			itemAmount = FlxG.random.int(1, 99);
+			itemAmount = FlxG.random.int(1, 999);
 			trace('itemAmount:' + itemAmount);
 		}
 
@@ -1321,6 +1321,45 @@ class PlayState extends MusicBeatState
 			}
 		}
 		#end
+
+		trace("Checking for missing Items...");
+if (stuck) {
+		stuck = false;
+		trace("Trying with any hittable notes...");
+		while (did < itemAmount && !stuck) {
+				var foundOne:Bool = false;
+				for (i in 0...unspawnNotes.length) {
+						if (did >= itemAmount) {
+								break; // exit the loop if the required number of notes are created
+						}
+						if (unspawnNotes[i].mustPress && !unspawnNotes[i].ignoreNote && !unspawnNotes[i].isSustainNote && !unspawnNotes[i].animation.curAnim.name.endsWith('tail') && FlxG.random.bool(1) && unspawnNotes.filter(function(note:Note):Bool { return note.mustPress && !note.ignoreNote && !note.isSustainNote && (note.noteType != 'Check Note' || !note.isCheck); }).length != 0) {
+								unspawnNotes[i].isCheck = true;
+								did++;
+								foundOne = true;
+								trace('Found One! ' + did + '/' + itemAmount);
+						} else if (unspawnNotes.filter(function(note:Note):Bool { return note.mustPress && !note.ignoreNote && !note.isSustainNote && (note.noteType != 'Check Note' || !note.isCheck); }).length == 0) {
+								trace('Stuck!');
+								stuck = true;
+								// Additional handling for when it gets stuck
+						}
+				}
+				// Check if there are no more mustPress notes with ignoreNote=false and not isSustainNote
+				if (stuck) {
+						trace('No more suitable notes found. Breaking the loop.');
+						break; // exit the loop if no more suitable notes are found
+				}
+		}
+}
+trace("Note Generation complete.");
+for (i in 0...unspawnNotes.length) {
+		if (unspawnNotes[i].isCheck && unspawnNotes[i].noteType != 'Check Note') {
+				trace('Making extra note noticable as Check...');
+				unspawnNotes[i].colorSwap.hue = 40;
+				unspawnNotes[i].colorSwap.saturation = 50;
+				unspawnNotes[i].colorSwap.brightness = 50;
+		}
+}
+
 
 		var daSong:String = Paths.formatToSongPath(curSong);
 		if (isStoryMode && !seenCutscene)
@@ -2398,7 +2437,7 @@ class PlayState extends MusicBeatState
 			});
 		}
 		callOnLuas('onUpdateScore', [miss]);
-		scoreTxt.text += ' | Checks Left: ' + check + '/' + did;
+		scoreTxt.text += ' | Checks Left: ' + check + '/' + did + '(Total: ' + itemAmount + ')';
 	}
 
 	public function setSongTime(time:Float)
@@ -2781,7 +2820,7 @@ case "Stairs":
 		        }
 		    }
 		}
-
+trace("Generating Checks...");
 		if (archMode)
 		{
 			if (PlayState.SONG.song.toLowerCase().contains('resistance') || PlayState.SONG.song.toLowerCase() == 'resistalovania') itemAmount = 69; trace("RESISTANCE OVERRIDE!"); //what are the chances
@@ -2808,7 +2847,8 @@ case "Stairs":
 
 				// Check if there are no more mustPress notes of type '' and not isSustainNote
 				if (stuck) {
-					trace('No more mustPress notes of type \'\' found. Breaking the loop.');
+				trace('No more mustPress notes of type \'\' found. Pausing Note Generation...');
+				trace('Waiting for Note Scripts...');
 					break; // exit the loop if no more mustPress notes of type '' are found
 				}
 			}
@@ -3333,7 +3373,7 @@ function commandSend(command:String)
 
 			if (FlxG.keys.justPressed.F)
 			{
-				switch (FlxG.random.int(0, 2))
+				switch (FlxG.random.int(0, 3))
 				{
 					case 0:
 						activeItems[0] = FlxG.random.int(0, 5);
@@ -4950,7 +4990,7 @@ function commandSend(command:String)
 					        keys.push(key);
 					        keybinds['note_' + keyNames[i]] = [key, key]; // Modify as needed
 					    }
-
+trace(keybinds);
 					    return keybinds;
 					}
 
@@ -5233,7 +5273,7 @@ function commandSend(command:String)
 			{
 				check++;
 				if (ClientPrefs.notePopup) ArchPopup.startPopupCustom('You Found A Check!', check + '/' + itemAmount, 'Color'); // test
-				trace(check + '/' + itemAmount);
+			trace('Got: ' + check + '/' + itemAmount);
 			}
 		}
 		if (!note.wasGoodHit)
