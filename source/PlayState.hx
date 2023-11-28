@@ -444,7 +444,9 @@ class PlayState extends MusicBeatState
 			mania = Note.defaultMania;
 
 		EKMode = SONG.EKSkin;
-		if (mania != Note.defaultMania || EKMode == null)
+		if (mania != Note.defaultMania)
+		 {EKMode = true;}
+		if (EKMode == null)
 		 {EKMode = true;}
 
 		trace("song keys: " + (mania + 1) + " / mania value: " + mania);
@@ -2192,7 +2194,7 @@ class PlayState extends MusicBeatState
 	                break; // exit the loop if the required number of notes are created
 	            }
 
-	            if (unspawnNotes[i].mustPress && !unspawnNotes[i].isSustainNote && !unspawnNotes[i].animation.curAnim.name.endsWith('tail') && FlxG.random.bool(1) && !unspawnNotes[i].isCheck && !unspawnNotes[i].ignoreNote && unspawnNotes.filter(function(note:Note):Bool { return note.mustPress && !note.isSustainNote && !note.isCheck && !note.ignoreNote; }).length != 0) {
+	            if (unspawnNotes[i].mustPress && !unspawnNotes[i].isSustainNote && FlxG.random.bool(1) && !unspawnNotes[i].isCheck && !unspawnNotes[i].ignoreNote && unspawnNotes.filter(function(note:Note):Bool { return note.mustPress && !note.isSustainNote && !note.isCheck && !note.ignoreNote; }).length != 0) {
 	                unspawnNotes[i].isCheck = true;
 	                did++;
 	                foundOne = true;
@@ -2812,29 +2814,33 @@ case "Stairs":
 
 		if (chartModifier == 'SpeedRando') {
 		    for (i in 0...unspawnNotes.length) {
-		        if (unspawnNotes[i].mustPress) {
-		            if (!unspawnNotes[i].isSustainNote) {
-		                unspawnNotes[i].multSpeed = FlxG.random.float(0.1, 2);
-		                curNotes[unspawnNotes[i].noteData] = unspawnNotes[i];
-		            } else {
-		                if (curNotes[unspawnNotes[i].noteData] != null) {
-		                    unspawnNotes[i].multSpeed = curNotes[unspawnNotes[i].noteData].multSpeed;
+		        if (unspawnNotes[i] != null) {  // Null check
+
+		            if (unspawnNotes[i].mustPress) {
+		                if (!unspawnNotes[i].isSustainNote) {
+		                    unspawnNotes[i].multSpeed = FlxG.random.float(0.1, 2);
+		                    curNotes[unspawnNotes[i].noteData] = unspawnNotes[i];
+		                } else {
+		                    if (curNotes[unspawnNotes[i].noteData] != null) {
+		                        unspawnNotes[i].multSpeed = curNotes[unspawnNotes[i].noteData].multSpeed;
+		                    }
 		                }
 		            }
-		        }
 
-		        if (!unspawnNotes[i].mustPress) {
-		            if (!unspawnNotes[i].isSustainNote) {
-		                unspawnNotes[i].multSpeed = FlxG.random.float(0.1, 2);
-		                curNotes[unspawnNotes[i].noteData] = unspawnNotes[i];
-		            } else {
-		                if (curNotes[unspawnNotes[i].noteData] != null) {
-		                    unspawnNotes[i].multSpeed = curNotes[unspawnNotes[i].noteData].multSpeed;
+		            if (!unspawnNotes[i].mustPress) {
+		                if (!unspawnNotes[i].isSustainNote) {
+		                    unspawnNotes[i].multSpeed = FlxG.random.float(0.1, 2);
+		                    curNotes[unspawnNotes[i].noteData] = unspawnNotes[i];
+		                } else {
+		                    if (curNotes[unspawnNotes[i].noteData] != null) {
+		                        unspawnNotes[i].multSpeed = curNotes[unspawnNotes[i].noteData].multSpeed;
+		                    }
 		                }
 		            }
 		        }
 		    }
 		}
+
 trace("Generating Checks...");
 		if (archMode)
 		{
@@ -2847,7 +2853,7 @@ trace("Generating Checks...");
 						break; // exit the loop if the required number of notes are created
 					}
 
-					if (unspawnNotes[i].mustPress && unspawnNotes[i].noteType == '' && !unspawnNotes[i].isSustainNote && !unspawnNotes[i].animation.curAnim.name.endsWith('tail') && FlxG.random.bool(1) && unspawnNotes.filter(function(note:Note):Bool { return note.mustPress && note.noteType == '' && !note.isSustainNote; }).length != 0) {
+					if (unspawnNotes[i].mustPress && unspawnNotes[i].noteType == '' && !unspawnNotes[i].isSustainNote && FlxG.random.bool(1) && unspawnNotes.filter(function(note:Note):Bool { return note.mustPress && note.noteType == '' && !note.isSustainNote; }).length != 0) {
 						unspawnNotes[i].isCheck = true;
 						unspawnNotes[i].noteType = 'Check Note';
 						did++;

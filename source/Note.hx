@@ -9,6 +9,9 @@ import flixel.util.FlxColor;
 import flash.display.BitmapData;
 import editors.ChartingState;
 import lime.system.Clipboard;
+import sys.FileSystem;
+import sys.io.File;
+import flixel.graphics.FlxGraphic;
 
 
 using StringTools;
@@ -147,13 +150,20 @@ class Note extends FlxSprite
 	public var isCheck:Bool = false;
 
 	public function resizeByRatio(ratio:Float) //haha funny twitter shit
-		{
-			if(isSustainNote && !animation.curAnim.name.endsWith('tail'))
-			{
-				scale.y *= ratio;
-				updateHitbox();
-			}
-		}
+	{
+	    if (isNewEngine()) {
+	        if (isSustainNote && !animation.curAnim.name.endsWith('tail')) {
+	            scale.y *= ratio;
+	            updateHitbox();
+	        }
+	    } else {
+	        if (isSustainNote && !animation.curAnim.name.endsWith('end')) {
+	            scale.y *= ratio;
+	            updateHitbox();
+	        }
+	    }
+	}
+
 
 	private function set_multSpeed(value:Float):Float {
 		resizeByRatio(value / multSpeed);
@@ -326,12 +336,17 @@ class Note extends FlxSprite
 		if(suffix == null) suffix = '';
 
 		var skin:String = texture;
-		if(texture.length < 1) {
-			skin = PlayState.SONG.arrowSkin;
-			if(skin == null || skin.length < 1) {
-				skin = 'NOTE_assets';
-			}
+
+		// Null check
+		if (skin == null || skin.length == 0) {
+		    skin = 'NOTE_assets';
 		}
+
+
+
+
+
+
 
 		var animName:String = null;
 		if(animation.curAnim != null) {
