@@ -2180,13 +2180,18 @@ class PlayState extends MusicBeatState
 
 	public function startCountdown():Void
 	{
-		trace("Checking for missing Items...");
+	trace("Checking for missing Items...");
 
-		if (stuck) {
-			if (PlayState.SONG.song.toLowerCase().contains('resistance') || PlayState.SONG.song.toLowerCase() == 'resistalovania') itemAmount = 69;
-			trace("RESISTANCE OVERRIDE!");
-				stuck = false;
+	if (stuck) {
+	    if (PlayState.SONG.song.toLowerCase().contains('resistance') || PlayState.SONG.song.toLowerCase() == 'resistalovania') itemAmount = 69;
+	    trace("RESISTANCE OVERRIDE!");
+	    stuck = false;
 
+	    // Check if there are any suitable mustPress notes available
+	    if (unspawnNotes.filter(function(note:Note):Bool { return note.mustPress && !note.isSustainNote && !note.isCheck && !note.ignoreNote; }).length == 0) {
+	        trace('No suitable notes found. Stopping current Generation...');
+	        trace('Waiting for Song Generator...');
+	    } else {
 			while (did < itemAmount && !stuck) {
 				var foundOne:Bool = false;
 
@@ -2215,10 +2220,18 @@ class PlayState extends MusicBeatState
 				}
 			}
 		}
-
+}
 
 		trace("Note Generation complete.");
 
+if (did == 0)
+{
+trace("No notes...? Impossible song detected! Fixing this blunder.");
+check = itemAmount;
+ArchPopup.startPopupCustom('You Found A Check!', check + '/' + itemAmount, 'Color');
+trace('Got: ' + check + '/' + itemAmount);
+ArchPopup.startPopupCustom('Error Found', 'No Items could be spawned as there are no Notes.', 'Color');
+}
 
 
 		for (i in 0...unspawnNotes.length) {
@@ -2853,39 +2866,49 @@ case "Stairs":
 		    }
 		}
 
-trace("Generating Checks...");
-		if (archMode)
-		{
-			if (PlayState.SONG.song.toLowerCase().contains('resistance') || PlayState.SONG.song.toLowerCase() == 'resistalovania') itemAmount = 69; trace("RESISTANCE OVERRIDE!"); //what are the chances
-			while (did < itemAmount && !stuck) {
-				var foundOne:Bool = false;
+		trace("Generating Checks...");
+		if (archMode) {
+		    if (PlayState.SONG.song.toLowerCase().contains('resistance') || PlayState.SONG.song.toLowerCase() == 'resistalovania') itemAmount = 69;
+		    trace("RESISTANCE OVERRIDE!"); //what are the chances
 
-				for (i in 0...unspawnNotes.length) {
-					if (did >= itemAmount) {
-						break; // exit the loop if the required number of notes are created
+		    // Check if there are any mustPress notes available
+		    if (unspawnNotes.filter(function(note:Note):Bool { return note.mustPress && note.noteType == '' && !note.isSustainNote; }).length == 0) {
+		        trace('No mustPress notes found. Pausing Note Generation...');
+		        trace('Waiting for Note Scripts...');
+		    } else {
+				while (did < itemAmount && !stuck) {
+					var foundOne:Bool = false;
+
+					for (i in 0...unspawnNotes.length) {
+						if (did >= itemAmount) {
+							break; // exit the loop if the required number of notes are created
+						}
+
+						if (unspawnNotes[i].mustPress && unspawnNotes[i].noteType == '' && !unspawnNotes[i].isSustainNote && FlxG.random.bool(1) && unspawnNotes.filter(function(note:Note):Bool { return note.mustPress && note.noteType == '' && !note.isSustainNote; }).length != 0) {
+							unspawnNotes[i].isCheck = true;
+							unspawnNotes[i].noteType = 'Check Note';
+							did++;
+							foundOne = true;
+							trace('Found One! ' + did + '/' + itemAmount);
+						} else if (unspawnNotes.filter(function(note:Note):Bool { return note.mustPress && note.noteType == '' && !note.isSustainNote; }).length == 0) {
+							trace('Stuck!');
+							stuck = true;
+							// Additional handling for when it gets stuck
+						}
 					}
 
-					if (unspawnNotes[i].mustPress && unspawnNotes[i].noteType == '' && !unspawnNotes[i].isSustainNote && FlxG.random.bool(1) && unspawnNotes.filter(function(note:Note):Bool { return note.mustPress && note.noteType == '' && !note.isSustainNote; }).length != 0) {
-						unspawnNotes[i].isCheck = true;
-						unspawnNotes[i].noteType = 'Check Note';
-						did++;
-						foundOne = true;
-						trace('Found One! ' + did + '/' + itemAmount);
-					} else if (unspawnNotes.filter(function(note:Note):Bool { return note.mustPress && note.noteType == '' && !note.isSustainNote; }).length == 0) {
-						trace('Stuck!');
-						stuck = true;
-						// Additional handling for when it gets stuck
+					// Check if there are no more mustPress notes of type '' and not isSustainNote
+					if (stuck) {
+					trace('No more mustPress notes of type \'\' found. Pausing Note Generation...');
+					trace('Waiting for Note Scripts...');
+						break; // exit the loop if no more mustPress notes of type '' are found
 					}
-				}
-
-				// Check if there are no more mustPress notes of type '' and not isSustainNote
-				if (stuck) {
-				trace('No more mustPress notes of type \'\' found. Pausing Note Generation...');
-				trace('Waiting for Note Scripts...');
-					break; // exit the loop if no more mustPress notes of type '' are found
 				}
 			}
 		}
+
+
+
 
 
 
