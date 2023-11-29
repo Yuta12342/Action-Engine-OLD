@@ -446,7 +446,7 @@ class PlayState extends MusicBeatState
 
 		EKMode = SONG.EKSkin;
 		if (mania != Note.defaultMania)
-		 {EKMode = true;}
+		 {EKMode = true;} else EKMode = false;
 		if (EKMode == null)
 		 {EKMode = true;}
 
@@ -2180,20 +2180,20 @@ class PlayState extends MusicBeatState
 
 	public function startCountdown():Void
 	{
-	trace("Checking for missing Items...");
+		trace("Checking for missing Items...");
 
-	if (stuck) {
-	    if (PlayState.SONG.song.toLowerCase().contains('resistance') || PlayState.SONG.song.toLowerCase() == 'resistalovania') itemAmount = 69;
-	    trace("RESISTANCE OVERRIDE!");
-			stuck = false;
+		if (stuck) {
+			if (PlayState.SONG.song.toLowerCase().contains('resistance') || PlayState.SONG.song.toLowerCase() == 'resistalovania') itemAmount = 69;
+			trace("RESISTANCE OVERRIDE!");
+				stuck = false;
 
-	    while (did < itemAmount && !stuck) {
-	        var foundOne:Bool = false;
+			while (did < itemAmount && !stuck) {
+				var foundOne:Bool = false;
 
-	        for (i in 0...unspawnNotes.length) {
-	            if (did >= itemAmount) {
-	                break; // exit the loop if the required number of notes are created
-	            }
+				for (i in 0...unspawnNotes.length) {
+					if (did >= itemAmount) {
+						break; // exit the loop if the required number of notes are created
+					}
 
 	            if (unspawnNotes[i].mustPress && !unspawnNotes[i].isSustainNote && FlxG.random.bool(1) && !unspawnNotes[i].isCheck && !unspawnNotes[i].ignoreNote && unspawnNotes.filter(function(note:Note):Bool { return note.mustPress && !note.isSustainNote && !note.isCheck && !note.ignoreNote; }).length != 0) {
 	                unspawnNotes[i].isCheck = true;
@@ -2207,28 +2207,28 @@ class PlayState extends MusicBeatState
 	            }
 	        }
 
-	        // Check if there are no more mustPress notes that are not sustain notes, not isCheck, and not ignoreNote
-	        if (stuck) {
-	            trace('No more suitable notes found. Stopping current Generation...');
-	            trace('Waiting for Song Generator...');
-	            break; // exit the loop if no more suitable notes are found
-	        }
-	    }
-	}
+				// Check if there are no more mustPress notes that are not sustain notes, not isCheck, and not ignoreNote
+				if (stuck) {
+					trace('No more suitable notes found. Stopping current Generation...');
+					trace('Waiting for Song Generator...');
+					break; // exit the loop if no more suitable notes are found
+				}
+			}
+		}
 
 
-	trace("Note Generation complete.");
+		trace("Note Generation complete.");
 
 
 
-for (i in 0...unspawnNotes.length) {
-	if (unspawnNotes[i].isCheck && unspawnNotes[i].noteType != 'Check Note') {
-			trace('Making extra note noticable as Check...');
-			unspawnNotes[i].colorSwap.hue = 40;
-			unspawnNotes[i].colorSwap.saturation = 50;
-			unspawnNotes[i].colorSwap.brightness = 50;
-	}
-}
+		for (i in 0...unspawnNotes.length) {
+			if (unspawnNotes[i].isCheck && unspawnNotes[i].noteType != 'Check Note') {
+					trace('Making extra note noticable as Check...');
+					unspawnNotes[i].colorSwap.hue = 40;
+					unspawnNotes[i].colorSwap.saturation = 50;
+					unspawnNotes[i].colorSwap.brightness = 50;
+			}
+		}
 		if(startedCountdown) {
 			callOnLuas('onStartCountdown', []);
 			return;
@@ -3358,20 +3358,20 @@ trace("Generating Checks...");
 	var canPause:Bool = true;
 	var limoSpeed:Float = 0;
 
-function commandSend(command:String)
-{
-	if (paused)
-		{return;}
-	if (endingSong)
-		{return;}
+	function commandSend(command:String)
+	{
+		if (paused)
+			{return;}
+		if (endingSong)
+			{return;}
 		try {
-		        callOnLuas('onStreamCommand', [command]);
+				callOnLuas('onStreamCommand', [command]);
 						trace("Command sent: " + command);
-		    } catch (e:Dynamic) {
-		        trace("Error calling Lua function: " + e);
-		    }
-		    commands.remove(command);
-}
+			} catch (e:Dynamic) {
+				trace("Error calling Lua function: " + e);
+			}
+			commands.remove(command);
+	}
 
 
 	function readChatData()
@@ -3417,6 +3417,9 @@ function commandSend(command:String)
 					case 2:
 						activeItems[2] = FlxG.random.int(0, 2);
 						ArchPopup.startPopupCustom('You Got an Item!', "Max HP Up!", 'Color');
+					case 3:
+						keybindSwitch('sand');
+						ArchPopup.startPopupCustom('You Got an Item!', "Keybind Switch (S A N D)", 'Color');
 				}
 			}
 
@@ -5006,48 +5009,48 @@ function commandSend(command:String)
 
 	    var switched:Bool = false;
 
-	    function keybindSwitch(keybind:String = 'normal'):Void {
-	        switched = true;
+		function keybindSwitch(keybind:String = 'normal'):Void {
+			switched = true;
 
 	        // Function to create keybinds dynamically
-					function createKeybinds(bindString:String):Map<String, Array<FlxKey>> {
-					    var keybinds:Map<String, Array<FlxKey>> = [];
-					    var keys:Array<FlxKey> = [];
+			function createKeybinds(bindString:String):Map<String, Array<FlxKey>> {
+				var keybinds:Map<String, Array<FlxKey>> = [];
+				var keys:Array<FlxKey> = [];
 
-					    var keyNames:Array<String> = ['left', 'down', 'up', 'right'];
+				var keyNames:Array<String> = ['left', 'down', 'up', 'right'];
 
-					    for (i in 0...bindString.length) {
-					        var keyChar:String = bindString.charAt(i);
-					        var key:FlxKey = FlxKey.fromString(keyChar);
+				for (i in 0...bindString.length) {
+					var keyChar:String = bindString.charAt(i);
+					var key:FlxKey = FlxKey.fromString(keyChar);
 
 					        keys.push(key);
 					        keybinds['note_' + keyNames[i]] = [key, key]; // Modify as needed
-					    }
-trace(keybinds);
-					    return keybinds;
-					}
+				}
+				trace(keybinds);
+				return keybinds;
+			}
 
 
-	        function switchKeys(newBinds:String):Void {
-	            var bindsTable:Array<String> = newBinds.split("");
-	            midSwitched = true;
-			       changeMania(3);
+			function switchKeys(newBinds:String):Void {
+				var bindsTable:Array<String> = newBinds.split("");
+				midSwitched = true;
+				changeMania(3);
 
-	            keysArray = [];
-	            ClientPrefs.keyBinds = createKeybinds(newBinds);
-	            keysArray = [
-	                (ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_left'))),
-	                (ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_down'))),
-	                (ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_up'))),
-	                (ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_right')))
-	            ];
-	        }
+				keysArray = [];
+				ClientPrefs.keyBinds = createKeybinds(newBinds);
+				keysArray = [
+					(ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_left'))),
+					(ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_down'))),
+					(ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_up'))),
+					(ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_right')))
+				];
+			}
 
 	        // Switch based on the provided keybind
-	        switchKeys(keybind);
+			switchKeys(keybind);
 
-	        ClientPrefs.reloadControls();
-	    }
+			ClientPrefs.reloadControls();
+		}
 
 
 	function sortHitNotes(a:Note, b:Note):Int
