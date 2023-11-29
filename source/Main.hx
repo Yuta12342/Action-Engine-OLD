@@ -210,7 +210,7 @@ public static var initialState:Class<FlxState> = TitleState; // The FlxState the
 
 
 
-		} 
+		}
 		catch (error:Dynamic) {
 			var stageWidth:Int = Lib.current.stage.stageWidth;
 			var stageHeight:Int = Lib.current.stage.stageHeight;
@@ -292,6 +292,8 @@ public static var initialState:Class<FlxState> = TitleState; // The FlxState the
 	// very cool person for real they don't get enough credit for their work
 	#if CRASH_HANDLER
 	public static function onCrash(e:UncaughtErrorEvent):Void {
+	// Prevent further propagation of the error to avoid crashing the application
+	e.preventDefault();
 		var errMsg:String = "";
 			var errType:String = e.error;
 		var path:String;
@@ -381,8 +383,7 @@ public static var initialState:Class<FlxState> = TitleState; // The FlxState the
 
 	    // Additional error handling or recovery mechanisms can be added here
 
-	    // Prevent further propagation of the error to avoid crashing the application
-			e.preventDefault();
+
 	}
 
 	#end

@@ -3338,17 +3338,47 @@ function updateGrid():Void
 	{
 		//shitty null fix, i fucking hate it when this happens
 		//make it look sexier if possible
-		if (CoolUtil.difficulties[PlayState.storyDifficulty] != CoolUtil.defaultDifficulty) {
-			if(CoolUtil.difficulties[PlayState.storyDifficulty] == null){
-				PlayState.SONG = Song.loadFromJson(song.toLowerCase(), song.toLowerCase());
-			}else{
-				PlayState.SONG = Song.loadFromJson(song.toLowerCase() + "-" + CoolUtil.difficulties[PlayState.storyDifficulty], song.toLowerCase());
-			}
-		}else{
-		PlayState.SONG = Song.loadFromJson(song.toLowerCase(), song.toLowerCase());
+		try {
+		    if (CoolUtil.difficulties[PlayState.storyDifficulty] != CoolUtil.defaultDifficulty) {
+		        if(CoolUtil.difficulties[PlayState.storyDifficulty] == null){
+		            PlayState.SONG = Song.loadFromJson(song.toLowerCase(), song.toLowerCase());
+		        }else{
+		            PlayState.SONG = Song.loadFromJson(song.toLowerCase() + "-" + CoolUtil.difficulties[PlayState.storyDifficulty], song.toLowerCase());
+		        }
+		    } else {
+		        PlayState.SONG = Song.loadFromJson(song.toLowerCase(), song.toLowerCase());
+		    }
+		    MusicBeatState.resetState();
+		} catch (e:Dynamic) {
+		    trace("An error occurred while loading the song: " + e);
+
+		    // Handle the error or provide a default song
+		    CoolUtil.difficulties = CoolUtil.defaultDifficulties.copy();
+
+		    _song = {
+		        song: 'Test',
+		        notes: [],
+		        events: [],
+		        bpm: 150.0,
+		        needsVoices: true,
+		        arrowSkin: '',
+		        splashSkin: 'noteSplashes',
+		        player1: 'bf',
+		        player2: 'dad',
+		        gfVersion: 'gf',
+		        speed: 1,
+		        stage: 'stage',
+		        validScore: false,
+		        mania: Note.defaultMania,
+		        EKSkin: true,
+		        offset: 0
+		    };
+		    addSection();
+		    PlayState.SONG = _song;
+						    MusicBeatState.resetState();
 		}
-		MusicBeatState.resetState();
 	}
+
 
 /*function saveJson(song:String):Void
 {
