@@ -2585,7 +2585,7 @@ ArchPopup.startPopupCustom('Error Found', 'No Items could be spawned as there ar
 		    } catch (error:Dynamic) {
 
 		        trace("Error loading vocals:", error);
-	Application.current.window.alert("Error: Expected Vocals, but none were found! \n" + error, "Sound Error");
+				Application.current.window.alert("Error: Expected Vocals, but none were found! \n" + error, "Sound Error");
 		        vocals = new FlxSound();
 		    }
 		} else {
