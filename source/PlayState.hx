@@ -3329,33 +3329,33 @@ case "Stairs":
 
 	override public function onFocus():Void
 	{
-		#if desktop
-		if (health > 0 && !paused)
-		{
-			if (Conductor.songPosition > 0.0)
-			{
-				DiscordClient.changePresence(detailsText, SONG.song + storyDifficultyText, iconP2.getCharacter(), true, songLength - Conductor.songPosition - ClientPrefs.noteOffset - SONG.offset);
-			}
-			else
-			{
-				DiscordClient.changePresence(detailsText, SONG.song + storyDifficultyText, iconP2.getCharacter());
-			}
-		}
-		#end
+	    #if desktop
+	    if (health > 0 && !paused && !Crashed)
+	    {
+	        if (Conductor.songPosition > 0.0)
+	        {
+	            DiscordClient.changePresence(detailsText, SONG.song + storyDifficultyText, iconP2.getCharacter(), true, songLength - Conductor.songPosition - ClientPrefs.noteOffset - SONG.offset);
+	        }
+	        else
+	        {
+	            DiscordClient.changePresence(detailsText, SONG.song + storyDifficultyText, iconP2.getCharacter());
+	        }
+	    }
+	    #end
 
-		super.onFocus();
+	    super.onFocus();
 	}
 
 	override public function onFocusLost():Void
 	{
-		#if desktop
-		if (health > 0 && !paused)
-		{
-			DiscordClient.changePresence(detailsPausedText, SONG.song + storyDifficultyText, iconP2.getCharacter());
-		}
-		#end
+	    #if desktop
+	    if (health > 0 && !paused && !Crashed)
+	    {
+	        DiscordClient.changePresence(detailsPausedText, SONG.song + storyDifficultyText, iconP2.getCharacter());
+	    }
+	    #end
 
-		super.onFocusLost();
+	    super.onFocusLost();
 	}
 
 	function resyncVocals():Void
@@ -3413,9 +3413,15 @@ case "Stairs":
 	{
 		commands = [];
 	}
-
+public var Crashed:Bool;
 	override public function update(elapsed:Float)
 	{
+
+	if (Crashed) {
+    FlxG.switchState(new MainMenuState());
+Crashed = false;
+}
+
 		/*if (FlxG.keys.justPressed.NINE)
 		{
 			iconP1.swapOldIcon();

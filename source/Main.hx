@@ -262,13 +262,15 @@ class Main extends Sprite
 	}
 
 
+	public var PlayStateCrash:Bool = false;
 
 
 	// Code was entirely made by sqirra-rng for their fnf engine named "Izzy Engine", big props to them!!!
 	// very cool person for real they don't get enough credit for their work
 	#if CRASH_HANDLER
-	function onCrash(e:UncaughtErrorEvent):Void {
+public static function onCrash(e:UncaughtErrorEvent):Void {
 	    var errMsg:String = "";
+			var errType:String = e.error;
 	    var path:String;
 	    var callStack:Array<StackItem> = CallStack.exceptionStack(true);
 	    var dateNow:String = Date.now().toString();
@@ -305,8 +307,9 @@ trace("Crash caused in: " + Type.getClassName(Type.getClass(FlxG.state)));
 		    switch (Type.getClassName(Type.getClass(FlxG.state)))
 		    {
 		        case "PlayState":
+						PlayState.instance.Crashed = true;
 		            // Check if it's a Null Object Reference error
-		            if (errMsg.toLowerCase().contains("null object reference"))
+		            if (errType.contains("Null Object Reference"))
 		            {
 		                if (PlayState.isStoryMode)
 		                {
@@ -321,7 +324,7 @@ trace("Crash caused in: " + Type.getClassName(Type.getClass(FlxG.state)));
 
 		        case "editors.ChartingState":
 		            // Check if it's a "Chart doesn't exist" error
-		            if (errMsg.toLowerCase().contains("null object reference"))
+		            if (e.error.toLowerCase().contains("null object reference"))
 		            {
 		                // Show an extra error dialog
 		                Application.current.window.alert("You tried to load a Chart that doesn't exist!", "Chart Error");
