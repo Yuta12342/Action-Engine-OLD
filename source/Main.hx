@@ -290,7 +290,7 @@ public static function onCrash(e:UncaughtErrorEvent):Void {
 	        }
 	    }
 
-	    errMsg += "\nUncaught Error: " + e.error + "\nPlease report this error to the GitHub page: https://github.com/Yuta12342/Action-Engine\n\n> Crash Handler written by: sqirra-rng\n\n> Crash prevented!";
+	    errMsg += "\nUncaught Error: " + e.error + "\nPlease report this error to the GitHub page: https://github.com/Yuta12342/Action-Engine\n\n> Crash Handler written by: sqirra-rng\n> Crash prevented!";
 
 	    if (!FileSystem.exists("./crash/")) {
 	        FileSystem.createDirectory("./crash/");
