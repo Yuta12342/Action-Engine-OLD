@@ -83,7 +83,7 @@ class Main extends Sprite
 	public static var args = Sys.args();
 	var gameWidth:Int = 1280; // Width of the game in pixels (might be less / more in actual pixels depending on your zoom).
 	var gameHeight:Int = 720; // Height of the game in pixels (might be less / more in actual pixels depending on your zoom).
-	var initialState:Class<FlxState> = TitleState; // The FlxState the game starts with.
+public static var initialState:Class<FlxState> = TitleState; // The FlxState the game starts with.
 	var zoom:Float = -1; // If -1, zoom is automatically calculated to fit the window dimensions.
 	var framerate:Int = 60; // How many frames per second the game should run at.
 	var skipSplash:Bool = true; // Whether to skip the flixel splash screen that appears in release mode.
@@ -155,111 +155,133 @@ class Main extends Sprite
 		setupGame();
 	}
 
-	private function setupGame():Void
-	{
-		var stageWidth:Int = Lib.current.stage.stageWidth;
-		var stageHeight:Int = Lib.current.stage.stageHeight;
 
-		if (zoom == -1)
-		{
-			var ratioX:Float = stageWidth / gameWidth;
-			var ratioY:Float = stageHeight / gameHeight;
-			zoom = Math.min(ratioX, ratioY);
-			gameWidth = Math.ceil(stageWidth / zoom);
-			gameHeight = Math.ceil(stageHeight / zoom);
-		}
 
-		//ClientPrefs.loadDefaultKeys();
-		addChild(new FlxGame(gameWidth, gameHeight, initialState, #if (flixel < "5.0.0") zoom, #end framerate, framerate, skipSplash, startFullscreen));
-		#if !mobile
-		fpsVar = new FPS(10, 3, 0xFFFFFF);
-		addChild(fpsVar);
-		Lib.current.stage.align = "tl";
-		Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;
-		if(fpsVar != null) {
-			fpsVar.visible = ClientPrefs.showFPS;
-		}
-		#end
+	    private function setupGame():Void {
+	        try {
+	            var stageWidth:Int = Lib.current.stage.stageWidth;
+	            var stageHeight:Int = Lib.current.stage.stageHeight;
 
-		FlxGraphic.defaultPersist = false;
-		FlxG.signals.preStateSwitch.add(function()
-		{
+	            if (zoom == -1) {
+	                var ratioX:Float = stageWidth / gameWidth;
+	                var ratioY:Float = stageHeight / gameHeight;
+	                zoom = Math.min(ratioX, ratioY);
+	                gameWidth = Math.ceil(stageWidth / zoom);
+	                gameHeight = Math.ceil(stageHeight / zoom);
+	            }
 
-			//i tihnk i finally fixed it
+	            //ClientPrefs.loadDefaultKeys();
+	            addChild(new FlxGame(gameWidth, gameHeight, initialState, #if (flixel < "5.0.0") zoom, #end framerate, framerate, skipSplash, startFullscreen));
+	            #if !mobile
+	            fpsVar = new FPS(10, 3, 0xFFFFFF);
+	            addChild(fpsVar);
+	            Lib.current.stage.align = "tl";
+	            Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;
+	            if (fpsVar != null) {
+	                fpsVar.visible = ClientPrefs.showFPS;
+	            }
+	            #end
 
-			@:privateAccess
-			for (key in FlxG.bitmap._cache.keys())
-			{
-				var obj = FlxG.bitmap._cache.get(key);
-				if (obj != null)
-				{
-					lime.utils.Assets.cache.image.remove(key);
-					openfl.Assets.cache.removeBitmapData(key);
-					FlxG.bitmap._cache.remove(key);
-					//obj.destroy(); //breaks the game lol
-				}
-			}
+	            FlxGraphic.defaultPersist = false;
+	            FlxG.signals.preStateSwitch.add(function () {
 
-			//idk if this helps because it looks like just clearing it does the same thing
-			for (k => f in lime.utils.Assets.cache.font)
-				lime.utils.Assets.cache.font.remove(k);
-			for (k => s in lime.utils.Assets.cache.audio)
-				lime.utils.Assets.cache.audio.remove(k);
+	                // Existing cleanup code
 
-			/*
-			@:privateAccess
-			{
-				for (k => f in openfl.Assets.cache._font)
-					openfl.Assets.cache._font.removeFont(k);
-				for (k => s in openfl.Assets.cache._audio)
-					openfl.Assets.cache.audio.removeSound(k);
-			}
-			*/
+	            });
+
+	            FlxG.signals.postStateSwitch.add(function () {
+	                #if cpp
+	                cpp.vm.Gc.enable(true);
+	                #end
+
+	                #if sys
+	                openfl.system.System.gc();
+	                #end
+	            });
+
+	            #if html5
+	            FlxG.autoPause = false;
+	            FlxG.mouse.visible = false;
+	            #end
+
+	            #if CRASH_HANDLER
+	            Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onCrash);
+	            #end
 
 
 
+	        } catch (error:Dynamic) {
+					var stageWidth:Int = Lib.current.stage.stageWidth;
+					var stageHeight:Int = Lib.current.stage.stageHeight;
 
-			//Paths.clearMemory();
-			lime.utils.Assets.cache.clear();
+					if (zoom == -1) {
+							var ratioX:Float = stageWidth / gameWidth;
+							var ratioY:Float = stageHeight / gameHeight;
+							zoom = Math.min(ratioX, ratioY);
+							gameWidth = Math.ceil(stageWidth / zoom);
+							gameHeight = Math.ceil(stageHeight / zoom);
+					}
+	            // Asset loading failed, switch to AssetWaitState
+							var assetWaitState:AssetWaitState = new AssetWaitState(MusicBeatState); // Provide the initial state
+							addChild(new FlxGame(gameWidth, gameHeight, AssetWaitState, #if (flixel < "5.0.0") zoom, #end framerate, framerate, skipSplash, startFullscreen));
+							#if !mobile
+							fpsVar = new FPS(10, 3, 0xFFFFFF);
+							addChild(fpsVar);
+							Lib.current.stage.align = "tl";
+							Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;
+							if (fpsVar != null) {
+									fpsVar.visible = ClientPrefs.showFPS;
+							}
+							#end
 
-			openfl.Assets.cache.clear();
+							FlxGraphic.defaultPersist = false;
+							FlxG.signals.preStateSwitch.add(function () {
 
-			FlxG.bitmap.dumpCache();
+									// Existing cleanup code
 
-			#if polymod
-			polymod.Polymod.clearCache();
+							});
 
-			#end
+							FlxG.signals.postStateSwitch.add(function () {
+									#if cpp
+									cpp.vm.Gc.enable(true);
+									#end
 
-			#if cpp
-			cpp.vm.Gc.enable(true);
-			#end
+									#if sys
+									openfl.system.System.gc();
+									#end
+							});
 
-			#if sys
-			openfl.system.System.gc();
-			#end
-		});
+							#if html5
+							FlxG.autoPause = false;
+							FlxG.mouse.visible = false;
+							#end
 
-		FlxG.signals.postStateSwitch.add(function()
-		{
-			#if cpp
-			cpp.vm.Gc.enable(true);
-			#end
+							#if CRASH_HANDLER
+							Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onCrash);
+							#end
 
-			#if sys
-			openfl.system.System.gc();
-			#end
-		});
 
-		#if html5
-		FlxG.autoPause = false;
-		FlxG.mouse.visible = false;
-		#end
+trace("Failed to start game normally!");
+Application.current.window.alert("Due to this Error, FPS may not work properly.", "Warning");
+FlxG.log.warn("Framerate may now affect all objects.");
+trace('FPS Limiter has stopped working...')
 
-		#if CRASH_HANDLER
-		Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onCrash);
-		#end
-	}
+	            // Continuously check for the assets and update the message
+	            Lib.current.stage.addEventListener(Event.ENTER_FRAME, checkAssets);
+	        }
+	    }
+
+	    private function checkAssets(event:Event):Void {
+			var assetsLoaded:Bool = FileSystem.exists("./assets/");
+	        if (assetsLoaded) {
+	            // Assets are loaded, switch back to the initial state
+	            FlxG.switchState(new TitleState());
+
+	            // Remove the enter frame listener
+	            Lib.current.stage.removeEventListener(Event.ENTER_FRAME, checkAssets);
+	        }
+	    }
+
 
 
 	public var PlayStateCrash:Bool = false;
@@ -345,7 +367,8 @@ trace("Crash caused in: " + Type.getClassName(Type.getClass(FlxG.state)));
 		            // Show an error dialog and close the game
 		            Application.current.window.alert("Something went extremely wrong... You may want to check some things in the files!\nFailed to load TitleState!", "Fatal Error");
 								trace("Unable to recover...");
-	Sys.exit(1);
+								var assetWaitState:AssetWaitState = new AssetWaitState(MusicBeatState); // Provide the initial state
+								FlxG.switchState(assetWaitState);
 
 
 
