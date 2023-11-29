@@ -1425,11 +1425,17 @@ function loadThatAutosave()
 			// vocals.stop();
 		}
 
-		var file:Dynamic = Paths.voices(currentSongName);
-		vocals = new FlxSound();
-		if (Std.isOfType(file, Sound) || OpenFlAssets.exists(file)) {
-			vocals.loadEmbedded(file);
-			FlxG.sound.list.add(vocals);
+		if (PlayState.SONG.needsVoices) {
+		    try {
+		        vocals = new FlxSound().loadEmbedded(Paths.voices(PlayState.SONG.song));
+		    } catch (error:Dynamic) {
+
+		        trace("Error loading vocals:", error);
+	Application.current.window.alert("Error: Expected Vocals, but none were found! \n" + error, "Sound Error");
+		        vocals = new FlxSound();
+		    }
+		} else {
+		    vocals = new FlxSound();
 		}
 		generateSong();
 		FlxG.sound.music.pause();

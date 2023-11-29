@@ -63,6 +63,7 @@ import DialogueBoxPsych;
 import Conductor.Rating;
 import Note;
 import archipelago.ArchPopup;
+import lime.app.Application;
 
 #if !flash
 import flixel.addons.display.FlxRuntimeShader;
@@ -2565,10 +2566,21 @@ for (i in 0...unspawnNotes.length) {
 
 		curSong = songData.song;
 
-		if (SONG.needsVoices)
-			vocals = new FlxSound().loadEmbedded(Paths.voices(PlayState.SONG.song));
-		else
-			vocals = new FlxSound();
+		if (SONG.needsVoices) {
+		    try {
+		        vocals = new FlxSound().loadEmbedded(Paths.voices(PlayState.SONG.song));
+		    } catch (error:Dynamic) {
+
+		        trace("Error loading vocals:", error);
+	Application.current.window.alert("Error: Expected Vocals, but none were found! \n" + error, "Sound Error");
+		        vocals = new FlxSound();
+		    }
+		} else {
+		    vocals = new FlxSound();
+		}
+
+
+
 
 		vocals.pitch = playbackRate;
 		FlxG.sound.list.add(vocals);
