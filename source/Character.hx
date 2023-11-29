@@ -114,13 +114,208 @@ class Character extends FlxSprite
 					path = Paths.getPreloadPath('characters/' + DEFAULT_CHARACTER + '.json'); //If a character couldn't be found, change him to BF just to prevent a crash
 				}
 
+				var rawJson:String;
+
 				#if MODS_ALLOWED
-				var rawJson = File.getContent(path);
+				if (FileSystem.exists(path)) {
+				   rawJson = File.getContent(path);
+				} else {
+				    // If the file doesn't exist, use the provided JSON
+				   rawJson = '{
+	"animations": [
+		{
+			"offsets": [
+				-5,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "idle",
+			"indices": [],
+			"name": "BF idle dance"
+		},
+		{
+			"offsets": [
+				5,
+				-6
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singLEFT",
+			"indices": [],
+			"name": "BF NOTE LEFT0"
+		},
+		{
+			"offsets": [
+				-20,
+				-51
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singDOWN",
+			"indices": [],
+			"name": "BF NOTE DOWN0"
+		},
+		{
+			"offsets": [
+				-46,
+				27
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singUP",
+			"indices": [],
+			"name": "BF NOTE UP0"
+		},
+		{
+			"offsets": [
+				-48,
+				-7
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singRIGHT",
+			"indices": [],
+			"name": "BF NOTE RIGHT0"
+		},
+		{
+			"offsets": [
+				7,
+				19
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singLEFTmiss",
+			"indices": [],
+			"name": "BF NOTE LEFT MISS"
+		},
+		{
+			"offsets": [
+				-15,
+				-19
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singDOWNmiss",
+			"indices": [],
+			"name": "BF NOTE DOWN MISS"
+		},
+		{
+			"offsets": [
+				-46,
+				27
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singUPmiss",
+			"indices": [],
+			"name": "BF NOTE UP MISS"
+		},
+		{
+			"offsets": [
+				-44,
+				22
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singRIGHTmiss",
+			"indices": [],
+			"name": "BF NOTE RIGHT MISS"
+		},
+		{
+			"offsets": [
+				-3,
+				5
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "hey",
+			"indices": [],
+			"name": "BF HEY"
+		},
+		{
+			"offsets": [
+				14,
+				18
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "hurt",
+			"indices": [],
+			"name": "BF hit"
+		},
+		{
+			"offsets": [
+				-4,
+				0
+			],
+			"loop": true,
+			"fps": 24,
+			"anim": "scared",
+			"indices": [],
+			"name": "BF idle shaking"
+		},
+		{
+			"offsets": [
+				-10,
+				-16
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "dodge",
+			"indices": [],
+			"name": "boyfriend dodge"
+		},
+		{
+			"offsets": [
+				294,
+				267
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "attack",
+			"indices": [],
+			"name": "boyfriend attack"
+		},
+		{
+			"offsets": [
+				-40,
+				-40
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "pre-attack",
+			"indices": [],
+			"name": "bf pre attack"
+		}
+	],
+	"no_antialiasing": false,
+	"image": "characters/BOYFRIEND",
+	"position": [
+		0,
+		350
+	],
+	"healthicon": "bf",
+	"flip_x": true,
+	"healthbar_colors": [
+		49,
+		176,
+		209
+	],
+	"camera_position": [
+		0,
+		0
+	],
+	"sing_duration": 4,
+	"scale": 1
+}';
+				}
 				#else
-				var rawJson = Assets.getText(path);
+				rawJson = Assets.getText(path);
 				#end
 
 				var json:CharacterFile = cast Json.parse(rawJson);
+
 				var spriteType = "sparrow";
 				//sparrow
 				//packer
@@ -128,10 +323,10 @@ class Character extends FlxSprite
 				#if MODS_ALLOWED
 				var modTxtToFind:String = Paths.modsTxt(json.image);
 				var txtToFind:String = Paths.getPath('images/' + json.image + '.txt', TEXT);
-				
+
 				//var modTextureToFind:String = Paths.modFolders("images/"+json.image);
 				//var textureToFind:String = Paths.getPath('images/' + json.image, new AssetType();
-				
+
 				if (FileSystem.exists(modTxtToFind) || FileSystem.exists(txtToFind) || Assets.exists(txtToFind))
 				#else
 				if (Assets.exists(Paths.getPath('images/' + json.image + '.txt', TEXT)))
@@ -139,14 +334,14 @@ class Character extends FlxSprite
 				{
 					spriteType = "packer";
 				}
-				
+
 				#if MODS_ALLOWED
 				var modAnimToFind:String = Paths.modFolders('images/' + json.image + '/Animation.json');
 				var animToFind:String = Paths.getPath('images/' + json.image + '/Animation.json', TEXT);
-				
+
 				//var modTextureToFind:String = Paths.modFolders("images/"+json.image);
 				//var textureToFind:String = Paths.getPath('images/' + json.image, new AssetType();
-				
+
 				if (FileSystem.exists(modAnimToFind) || FileSystem.exists(animToFind) || Assets.exists(animToFind))
 				#else
 				if (Assets.exists(Paths.getPath('images/' + json.image + '/Animation.json', TEXT)))
@@ -156,13 +351,13 @@ class Character extends FlxSprite
 				}
 
 				switch (spriteType){
-					
+
 					case "packer":
 						frames = Paths.getPackerAtlas(json.image);
-					
+
 					case "sparrow":
 						frames = Paths.getSparrowAtlas(json.image);
-					
+
 					case "texture":
 						frames = AtlasFrameMaker.construct(json.image);
 				}
@@ -275,7 +470,7 @@ class Character extends FlxSprite
 				specialAnim = false;
 				dance();
 			}
-			
+
 			switch(curCharacter)
 			{
 				case 'pico-speaker':
@@ -367,7 +562,7 @@ class Character extends FlxSprite
 			}
 		}
 	}
-	
+
 	function loadMappedAnims():Void
 	{
 		var noteData:Array<SwagSection> = Song.loadFromJson('picospeaker', Paths.formatToSongPath(PlayState.SONG.song)).notes;
