@@ -267,48 +267,96 @@ class Main extends Sprite
 	// Code was entirely made by sqirra-rng for their fnf engine named "Izzy Engine", big props to them!!!
 	// very cool person for real they don't get enough credit for their work
 	#if CRASH_HANDLER
-	function onCrash(e:UncaughtErrorEvent):Void
-	{
-		var errMsg:String = "";
-		var path:String;
-		var callStack:Array<StackItem> = CallStack.exceptionStack(true);
-		var dateNow:String = Date.now().toString();
-		var crashState:String = Std.string(FlxG.state);
+	function onCrash(e:UncaughtErrorEvent):Void {
+	    var errMsg:String = "";
+	    var path:String;
+	    var callStack:Array<StackItem> = CallStack.exceptionStack(true);
+	    var dateNow:String = Date.now().toString();
+	    var crashState:String = Std.string(FlxG.state);
 
-		dateNow = dateNow.replace(" ", "_");
-		dateNow = dateNow.replace(":", "'");
+	    dateNow = dateNow.replace(" ", "_");
+	    dateNow = dateNow.replace(":", "'");
 
-		path = "./crash/" + "ActionEngine_" + dateNow + ".txt";
+	    path = "./crash/" + "ActionEngine_" + dateNow + ".txt";
 
-		for (stackItem in callStack)
-		{
-			switch (stackItem)
-			{
-				case FilePos(s, file, line, column):
-					errMsg += file + " (line " + line + ")\n";
-				default:
-					Sys.println(stackItem);
-			}
-		}
-		// Restart the game
-		FlxG.resetState();
-		FlxG.switchState(new MainMenuState());
-		errMsg += "\nUncaught Error: " + e.error + "\nPlease report this error to the GitHub page: https://github.com/Yuta12342/Action-Engine\n\n> Crash Handler written by: sqirra-rng";
+	    for (stackItem in callStack) {
+	        switch (stackItem) {
+	            case FilePos(s, file, line, column):
+	                errMsg += file + " (line " + line + ")\n";
+	            default:
+	                Sys.println(stackItem);
+	        }
+	    }
 
-		if (!FileSystem.exists("./crash/"))
-			FileSystem.createDirectory("./crash/");
+	    errMsg += "\nUncaught Error: " + e.error + "\nPlease report this error to the GitHub page: https://github.com/Yuta12342/Action-Engine\n\n> Crash Handler written by: sqirra-rng\n\n> Crash prevented!";
 
-		File.saveContent(path, errMsg + "\n");
+	    if (!FileSystem.exists("./crash/")) {
+	        FileSystem.createDirectory("./crash/");
+	    }
 
-		Sys.println(errMsg);
-		Sys.println("Crash dump saved in " + Path.normalize(path));
+	    File.saveContent(path, errMsg + "\n");
 
-		Application.current.window.alert(errMsg, "Error!");
+	    Sys.println(errMsg);
+	    Sys.println("Crash dump saved in " + Path.normalize(path));
 
-		DiscordClient.shutdown();
-		// Restart the game
-		FlxG.resetState();
-		FlxG.switchState(new MainMenuState());
+	    Application.current.window.alert(errMsg, "Error!");
+trace("Crash caused in: " + Type.getClassName(Type.getClass(FlxG.state)));
+			// Handle different states
+		    switch (Type.getClassName(Type.getClass(FlxG.state)))
+		    {
+		        case "PlayState":
+		            // Check if it's a Null Object Reference error
+		            if (errMsg.toLowerCase().contains("null object reference"))
+		            {
+		                if (PlayState.isStoryMode)
+		                {
+		                    FlxG.switchState(new StoryMenuState());
+		                }
+		                else
+		                {
+		                    FlxG.switchState(new FreeplayState());
+		                }
+		            }
+
+
+		        case "editors.ChartingState":
+		            // Check if it's a "Chart doesn't exist" error
+		            if (errMsg.toLowerCase().contains("null object reference"))
+		            {
+		                // Show an extra error dialog
+		                Application.current.window.alert("You tried to load a Chart that doesn't exist!", "Chart Error");
+		            }
+
+
+		        case "FreeplayState", "StoryModeState":
+		            // Switch back to MainMenuState
+		            FlxG.switchState(new MainMenuState());
+
+
+		        case "MainMenuState":
+		            // Go back to TitleState
+		            FlxG.switchState(new TitleState());
+
+
+		        case "TitleState":
+		            // Show an error dialog and close the game
+		            Application.current.window.alert("Something went extremely wrong... You may want to check some things in the files!\nFailed to load TitleState!", "Fatal Error");
+								trace("Unable to recover...");
+	Sys.exit(1);
+
+
+
+		        default:
+		            // For other states, reset to MainMenuState
+		            FlxG.switchState(new MainMenuState());
+		    }
+
+
+	    // Additional error handling or recovery mechanisms can be added here
+
+	    // Prevent further propagation of the error to avoid crashing the application
+	    e.preventDefault();
 	}
+
 	#end
-}
+	}
