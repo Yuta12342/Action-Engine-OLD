@@ -151,17 +151,17 @@ class Note extends FlxSprite
 
 	public function resizeByRatio(ratio:Float) //haha funny twitter shit
 	{
-	    if (isNewEngine()) {
-	        if (isSustainNote && !animation.curAnim.name.endsWith('tail')) {
+		if (isNewEngine()) {
+			if (isSustainNote && !animation.curAnim.name.endsWith('tail')) {
 	            scale.y *= ratio;
-	            updateHitbox();
-	        }
-	    } else {
-	        if (isSustainNote && !animation.curAnim.name.endsWith('end')) {
+				updateHitbox();
+				}
+		} else {
+		if (isSustainNote && !animation.curAnim.name.endsWith('end')) {
 	            scale.y *= ratio;
-	            updateHitbox();
-	        }
-	    }
+				updateHitbox();
+			}
+		}
 	}
 
 
@@ -264,12 +264,12 @@ class Note extends FlxSprite
 			x += swagWidth * (noteData % Note.ammo[mania]);
 			if(!isSustainNote && noteData > -1 && noteData < Note.maxManiaUI_integer) { //Doing this 'if' check to fix the warnings on Senpai songs
 				var animToPlay:String = '';
-				if (isNewEngine())
-				{animToPlay = Note.keysShit.get(mania).get('letters')[noteData];
-				animation.play(animToPlay);}
-				else {
-				animToPlay = colArray[noteData % 4];
-				animation.play(animToPlay + 'Scroll');
+				if (isNewEngine()) {
+					animToPlay = Note.keysShit.get(mania).get('letters')[noteData];
+					animation.play(animToPlay);
+				} else {
+					animToPlay = colArray[noteData % 4];
+					animation.play(animToPlay + 'Scroll');
 				}
 			}
 		}
@@ -285,10 +285,11 @@ class Note extends FlxSprite
 
 			offsetX += width / 2;
 			copyAngle = false;
-     if (isNewEngine())
-			{animation.play(Note.keysShit.get(mania).get('letters')[noteData] + ' tail');}
-			else
-			{animation.play(colArray[noteData % 4] + 'holdend');}
+    		if (isNewEngine()) {
+				animation.play(Note.keysShit.get(mania).get('letters')[noteData] + ' tail');
+			} else {
+				animation.play(colArray[noteData % 4] + 'holdend');
+			}
 
 			updateHitbox();
 
@@ -299,10 +300,11 @@ class Note extends FlxSprite
 
 			if (prevNote.isSustainNote)
 			{
-			if (isNewEngine())
-				{prevNote.animation.play(Note.keysShit.get(mania).get('letters')[prevNote.noteData] + ' hold');}
-				else
-        {prevNote.animation.play(colArray[prevNote.noteData % 4] + 'hold');}
+				if (isNewEngine()) {
+					prevNote.animation.play(Note.keysShit.get(mania).get('letters')[prevNote.noteData] + ' hold');}
+				else {
+					prevNote.animation.play(colArray[prevNote.noteData % 4] + 'hold');
+				}
 				prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.05;
 				if(PlayState.instance != null)
 				{
@@ -342,10 +344,7 @@ class Note extends FlxSprite
 		    skin = 'NOTE_assets';
 		}
 
-
-
-
-
+		if (isNewEngine()) skin += '-EK';
 
 
 		var animName:String = null;
@@ -416,38 +415,38 @@ class Note extends FlxSprite
 	}
 
 	public function loadNoteAnims():Void {
-			if (isNewEngine()) {
-					// Code for the new engine
-					for (i in 0...gfxLetter.length) {
-							animation.addByPrefix(gfxLetter[i], gfxLetter[i] + '0');
+		if (isNewEngine()) {
+				// Code for the new engine
+				for (i in 0...gfxLetter.length) {
+						animation.addByPrefix(gfxLetter[i], gfxLetter[i] + '0');
 
-							if (isSustainNote) {
-									animation.addByPrefix(gfxLetter[i] + ' hold', gfxLetter[i] + ' hold');
-									animation.addByPrefix(gfxLetter[i] + ' tail', gfxLetter[i] + ' tail');
-							}
-					}
+						if (isSustainNote) {
+								animation.addByPrefix(gfxLetter[i] + ' hold', gfxLetter[i] + ' hold');
+								animation.addByPrefix(gfxLetter[i] + ' tail', gfxLetter[i] + ' tail');
+						}
+				}
 
-					ogW = width;
-					ogH = height;
-					if (!isSustainNote) {
-							setGraphicSize(Std.int(defaultWidth * scales[mania]));
-					} else {
-							setGraphicSize(Std.int(defaultWidth * scales[mania]), Std.int(defaultHeight * scales[0]));
-					}
-					updateHitbox();
-			} else {
-					// Code for the old engine
-					animation.addByPrefix(colArray[noteData] + 'Scroll', colArray[noteData] + '0');
+				ogW = width;
+				ogH = height;
+				if (!isSustainNote) {
+						setGraphicSize(Std.int(defaultWidth * scales[mania]));
+				} else {
+						setGraphicSize(Std.int(defaultWidth * scales[mania]), Std.int(defaultHeight * scales[0]));
+				}
+				updateHitbox();
+		} else {
+				// Code for the old engine
+				animation.addByPrefix(colArray[noteData] + 'Scroll', colArray[noteData] + '0');
 
-					if (isSustainNote) {
-							animation.addByPrefix('purpleholdend', 'pruple end hold'); // ?????
-							animation.addByPrefix(colArray[noteData] + 'holdend', colArray[noteData] + ' hold end');
-							animation.addByPrefix(colArray[noteData] + 'hold', colArray[noteData] + ' hold piece');
-					}
+				if (isSustainNote) {
+						animation.addByPrefix('purpleholdend', 'pruple end hold'); // ?????
+						animation.addByPrefix(colArray[noteData] + 'holdend', colArray[noteData] + ' hold end');
+						animation.addByPrefix(colArray[noteData] + 'hold', colArray[noteData] + ' hold piece');
+				}
 
-					setGraphicSize(Std.int(width * 0.7));
-					updateHitbox();
-			}
+				setGraphicSize(Std.int(width * 0.7));
+				updateHitbox();
+		}
 	}
 
 	public function loadPixelNoteAnims():Void {
