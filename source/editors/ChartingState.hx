@@ -1670,7 +1670,16 @@ var sessionData:String = Json.stringify({
 		PlayState.mania = _song.mania;
 
 		var gWidth = GRID_SIZE * (Note.ammo[_song.mania] * 2);
-		camPos.x = -80 + gWidth;
+		try {
+		    camPos.x = -80 + gWidth;
+		} catch (e:Dynamic) {
+		    trace("An error occurred: " + e);
+				PlayState.SONG = null;
+		    FlxG.resetState();
+		}
+
+		// Continue with the rest of your code...
+
 		strumLine.width = gWidth;
 		rightIcon.x = gWidth / 2 + GRID_SIZE * 2;
 
