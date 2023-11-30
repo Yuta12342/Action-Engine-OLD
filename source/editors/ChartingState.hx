@@ -1678,7 +1678,6 @@ var sessionData:String = Json.stringify({
 		    FlxG.resetState();
 		}
 
-		// Continue with the rest of your code...
 
 		strumLine.width = gWidth;
 		rightIcon.x = gWidth / 2 + GRID_SIZE * 2;
