@@ -660,6 +660,7 @@ function loadThatAutosave()
 		check_EK.callback = function()
 		{
 			_song.EKSkin = check_EK.checked;
+			updateGrid();
 			//trace('CHECKED!');
 		};
 

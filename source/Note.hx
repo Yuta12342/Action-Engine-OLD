@@ -157,8 +157,8 @@ class Note extends FlxSprite
 				updateHitbox();
 				}
 		} else {
-		if (isSustainNote && !animation.curAnim.name.endsWith('end')) {
-	            scale.y *= ratio;
+			if (isSustainNote && !animation.curAnim.name.endsWith('end')) {
+				scale.y *= ratio;
 				updateHitbox();
 			}
 		}
