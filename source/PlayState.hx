@@ -3227,6 +3227,12 @@ case "Stairs":
 		strumLineNotes.clear();
 		setOnLuas('mania', mania);
 
+		EKMode = SONG.EKSkin;
+		if (mania != Note.defaultMania)
+		 {EKMode = true;} else EKMode = false;
+		if (EKMode == null)
+		 {EKMode = true;}
+
 		notes.forEachAlive(function(note:Note) {updateNote(note);});
 
 		for (noteI in 0...unspawnNotes.length) {
@@ -3435,19 +3441,19 @@ Crashed = false;
 
 			if (FlxG.keys.justPressed.F)
 			{
-				switch (FlxG.random.int(0, 3))
+				switch (FlxG.random.int(0, 2))
 				{
 					case 0:
-						activeItems[0] = FlxG.random.int(0, 5);
-						ArchPopup.startPopupCustom('You Got an Item!', '+1 Shield', 'Color');
+						activeItems[0] += 1;
+						ArchPopup.startPopupCustom('You Got an Item!', '+1 Shield ( ' + activeItems[0] + ' Left)', 'Color');
 					case 1:
-						activeItems[1] = FlxG.random.int(0, 1);
+						activeItems[1] = 1;
 						ArchPopup.startPopupCustom('You Got an Item!', "Blue Ball's Curse", 'Color');
 					case 2:
-						activeItems[2] = FlxG.random.int(0, 2);
+						activeItems[2] += 1;
 						ArchPopup.startPopupCustom('You Got an Item!', "Max HP Up!", 'Color');
 					case 3:
-						keybindSwitch('sand');
+						keybindSwitch('SAND');
 						ArchPopup.startPopupCustom('You Got an Item!', "Keybind Switch (S A N D)", 'Color');
 				}
 			}
@@ -3456,6 +3462,7 @@ Crashed = false;
 			{
 				health = 1;
 				activeItems[0]--;
+				ArchPopup.startPopupCustom('You Used A Shield!', '-1 Shield ( ' + activeItems[0] + ' Left)', 'Color');
 			}
 
 			if (activeItems[1] == 1) doDeathCheck(true, true);
@@ -3969,8 +3976,41 @@ Crashed = false;
 
 	public var isDead:Bool = false; //Don't mess with this on Lua!!!
 	function doDeathCheck(?skipHealthCheck:Bool = false, instaKill:Bool = false) {
-		if (archMode && activeItems[0] >= 0)
+		if (archMode && activeItems[0] <= 0)
 		{
+			if ((((skipHealthCheck && instakillOnMiss) || health <= 0) && !practiceMode && !isDead) || instaKill)
+			{
+				var ret:Dynamic = callOnLuas('onGameOver', [], false);
+				if(ret != FunkinLua.Function_Stop) {
+					boyfriend.stunned = true;
+					deathCounter++;
+
+					paused = true;
+
+					vocals.stop();
+					FlxG.sound.music.stop();
+
+					persistentUpdate = false;
+					persistentDraw = false;
+					for (tween in modchartTweens) {
+						tween.active = true;
+					}
+					for (timer in modchartTimers) {
+						timer.active = true;
+					}
+					openSubState(new GameOverSubstate(boyfriend.getScreenPosition().x - boyfriend.positionArray[0], boyfriend.getScreenPosition().y - boyfriend.positionArray[1], camFollowPos.x, camFollowPos.y));
+
+					// MusicBeatState.switchState(new GameOverState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
+
+					#if desktop
+					// Game Over doesn't get his own variable because it's only used here
+					DiscordClient.changePresence("Game Over - " + detailsText, SONG.song + storyDifficultyText, iconP2.getCharacter());
+					#end
+					isDead = true;
+					return true;
+				}
+			}
+		} else if (!archMode) {
 			if ((((skipHealthCheck && instakillOnMiss) || health <= 0) && !practiceMode && !isDead) || instaKill)
 			{
 				var ret:Dynamic = callOnLuas('onGameOver', [], false);

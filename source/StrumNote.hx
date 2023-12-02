@@ -7,7 +7,7 @@ using StringTools;
 
 class StrumNote extends FlxSprite
 {
-    private var colorSwap:ColorSwap;
+	private var colorSwap:ColorSwap;
 	public var resetAnim:Float = 0;
 	private var noteData:Int = 0;
 	public var direction:Float = 90;//plan on doing scroll directions soon -bb
@@ -19,7 +19,7 @@ class StrumNote extends FlxSprite
 	// though, you shouldn't change it
 	public var confirm_anim(default, set):String = "static";
 
-    private var isNewEngine:Bool = PlayState.EKMode; // Set this to false to use old code
+	private var isNewEngine:Bool = PlayState.EKMode; // Set this to false to use old code
 
 	private function set_static_anim(value:String):String {
 		if (!PlayState.isPixelStage) {
@@ -68,16 +68,17 @@ class StrumNote extends FlxSprite
 		this.noteData = leData;
 		super(x, y);
 
-        if (isNewEngine) {
-            animationArray[0] = Note.keysShit.get(PlayState.mania).get('strumAnims')[leData];
-            animationArray[1] = Note.keysShit.get(PlayState.mania).get('letters')[leData];
-            animationArray[2] = Note.keysShit.get(PlayState.mania).get('letters')[leData]; // jic
-            var skin:String = 'NOTE_assets-EK';
-            //if(PlayState.isPixelStage) skin = 'PIXEL_' + skin;
-            if(PlayState.SONG.arrowSkin != null && PlayState.SONG.arrowSkin.length > 1) skin = PlayState.SONG.arrowSkin;
-            texture = skin; //Load texture and anims
-            scrollFactor.set();
-        } else {
+		if (isNewEngine) {
+			animationArray[0] = Note.keysShit.get(PlayState.mania).get('strumAnims')[leData];
+			animationArray[1] = Note.keysShit.get(PlayState.mania).get('letters')[leData];
+			animationArray[2] = Note.keysShit.get(PlayState.mania).get('letters')[leData]; // jic
+			var EKStrum:Bool = PlayState.EKMode;
+			var skin:String = 'NOTE_assets-EK';
+			//if(PlayState.isPixelStage) skin = 'PIXEL_' + skin;
+			if(PlayState.SONG.arrowSkin != null && PlayState.SONG.arrowSkin.length > 1) skin = PlayState.SONG.arrowSkin;
+			texture = skin; //Load texture and anims
+			scrollFactor.set();
+		} else {
             var skin:String = 'NOTE_assets';
             //if(PlayState.isPixelStage) skin = 'PIXEL_' + skin;
             if(PlayState.SONG.arrowSkin != null && PlayState.SONG.arrowSkin.length > 1) skin = PlayState.SONG.arrowSkin;
@@ -91,7 +92,7 @@ class StrumNote extends FlxSprite
 		var lastAnim:String = null;
 		if(animation.curAnim != null) lastAnim = animation.curAnim.name;
 		var pxDV:Int = Note.pixelNotesDivisionValue;
-        if (isNewEngine) {
+		if (isNewEngine) {
             if(PlayState.isPixelStage)
             {
                 loadGraphic(Paths.image('pixelUI/' + texture));
