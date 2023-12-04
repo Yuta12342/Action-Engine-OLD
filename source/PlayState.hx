@@ -1193,8 +1193,8 @@ class PlayState extends MusicBeatState
 		resistBarBG.screenCenter();
 		resistBarBG.x = resistBar.x + 5;
 
-		resistBarBar = new FlxSprite(resistBar.x + 309, resistBar.y);
-		resistBarBar.makeGraphic(Std.int(resistBarBG.width/1.1), Std.int(resistBarBar.height), 'eda6c4');
+		resistBarBar = new FlxSprite(resistBar.x, resistBar.y);
+		resistBarBar.makeGraphic(Std.int(resistBarBG.width/1.1), Std.int(resistBarBar.height), 0xffeda6c4);
 		resistBarBar.cameras = [camHUD];
 		add(resistBarBar);
 		resistBarBar.screenCenter();
@@ -3476,8 +3476,8 @@ case "Stairs":
 		else
 			resistBarBar.setGraphicSize(Std.int(resistBarBar.width/1.6 * resistBarBar.scale.x), Std.int(resistBarBG.height/0.99 * currentBarPorcent));
 
-		resistBarBar.x = resistBarBG.x;
-		resistBarBar.y = resistBar.y; // - resistBarBar.height;
+		resistBarBar.x = resistBar.x;
+		resistBarBar.y = resistBar.y + 655 - resistBarBar.height;
     	dadGroup.x = resistBarBG.height/1.2 * currentBarPorcent;
 
 		if (currentBarPorcent > 1) currentBarPorcent  = 1;
@@ -3493,7 +3493,6 @@ case "Stairs":
 		if (currentBarPorcent == 1) health -= 0.0051;
 
 		curResist = 100 - ((currentBarPorcent * 1000)/10);
-		trace(currentBarPorcent);
 		
 		if (health >= 1) curHorny = -0 else curHorny = ((health-1)*100);
 	}
@@ -5453,6 +5452,8 @@ case "Stairs":
 			note.destroy();
 		}
 
+		if (currentBarPorcent < 1) currentBarPorcent += 0.0030;
+
 	}
 
 	public var check:Int = 0;
@@ -5577,7 +5578,7 @@ case "Stairs":
 
 			callOnLuas('goodNoteHit', [notes.members.indexOf(note), leData, leType, isSus]);
 
-			if (currentBarPorcent > 0) currentBarPorcent =- 0.0080;
+			if (currentBarPorcent < 1) currentBarPorcent =- 0.0020;
 
 			if (!note.isSustainNote)
 			{
