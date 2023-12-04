@@ -2651,10 +2651,34 @@ ArchPopup.startPopupCustom('Error Found', 'No Items could be spawned as there ar
 					gottaHitNote = !section.mustHitSection;
 				}
 
+var prevNoteData:Int = -1;
+var initialNoteData:Int = -1;
 switch (chartModifier)
 {
 case "Random":
 						daNoteData = FlxG.random.int(0, mania);
+
+						case "RandomBasic":
+				        // Ensure consecutive notes are not the same
+				        var randomDirection:Int;
+				        do {
+				            randomDirection = FlxG.random.int(0, mania);
+				        } while (randomDirection == prevNoteData);
+
+				        prevNoteData = randomDirection;
+				        daNoteData = randomDirection;
+
+								case "RandomComplex":
+						        // Randomize the first note
+						        if (initialNoteData == -1) {
+						            initialNoteData = FlxG.random.int(0, mania);
+						            daNoteData = initialNoteData;
+						        } else {
+						            // If the previous note was the same, keep it the same, else randomize
+						            daNoteData = (prevNoteData == initialNoteData) ? initialNoteData : FlxG.random.int(0, mania);
+						        }
+
+						        prevNoteData = daNoteData;
 
 case "Flip":
 if (gottaHitNote)
