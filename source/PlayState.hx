@@ -343,6 +343,16 @@ class PlayState extends MusicBeatState
 	public var archMode:Bool = false;
 	public var midSwitched:Bool = false;
 
+	public var resistBarBar:FlxSprite;
+	public var resistBarBG:FlxSprite;
+	public var resistBar:FlxSprite;
+
+	public var currentBarPorcent:Float = 0;
+	public var heightBar:Float = 0;
+	public var songStarted:Bool = false;
+	public var curResist:Float = 0;
+	public var curHorny:Float = 0;
+
 	override public function create()
 	{
 		if (ClientPrefs.getGameplaySetting('archMode', false))
@@ -1169,6 +1179,25 @@ class PlayState extends MusicBeatState
 
 		FlxG.fixedTimestep = false;
 		moveCameraSection();
+
+		resistBar = new FlxSprite(FlxG.width - 100, 60).loadGraphic(Paths.image('healthBar2'));
+		resistBar.scale.set(1.8, 1.1);
+		resistBar.cameras = [camHUD];
+
+		resistBarBG = new FlxSprite(resistBar.x, resistBar.y).loadGraphic(Paths.image('healthBarg'));
+		resistBarBG.cameras = [camHUD];
+		resistBarBG.scale.set(1.6, 1.07);
+
+		add(resistBar);
+		add(resistBarBG);
+		resistBarBG.screenCenter();
+		resistBarBG.x = resistBar.x + 5;
+
+		resistBarBar = new FlxSprite(resistBar.x + 309, resistBar.y);
+		resistBarBar.makeGraphic(Std.int(resistBarBG.width/1.1), Std.int(resistBarBar.height), 'eda6c4');
+		resistBarBar.cameras = [camHUD];
+		add(resistBarBar);
+		resistBarBar.screenCenter();
 
 		healthBarBG = new AttachedSprite('healthBar');
 		healthBarBG.y = FlxG.height * 0.89;
@@ -2469,6 +2498,7 @@ ArchPopup.startPopupCustom('Error Found', 'No Items could be spawned as there ar
 		}
 		callOnLuas('onUpdateScore', [miss]);
 		scoreTxt.text += ' | Checks Left: ' + check + '/' + did + '(Total: ' + itemAmount + ')';
+		scoreTxt.text += ' | Amount of Resistance Left: ' + curResist + '%';
 	}
 
 	public function setSongTime(time:Float)
@@ -2550,11 +2580,7 @@ ArchPopup.startPopupCustom('Error Found', 'No Items could be spawned as there ar
 		#end
 		setOnLuas('songLength', songLength);
 		callOnLuas('onSongStart', []);
-
-		new FlxTimer().start(FlxG.random.float(5, FlxG.sound.music.length), function(deadTime:FlxTimer)
-		{
-			FlxG.camera.fade(FlxColor.WHITE, 1.6, false);
-		});
+		songStarted = true;
 	}
 
 	var debugNum:Int = 0;
@@ -3443,14 +3469,42 @@ case "Stairs":
 	{
 		commands = [];
 	}
-public var Crashed:Bool;
+
+	function updateResist() {
+		if (currentBarPorcent == 0)
+			resistBarBar.setGraphicSize(Std.int(resistBarBar.width/1.6 * resistBarBar.scale.x), 0);
+		else
+			resistBarBar.setGraphicSize(Std.int(resistBarBar.width/1.6 * resistBarBar.scale.x), Std.int(resistBarBG.height/0.99 * currentBarPorcent));
+
+		resistBarBar.x = resistBarBG.x;
+		resistBarBar.y = resistBar.y; // - resistBarBar.height;
+    	dadGroup.x = resistBarBG.height/1.2 * currentBarPorcent;
+
+		if (currentBarPorcent > 1) currentBarPorcent  = 1;
+		if (currentBarPorcent <= 0) {	
+			currentBarPorcent = 0;
+			resistBarBar.setGraphicSize(Std.int(resistBarBG.width/1.8 * resistBarBG.scale.x), 0);
+			resistBarBar.visible = false;
+		}
+		else resistBarBar.visible = true;
+
+		updateScore();
+		
+		if (currentBarPorcent == 1) health -= 0.0051;
+
+		curResist = 100 - ((currentBarPorcent * 1000)/10);
+		trace(currentBarPorcent);
+		
+		if (health >= 1) curHorny = -0 else curHorny = ((health-1)*100);
+	}
+	public var Crashed:Bool;
 	override public function update(elapsed:Float)
 	{
 
-	if (Crashed) {
-    FlxG.switchState(new MainMenuState());
-Crashed = false;
-}
+		if (Crashed) {
+			FlxG.switchState(new MainMenuState());
+			Crashed = false;
+		}
 
 		/*if (FlxG.keys.justPressed.NINE)
 		{
@@ -3489,12 +3543,19 @@ Crashed = false;
 				ArchPopup.startPopupCustom('You Used A Shield!', '-1 Shield ( ' + activeItems[0] + ' Left)', 'Color');
 			}
 
-			if (activeItems[1] == 1) doDeathCheck(true, true);
+			if (activeItems[1] == 1) 
+			{
+				activeItems[1] = 0;
+				health = 0;
+				doDeathCheck(true, true);
+			}
 		}
 
-			callOnLuas('onUpdate', [elapsed]);
+		callOnLuas('onUpdate', [elapsed]);
 
-			readChatData();
+		readChatData();
+
+		updateResist();
 
 		if(ClientPrefs.camMovement && !PlayState.isPixelStage) {
 			if(camlock) {
@@ -5282,6 +5343,8 @@ Crashed = false;
 		}
 
 		callOnLuas('noteMiss', [notes.members.indexOf(daNote), daNote.noteData, daNote.noteType, daNote.isSustainNote]);
+
+		if (daNote.noteType == '' && currentBarPorcent < 1) currentBarPorcent += 0.053;
 	}
 
 	function noteMissPress(direction:Int = 1):Void //You pressed a key when there was no notes to press for this key
@@ -5513,6 +5576,8 @@ Crashed = false;
 
 
 			callOnLuas('goodNoteHit', [notes.members.indexOf(note), leData, leType, isSus]);
+
+			if (currentBarPorcent > 0) currentBarPorcent =- 0.0080;
 
 			if (!note.isSustainNote)
 			{
@@ -5793,10 +5858,10 @@ Crashed = false;
 		super.beatHit();
 
 
-if(curBeat % 8 == 8)
-{
-readChatData();
-}
+		if(curBeat % 8 == 8)
+		{
+			readChatData();
+		}
 		if(lastBeatHit >= curBeat) {
 			//trace('BEAT HIT: ' + curBeat + ', LAST HIT: ' + lastBeatHit);
 			return;
@@ -5884,6 +5949,8 @@ readChatData();
 
 		setOnLuas('curBeat', curBeat); //DAWGG?????
 		callOnLuas('onBeatHit', []);
+
+		if (currentBarPorcent < 1) currentBarPorcent += 0.010;
 	}
 
 	override function sectionHit()
