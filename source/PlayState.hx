@@ -1180,23 +1180,27 @@ class PlayState extends MusicBeatState
 		FlxG.fixedTimestep = false;
 		moveCameraSection();
 
+		var resistGroup:FlxTypedGroup<FlxSprite> = new FlxTypedGroup<FlxSprite>();
+
 		resistBar = new FlxSprite(FlxG.width - 100, 60).loadGraphic(Paths.image('healthBar2'));
 		resistBar.scale.set(1.8, 1.1);
 		resistBar.cameras = [camHUD];
+		resistGroup.add(resistBar);
 
 		resistBarBG = new FlxSprite(resistBar.x, resistBar.y).loadGraphic(Paths.image('healthBarg'));
 		resistBarBG.cameras = [camHUD];
 		resistBarBG.scale.set(1.6, 1.07);
-
-		add(resistBar);
-		add(resistBarBG);
-		resistBarBG.screenCenter();
-		resistBarBG.x = resistBar.x + 5;
+		resistGroup.add(resistBarBG);
 
 		resistBarBar = new FlxSprite(resistBar.x, resistBar.y);
-		resistBarBar.makeGraphic(Std.int(resistBarBG.width/1.1), Std.int(resistBarBar.height), 0xffeda6c4);
+		resistBarBar.makeGraphic(Std.int(resistBarBG.width/1.1), Std.int(resistBar.height), 0xffeda6c4);
 		resistBarBar.cameras = [camHUD];
-		add(resistBarBar);
+		resistGroup.add(resistBarBar);
+		trace("Initial BarBar: " + (resistBarBar.x + resistBarBar.y));
+
+		add(resistGroup);
+		resistBarBG.screenCenter();
+		resistBarBG.x = resistBar.x + 5;
 		resistBarBar.screenCenter();
 
 		healthBarBG = new AttachedSprite('healthBar');
@@ -2498,7 +2502,8 @@ ArchPopup.startPopupCustom('Error Found', 'No Items could be spawned as there ar
 		}
 		callOnLuas('onUpdateScore', [miss]);
 		scoreTxt.text += ' | Checks Left: ' + check + '/' + did + '(Total: ' + itemAmount + ')';
-		scoreTxt.text += ' | Amount of Resistance Left: ' + curResist + '%';
+		scoreTxt.text += ' | Amount of Resistance Left: ' + Highscore.floorDecimal(curResist, 3) + '%';
+
 	}
 
 	public function setSongTime(time:Float)
@@ -3470,32 +3475,46 @@ case "Stairs":
 		commands = [];
 	}
 
-	function updateResist() {
-		if (currentBarPorcent == 0)
-			resistBarBar.setGraphicSize(Std.int(resistBarBar.width/1.6 * resistBarBar.scale.x), 0);
-		else
-			resistBarBar.setGraphicSize(Std.int(resistBarBar.width/1.6 * resistBarBar.scale.x), Std.int(resistBarBG.height/0.99 * currentBarPorcent));
-
-		resistBarBar.x = resistBar.x;
-		resistBarBar.y = resistBar.y + 655 - resistBarBar.height;
-    	dadGroup.x = resistBarBG.height/1.2 * currentBarPorcent;
-
-		if (currentBarPorcent > 1) currentBarPorcent  = 1;
-		if (currentBarPorcent <= 0) {	
-			currentBarPorcent = 0;
-			resistBarBar.setGraphicSize(Std.int(resistBarBG.width/1.8 * resistBarBG.scale.x), 0);
-			resistBarBar.visible = false;
+	function updateResist():Void {
+		if (currentBarPorcent == 0) {
+			resistBarBar.setGraphicSize(Math.ceil(resistBarBG.width / 1.6 * resistBarBG.scale.x), 1);
+		} else {
+			resistBarBar.setGraphicSize(Math.ceil(resistBarBG.width / 1.6 * resistBarBG.scale.x), Math.ceil(resistBarBG.height / 0.99 * currentBarPorcent));
 		}
-		else resistBarBar.visible = true;
+		resistBarBar.x = resistBar.x;
+		resistBarBar.y = resistBar.y + resistBarBG.height - resistBarBar.height;
+		dadGroup.x = Math.ceil(resistBarBG.width / 1.2 * currentBarPorcent);
 
+		if (currentBarPorcent > 1) {
+			currentBarPorcent = 1;
+		}
+		if (currentBarPorcent <= 0) {
+			currentBarPorcent = 0.01;
+			resistBarBar.setGraphicSize(Math.ceil(resistBarBG.width / 1.8 * resistBarBG.scale.x), 1);
+			resistBarBar.visible = false;
+		} else {
+			resistBarBar.visible = true;
+		}
+		if (currentBarPorcent == 1) {
+			health -= 0.0051;
+		}
+		curResist = 100 - Math.ceil((currentBarPorcent * 1000) / 10);
+
+		if (health >= 1) {
+			curHorny = -0;
+		} else {
+			curHorny = Math.ceil((health - 1) * 100);
+		}
+
+		// Debug traces
+		trace("Barbar size: " + resistBarBar.width + "x" + resistBarBar.height);
+		trace("Barbar visibility: " + resistBarBar.visible);
+
+		// Update the score
 		updateScore();
-		
-		if (currentBarPorcent == 1) health -= 0.0051;
-
-		curResist = 100 - ((currentBarPorcent * 1000)/10);
-		
-		if (health >= 1) curHorny = -0 else curHorny = ((health-1)*100);
 	}
+	
+	
 	public var Crashed:Bool;
 	override public function update(elapsed:Float)
 	{
@@ -5578,8 +5597,15 @@ case "Stairs":
 
 			callOnLuas('goodNoteHit', [notes.members.indexOf(note), leData, leType, isSus]);
 
-			if (currentBarPorcent < 1) currentBarPorcent =- 0.0020;
-
+			if (!note.isSustainNote) {
+				if (currentBarPorcent < 1) {
+					currentBarPorcent -= 0.0120;
+				}
+			} else {
+				if (currentBarPorcent < 1) {
+					currentBarPorcent -= 0.0001;
+				}
+			}
 			if (!note.isSustainNote)
 			{
 				note.kill();
