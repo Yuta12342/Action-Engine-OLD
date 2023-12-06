@@ -72,6 +72,9 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 
 		var goption:GameplayOption = new GameplayOption('Chart Modifier', 'chartModifier', 'string', 'Normal', ["Normal", "4K Only", "Flip", "Random", "Stairs", "Wave", "SpeedRando", "RandomBasic", "RandomComplex"]);
 		optionsArray.push(goption);
+		
+		var option:GameplayOption = new GameplayOption('Generator Type', 'generatorType', 'string', 'Chart', ["Chart", "Time"]);
+		optionsArray.push(option);
 
 		var option:GameplayOption = new GameplayOption('Health Gain Multiplier', 'healthgain', 'float', 1);
 		option.scrollSpeed = 2.5;

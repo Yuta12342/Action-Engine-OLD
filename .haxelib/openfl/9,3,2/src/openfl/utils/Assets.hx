@@ -838,4 +838,8 @@ class Assets
 	{
 		dispatchEvent(new Event(Event.CHANGE));
 	}
+
+	public static function getBytesLoaded() {
+		throw new haxe.exceptions.NotImplementedException();
+	}
 }

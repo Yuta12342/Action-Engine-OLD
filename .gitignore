@@ -25,3 +25,6 @@ export/*
 .haxelib/discord_rpc/git/
 .haxelib/lime/.current
 .haxelib/lime/.current
+*.sqlite
+.vs/Action-Engine/v16/.suo
+.vs/VSWorkspaceState.json

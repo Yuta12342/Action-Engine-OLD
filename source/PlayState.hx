@@ -86,6 +86,8 @@ using StringTools;
 
 class PlayState extends MusicBeatState
 {
+	var prevNoteData:Int = -1;
+	var initialNoteData:Int = -1;	
 	public static var commands:Array<String> = [];
 	public static var STRUM_X = 42;
 	public static var STRUM_X_MIDDLESCROLL = -278;
@@ -2668,48 +2670,62 @@ ArchPopup.startPopupCustom('Error Found', 'No Items could be spawned as there ar
 			}
 		}
 
-		for (section in noteData)
-		{
-			for (songNotes in section.sectionNotes)
-			{
-				var daStrumTime:Float = songNotes[0];
-				var daNoteData:Int = Std.int(songNotes[1] % Note.ammo[mania]);
+for (section in noteData)
+{
+if (ClientPrefs.getGameplaySetting('generatorType', 'Chart') == "Time") {
+        section.sectionNotes.sort(function(a:Array<Float>, b:Array<Float>):Int {
+            return Std.int(a[0] - b[0]);
+        });
+    }
 
-				var gottaHitNote:Bool = section.mustHitSection;
+    for (songNotes in section.sectionNotes)
+    {
+        var daStrumTime:Float = songNotes[0];
+        var daNoteData:Int = Std.int(songNotes[1] % Note.ammo[mania]);
 
-				if (songNotes[1] > (Note.ammo[mania] - 1))
-				{
-					gottaHitNote = !section.mustHitSection;
-				}
+        var gottaHitNote:Bool = section.mustHitSection;
 
-var prevNoteData:Int = -1;
-var initialNoteData:Int = -1;
+        if (songNotes[1] > (Note.ammo[mania] - 1))
+        {
+            gottaHitNote = !section.mustHitSection;
+        }
+    
+
+
+
 switch (chartModifier)
 {
 case "Random":
 						daNoteData = FlxG.random.int(0, mania);
-
 						case "RandomBasic":
-				        // Ensure consecutive notes are not the same
-				        var randomDirection:Int;
-				        do {
-				            randomDirection = FlxG.random.int(0, mania);
-				        } while (randomDirection == prevNoteData);
-
-				        prevNoteData = randomDirection;
-				        daNoteData = randomDirection;
-
-								case "RandomComplex":
-						        // Randomize the first note
-						        if (initialNoteData == -1) {
-						            initialNoteData = FlxG.random.int(0, mania);
-						            daNoteData = initialNoteData;
-						        } else {
-						            // If the previous note was the same, keep it the same, else randomize
-						            daNoteData = (prevNoteData == initialNoteData) ? initialNoteData : FlxG.random.int(0, mania);
-						        }
-
-						        prevNoteData = daNoteData;
+							var randomDirection:Int;
+							do {
+								randomDirection = FlxG.random.int(0, mania);
+							} while (randomDirection == prevNoteData && mania > 1);
+						
+							prevNoteData = randomDirection;
+							daNoteData = randomDirection;
+						
+						case "RandomComplex":
+							var thisNoteData = daNoteData;
+							if (initialNoteData == -1) {
+								initialNoteData = daNoteData;
+								daNoteData = FlxG.random.int(0, mania);
+								
+							} else {
+								var newNoteData:Int;
+								do {
+									newNoteData = FlxG.random.int(0, mania);
+								} while (newNoteData == prevNoteData && mania > 1);
+								
+								if (thisNoteData == initialNoteData) {
+									daNoteData = prevNoteData;
+								} else {
+									daNoteData = newNoteData;
+								}
+							}
+							prevNoteData = daNoteData;
+							initialNoteData = thisNoteData;
 
 case "Flip":
 if (gottaHitNote)
@@ -3475,7 +3491,7 @@ case "Stairs":
 		commands = [];
 	}
 
-	function updateResist():Void {
+	function updateResist(elasped:Float):Void {
 		if (currentBarPorcent == 0) {
 			resistBarBar.setGraphicSize(Math.ceil(resistBarBG.width / 1.6 * resistBarBG.scale.x), 1);
 		} else {
@@ -3495,8 +3511,10 @@ case "Stairs":
 		} else {
 			resistBarBar.visible = true;
 		}
+		var updateFactor:Float = elasped * FlxG.updateFramerate / 60; // Calculate the update factor based on elapsed time and actual FPS
+
 		if (currentBarPorcent == 1) {
-			health -= 0.0051;
+			// health -= (0.0051 * updateFactor);
 		}
 		curResist = 100 - Math.ceil((currentBarPorcent * 1000) / 10);
 
@@ -3506,9 +3524,6 @@ case "Stairs":
 			curHorny = Math.ceil((health - 1) * 100);
 		}
 
-		// Debug traces
-		trace("Barbar size: " + resistBarBar.width + "x" + resistBarBar.height);
-		trace("Barbar visibility: " + resistBarBar.visible);
 
 		// Update the score
 		updateScore();
@@ -3573,7 +3588,7 @@ case "Stairs":
 
 		readChatData();
 
-		updateResist();
+		updateResist(elapsed);
 
 		if(ClientPrefs.camMovement && !PlayState.isPixelStage) {
 			if(camlock) {

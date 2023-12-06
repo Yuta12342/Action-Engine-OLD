@@ -67,7 +67,8 @@ class ClientPrefs {
 		'practice' => false,
 		'botplay' => false,
 		'archMode' => false,
-		'opponentplay' => false
+		'opponentplay' => false,
+		'generatorType' => 'Chart'
 	];
 
 	public static var comboOffset:Array<Int> = [0, 0, 0, 0];
