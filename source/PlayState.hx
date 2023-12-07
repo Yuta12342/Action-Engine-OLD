@@ -355,8 +355,12 @@ class PlayState extends MusicBeatState
 	public var curResist:Float = 0;
 	public var curHorny:Float = 0;
 
+	
+
+
 	override public function create()
 	{
+	
 		if (ClientPrefs.getGameplaySetting('archMode', false))
 		{
 			if (FlxG.save.data.activeItems != null) activeItems = FlxG.save.data.activeItems;
@@ -2670,13 +2674,25 @@ ArchPopup.startPopupCustom('Error Found', 'No Items could be spawned as there ar
 			}
 		}
 
+for (section in noteData) {
+	for (songNotes in section.sectionNotes) {
+		if (ClientPrefs.getGameplaySetting('generatorType', 'Chart') == "Time") {
+			section.sectionNotes.sort(function(a:Array<Float>, b:Array<Float>):Int {
+				return Std.int(a[0] - b[0]);
+			});
+		}
+		// add here
+		if (songNotes.length >= 4 && !Std.isOfType(songNotes[3], String) || songNotes[3] == null) {
+			if (Std.isOfType(songNotes[2], String)) {
+				songNotes[3] = songNotes[2];
+			}
+		}
+	}
+}
+		
 for (section in noteData)
 {
-if (ClientPrefs.getGameplaySetting('generatorType', 'Chart') == "Time") {
-        section.sectionNotes.sort(function(a:Array<Float>, b:Array<Float>):Int {
-            return Std.int(a[0] - b[0]);
-        });
-    }
+
 
     for (songNotes in section.sectionNotes)
     {

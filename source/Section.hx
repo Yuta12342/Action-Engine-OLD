@@ -30,5 +30,6 @@ class Section
 	{
 		this.sectionBeats = sectionBeats;
 		trace('test created section: ' + sectionBeats);
-	}
-}
+			}
+
+		}
