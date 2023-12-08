@@ -2768,6 +2768,24 @@ case "Stairs":
 		} else {
 		    daNoteData = luigiSex - marioSex;
 		}
+		case "DoubleWave":
+			var ammoFromFortnite:Int = Note.ammo[mania];
+			var luigiSex:Int = (ammoFromFortnite * 4 - 4);
+			var marioSex:Int = stair++ % luigiSex;
+			var step:Int = Std.int(luigiSex / 3);
+
+			var waveIndex:Int = Std.int(marioSex / step);
+			var waveDirection:Int = waveIndex % 2 == 0 ? 1 : -1;
+			var waveRepeat:Int = Std.int(waveIndex / 2);
+
+			daNoteData = waveRepeat * step + waveDirection * (marioSex % step);
+
+			// If the note index is out of range, wrap it around
+			if (daNoteData < 0) {
+				daNoteData = 0;
+			} else if (daNoteData >= ammoFromFortnite) {
+				daNoteData = ammoFromFortnite - 1;
+			}
 
 		case "Ew":
 // I hate that I used Sketchie's variables as a base for this... ;-;
