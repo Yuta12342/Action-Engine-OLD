@@ -383,7 +383,7 @@ class PlayState extends MusicBeatState
 			if (FlxG.save.data.activeItems != null)
 				activeItems = FlxG.save.data.activeItems;
 			if (FlxG.save.data.activeItems == null)
-				activeItems[3] = FlxG.random.int(0, 6);
+				activeItems[3] = FlxG.random.int(0, 5);
 		}
 		if (Main.args[0] == 'editorMode')
 		{
@@ -456,7 +456,7 @@ class PlayState extends MusicBeatState
 						case 6:
 							chartModifier = 'Amalgam';
                     }
-					}
+					
 					ArchPopup.startPopupCustom('You Got an Item!', "Chart Modifier Trap (" + chartModifier + ")", 'Color');
 				}
 
@@ -1214,7 +1214,7 @@ class PlayState extends MusicBeatState
 
 		if (archMode)
 		{
-			itemAmount = FlxG.random.int(1, 999);
+			itemAmount = FlxG.random.int(1, ClientPrefs.getGameplaySetting('ItemAmount', 69));
 			trace('itemAmount:' + itemAmount);
 		}
 

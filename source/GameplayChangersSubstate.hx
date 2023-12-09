@@ -70,7 +70,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		optionsArray.push(option);
 		#end
 
-		var goption:GameplayOption = new GameplayOption('Chart Modifier', 'chartModifier', 'string', 'Normal', ["Normal", "4K Only", "Flip", "Random", "Stairs", "Wave", "DoubleWave", "SpeedRando", "RandomBasic", "RandomComplex"]);
+		var goption:GameplayOption = new GameplayOption('Chart Modifier', 'chartModifier', 'string', 'Normal', ["Normal", "4K Only", "Flip", "Random", "Stairs", "Wave", "DoubleWave", "SpeedRando", "RandomBasic", "RandomComplex", "Amalgam"]);
 		optionsArray.push(goption);
 		
 		var option:GameplayOption = new GameplayOption('Generator Type', 'generatorType', 'string', 'Chart', ["Chart", "Time"]);
@@ -103,6 +103,13 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 
 		var option:GameplayOption = new GameplayOption('Archipelago Mode', 'archMode', 'bool', false);
 		optionsArray.push(option);
+
+		var option:GameplayOption = new GameplayOption('Maximum Items', 'itemAmount', 'int', 69);
+		option.scrollSpeed = 1;
+		option.minValue = 0;
+		option.maxValue = 9999;
+		optionsArray.push(option);
+
 	}
 
 	public function getOptionByName(name:String)
