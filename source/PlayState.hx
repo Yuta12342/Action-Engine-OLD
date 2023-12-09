@@ -383,7 +383,7 @@ class PlayState extends MusicBeatState
 			if (FlxG.save.data.activeItems != null)
 				activeItems = FlxG.save.data.activeItems;
 			if (FlxG.save.data.activeItems == null)
-				activeItems[3] = FlxG.random.int(0, 5);
+				activeItems[3] = FlxG.random.int(0, 6);
 		}
 		if (Main.args[0] == 'editorMode')
 		{
