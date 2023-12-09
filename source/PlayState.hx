@@ -2869,28 +2869,33 @@ class PlayState extends MusicBeatState
 			}
 		}
 
-		for (section in noteData)
-		{
-			for (songNotes in section.sectionNotes)
-			{
-				if (ClientPrefs.getGameplaySetting('generatorType', 'Chart') == "Time")
+		/*
+				for (section in noteData)
 				{
-					section.sectionNotes.sort(function(a:Array<Float>, b:Array<Float>):Int
+					for (songNotes in section.sectionNotes)
 					{
-						return Std.int(a[0] - b[0]);
-					});
+						if (ClientPrefs.getGameplaySetting('generatorType', 'Chart') == "Time")
+						{
+							section.sectionNotes.sort(function(a:Array<Float>, b:Array<Float>):Int
+							{
+								return Std.int(a[0] - b[0]);
+							});
 
-				}
-				// add here
-				if (songNotes.length >= 4 && !Std.isOfType(songNotes[3], String) || songNotes[3] == null)
-				{
-					if (Std.isOfType(songNotes[2], String))
-					{
-						songNotes[3] = songNotes[2];
+						}
+						// add here
+						if (songNotes.length >= 4 && !Std.isOfType(songNotes[3], String) || songNotes[3] == null)
+						{
+							if (Std.isOfType(songNotes[2], String))
+							{
+								songNotes[3] = songNotes[2];
+							}
+						}
 					}
 				}
-			}
-		}
+		*/
+
+
+		
 		for (section in noteData)
 		{
 			for (songNotes in section.sectionNotes)
@@ -2904,6 +2909,8 @@ class PlayState extends MusicBeatState
 				{
 					gottaHitNote = !section.mustHitSection;
 				}
+
+				
 				switch (chartModifier)
 				{
 					case "Random":
@@ -2970,34 +2977,27 @@ class PlayState extends MusicBeatState
 						{
 							daNoteData = luigiSex - marioSex;
 						}
-					case "DoubleWave":
+					case "Trills":
 						var ammoFromFortnite:Int = Note.ammo[mania];
-						var luigiSex:Int = (ammoFromFortnite * 4 - 4);
-						var marioSex:Int = stair++ % luigiSex;
-						var step:Int = Std.int(luigiSex / 3);
+						var luigiSex:Int = (ammoFromFortnite * 2 - 2);
+						var marioSex:Int;
 
-						var waveIndex:Int = Std.int(marioSex / step);
-						var waveDirection:Int = waveIndex % 2 == 0 ? 1 : -1;
-						var waveRepeat:Int = Std.int(waveIndex / 2);
+						do
+						{
+							marioSex = Std.int((stair++ % (luigiSex * 4)) / 4 + stair % 2);
 
-						var repeatStep:Int = marioSex % step;
+							if (marioSex < ammoFromFortnite)
+							{
+								daNoteData = marioSex;
+							}
+							else
+							{
+								daNoteData = luigiSex - marioSex;
+							}
+						}
+						while (daNoteData == prevNoteData && mania > 1);
 
-						if (repeatStep < waveRepeat)
-						{
-							daNoteData = waveIndex * step + waveDirection * repeatStep;
-						}
-						else
-						{
-							daNoteData = waveIndex * step + waveDirection * (waveRepeat * 2 - repeatStep);
-						}
-						if (daNoteData < 0)
-						{
-							daNoteData = 0;
-						}
-						else if (daNoteData >= ammoFromFortnite)
-						{
-							daNoteData = ammoFromFortnite - 1;
-						}
+						prevNoteData = daNoteData;
 					case "Ew":
 						// I hate that I used Sketchie's variables as a base for this... ;-;
 						var ammoFromFortnite:Int = Note.ammo[mania];
@@ -3064,14 +3064,17 @@ case "Amalgam":
 						"4K Only",
 						"Stairs",
 						"Wave",
-						"DoubleWave",
+						"Huh",
 						"Ew",
-						"What"
+						"What",
+						"Jack Wave",
+						"SpeedRando",
+						"Trills"
 					];
 
 					if (caseExecutionCount <= 0)
 					{
-						currentModifier = FlxG.random.int(0, 9); // Randomly select a case from 0 to 9
+						currentModifier = FlxG.random.int(-1, (modifierNames.length - 1)); // Randomly select a case from 0 to 9
 						caseExecutionCount = FlxG.random.int(1, 51); // Randomly select a number from 1 to 50
 						trace("Active Modifier: " + modifierNames[currentModifier] + ", Notes to edit: " + caseExecutionCount);
 					}
@@ -3145,7 +3148,7 @@ case "Amalgam":
 							{
 								daNoteData = luigiSex - marioSex;
 							}
-						case 7: // "DoubleWave"
+						case 7: // "Huh"
 							var ammoFromFortnite:Int = Note.ammo[mania];
 							var luigiSex:Int = (ammoFromFortnite * 4 - 4);
 							var marioSex:Int = stair++ % luigiSex;
@@ -3206,6 +3209,46 @@ case "Amalgam":
 									daNoteData = Note.ammo[mania] - 1 - (stair % Note.ammo[mania]);
 							}
 							stair++;
+
+						case 10: // Jack Wave
+							var ammoFromFortnite:Int = Note.ammo[mania];
+							var luigiSex:Int = (ammoFromFortnite * 2 - 2);
+							var marioSex:Int = Std.int((stair++ % (luigiSex * 4)) / 4);
+	
+							if (marioSex < ammoFromFortnite)
+							{
+								daNoteData = marioSex;
+							}
+							else
+							{
+								daNoteData = luigiSex - marioSex;
+							}
+
+						case 11: // SpeedRando
+						// Handled by SpeedRando Code below!
+
+						case 12: // Trills
+						var ammoFromFortnite:Int = Note.ammo[mania];
+						var luigiSex:Int = (ammoFromFortnite * 2 - 2);
+						var marioSex:Int;
+
+						do
+						{
+							marioSex = Std.int((stair++ % (luigiSex * 4)) / 4 + stair % 2);
+
+							if (marioSex < ammoFromFortnite)
+							{
+								daNoteData = marioSex;
+							}
+							else
+							{
+								daNoteData = luigiSex - marioSex;
+							}
+						}
+						while (daNoteData == prevNoteData && mania > 1);
+
+						prevNoteData = daNoteData;
+
 						default:
 							// Default case (optional)
 					}
@@ -3227,6 +3270,9 @@ case "Amalgam":
 				swagNote.sustainLength = songNotes[2];
 				swagNote.gfNote = (section.gfSection && (songNotes[1] < Note.ammo[mania]));
 				swagNote.noteType = songNotes[3];
+				if (chartModifier == 'Amalgam' && currentModifier == 11)
+					{swagNote.multSpeed = FlxG.random.float(0.1, 2);}
+
 				if (!Std.isOfType(songNotes[3], String))
 					swagNote.noteType = editors.ChartingState.noteTypeList[songNotes[3]]; // Backward compatibility + compatibility with Week 7 charts
 				swagNote.scrollFactor.set();
@@ -3243,12 +3289,14 @@ case "Amalgam":
 						oldNote = unspawnNotes[Std.int(unspawnNotes.length - 1)];
 						var sustainNote:Note = new Note(daStrumTime
 							+ (Conductor.stepCrochet * susNote)
-							+ (Conductor.stepCrochet / FlxMath.roundDecimal(songSpeed, 2)), daNoteData, oldNote,
+							+ (Conductor.stepCrochet / FlxMath.roundDecimal(songSpeed + swagNote.multSpeed, 2)), daNoteData, oldNote,
 							true);
 
 						sustainNote.mustPress = gottaHitNote;
 						sustainNote.gfNote = (section.gfSection && (songNotes[1] < Note.ammo[mania]));
 						sustainNote.noteType = swagNote.noteType;
+						if (chartModifier == 'Amalgam' && currentModifier == 11)
+							{sustainNote.multSpeed = swagNote.multSpeed;}
 						sustainNote.scrollFactor.set();
 						unspawnNotes.push(sustainNote);
 						if (sustainNote.mustPress)
