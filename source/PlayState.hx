@@ -383,7 +383,7 @@ class PlayState extends MusicBeatState
 			if (FlxG.save.data.activeItems != null)
 				activeItems = FlxG.save.data.activeItems;
 			if (FlxG.save.data.activeItems == null)
-				activeItems[3] = FlxG.random.int(0, 6);
+				activeItems[3] = FlxG.random.int(0, 7);
 		}
 		if (Main.args[0] == 'editorMode')
 		{
@@ -455,6 +455,8 @@ class PlayState extends MusicBeatState
 							chartModifier = 'SpeedRando';
 						case 6:
 							chartModifier = 'Amalgam';
+						case 7:
+							chartModifier = 'Trills';
                     }
 					
 					ArchPopup.startPopupCustom('You Got an Item!', "Chart Modifier Trap (" + chartModifier + ")", 'Color');
@@ -2895,7 +2897,7 @@ class PlayState extends MusicBeatState
 		*/
 
 
-		
+
 		for (section in noteData)
 		{
 			for (songNotes in section.sectionNotes)
