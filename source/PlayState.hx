@@ -466,7 +466,7 @@ class PlayState extends MusicBeatState
 						case 7:
 							chartModifier = 'Trills';
 						case 8:
-							trap = "Intense Window"
+							trap = "Intense Window";
 					}
 
 					ArchPopup.startPopupCustom('You Got an Item!', "It's a trap!", 'Color');
