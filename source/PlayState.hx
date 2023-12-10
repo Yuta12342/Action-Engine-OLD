@@ -84,12 +84,14 @@ import vlc.MP4Handler as VideoHandler;
 #end
 #end
 using StringTools;
-typedef PatternResult = {
-	pattern: Array<Int>,
-	repetitions: Int,
-	start: Int,
-	end: Int,
-	patternLength: Int
+
+typedef PatternResult =
+{
+	pattern:Array<Int>,
+	repetitions:Int,
+	start:Int,
+	end:Int,
+	patternLength:Int
 }
 
 class PlayState extends MusicBeatState
@@ -2908,89 +2910,88 @@ class PlayState extends MusicBeatState
 			}
 		}
 	 */
-	var allNotes:Array<Int> = [];
-	for (section in noteData)
-	{
-		for (songNotes in section.sectionNotes)
-		{
-			allNotes.push(songNotes[1]);
-		}
-	}
+		var allNotes:Array<Int> = [];
 
-	static function findPatterns(noteData:Array<Int>):Array<PatternResult>
-	{
-		var notePositions:Array<Int> = allNotes;
-		var patternResults:Array<PatternResult> = findRepeatingPatterns(notePositions);
-
-		if (patternResults.length > 0)
+		for (section in noteData)
 		{
-			for (result in patternResults)
+			for (songNotes in section.sectionNotes)
 			{
-				trace("Pattern found: " + result.pattern);
-				trace("Starts at: " + result.start);
-				trace("Ends at: " + result.end);
-				trace("Number of repetitions: " + result.repetitions);
-				trace("------");
+				allNotes.push(songNotes[1]);
 			}
 		}
-		else
+		static function findPatterns(noteData:Array<Int>):Array<PatternResult>
 		{
-			trace("No repeating patterns found.");
-		}
+			var notePositions:Array<Int> = allNotes;
+			var patternResults:Array<PatternResult> = findRepeatingPatterns(notePositions);
 
-		return patternResults;
-	}
-
-	static function findRepeatingPatterns(notePositions:Array<Int>):Array<PatternResult>
-	{
-		var results:Array<PatternResult> = [];
-
-		for (var patternLength:Int = 1; patternLength <= notePositions.length / 2; patternLength++)
-		{
-			var currentPattern:Array<Int> = notePositions.slice(0, patternLength);
-			var repetitions:Int = countPatternRepetitions(notePositions, currentPattern);
-
-			if (repetitions > 1)
+			if (patternResults.length > 0)
 			{
-				var result:PatternResult = {
-					pattern: currentPattern,
-					repetitions: repetitions,
-					start: notePositions.indexOf(currentPattern[0]),
-					patternLength: currentPattern.length,
-					end: notePositions.indexOf(currentPattern[0]) + (currentPattern.length * repetitions) - 1
-				};
-				results.push(result);
+				for (result in patternResults)
+				{
+					trace("Pattern found: " + result.pattern);
+					trace("Starts at: " + result.start);
+					trace("Ends at: " + result.end);
+					trace("Number of repetitions: " + result.repetitions);
+					trace("------");
+				}
 			}
+			else
+			{
+				trace("No repeating patterns found.");
+			}
+
+			return patternResults;
 		}
 
-		return results;
-	}
+		static function findRepeatingPatterns(notePositions:Array<Int>):Array<PatternResult>
+		{
+			var results:Array<PatternResult> = [];
+
+			for (patternLength in 0...notePositions.length)
+			{
+				var currentPattern:Array<Int> = notePositions.slice(0, patternLength);
+				var repetitions:Int = countPatternRepetitions(notePositions, currentPattern);
+
+				if (repetitions > 1)
+				{
+					var result:PatternResult = {
+						pattern: currentPattern,
+						repetitions: repetitions,
+						start: notePositions.indexOf(currentPattern[0]),
+						patternLength: currentPattern.length,
+						end: notePositions.indexOf(currentPattern[0]) + (currentPattern.length * repetitions) - 1
+					};
+					results.push(result);
+				}
+			}
+
+			return results;
+		}
 
 	static function countPatternRepetitions(notePositions:Array<Int>, pattern:Array<Int>):Int
-	{
-		var repetitions:Int = 0;
-		var i:Int = 0;
-
-		while (i < notePositions.length)
 		{
-			var currentIndex:Int = i % pattern.length;
-			if (notePositions[i] != pattern[currentIndex])
+			var repetitions:Int = 0;
+			var i:Int = 0;
+
+			while (i < notePositions.length)
 			{
-				i += pattern.length - currentIndex; // Skip to the next potential pattern start
-				continue;
+				var currentIndex:Int = i % pattern.length;
+				if (notePositions[i] != pattern[currentIndex])
+				{
+					i += pattern.length - currentIndex; // Skip to the next potential pattern start
+					continue;
+				}
+
+				if (currentIndex == pattern.length - 1)
+				{
+					repetitions++;
+				}
+
+				i++;
 			}
 
-			if (currentIndex == pattern.length - 1)
-			{
-				repetitions++;
-			}
-
-			i++;
+			return repetitions;
 		}
-
-		return repetitions;
-	}
-
 	
 
 	for (section in noteData)
@@ -3000,14 +3001,10 @@ class PlayState extends MusicBeatState
 			var daStrumTime:Float = songNotes[0];
 			var daNoteData:Int = Std.int(songNotes[1] % Note.ammo[mania]);
 			var gottaHitNote:Bool = section.mustHitSection;
-
 			if (songNotes[1] > (Note.ammo[mania] - 1))
 			{
 				gottaHitNote = !section.mustHitSection;
 			}
-
-			
-
 			switch (chartModifier)
 			{
 				case "Random":
@@ -3517,7 +3514,8 @@ class PlayState extends MusicBeatState
 			}
 		}
 	}
-} public var did:Int = 0;
+}
+public var did:Int = 0;
 public var itemAmount:Int = 1;
 public var stuck:Bool = false;
 
