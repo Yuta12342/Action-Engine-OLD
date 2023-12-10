@@ -2908,88 +2908,88 @@ class PlayState extends MusicBeatState
 			}
 		}
 	 */
-	 var allNotes:Array<Int> = [];
-				for (section in noteData)
-				{
-					for (songNotes in section.sectionNotes)
-					{
-						allNotes.push(songNotes[1]);
-					}
-				}
-			
-		
-		static function findPatterns(noteData:Array<Int>):Array<PatternResult>
+	var allNotes:Array<Int> = [];
+	for (section in noteData)
+	{
+		for (songNotes in section.sectionNotes)
 		{
-			var notePositions:Array<Int> = allNotes;
-			var patternResults:Array<PatternResult> = findRepeatingPatterns(notePositions);
+			allNotes.push(songNotes[1]);
+		}
+	}
 
-			if (patternResults.length > 0)
-			{
-				for (result in patternResults)
-				{
-					trace("Pattern found: " + result.pattern);
-					trace("Starts at: " + result.start);
-					trace("Ends at: " + result.end);
-					trace("Number of repetitions: " + result.repetitions);
-					trace("------");
-				}
-			}
-			else
-			{
-				trace("No repeating patterns found.");
-			}
+	static function findPatterns(noteData:Array<Int>):Array<PatternResult>
+	{
+		var notePositions:Array<Int> = allNotes;
+		var patternResults:Array<PatternResult> = findRepeatingPatterns(notePositions);
 
-			return patternResults;
+		if (patternResults.length > 0)
+		{
+			for (result in patternResults)
+			{
+				trace("Pattern found: " + result.pattern);
+				trace("Starts at: " + result.start);
+				trace("Ends at: " + result.end);
+				trace("Number of repetitions: " + result.repetitions);
+				trace("------");
+			}
+		}
+		else
+		{
+			trace("No repeating patterns found.");
 		}
 
-		static function findRepeatingPatterns(notePositions:Array<Int>):Array<PatternResult>
+		return patternResults;
+	}
+
+	static function findRepeatingPatterns(notePositions:Array<Int>):Array<PatternResult>
+	{
+		var results:Array<PatternResult> = [];
+
+		for (var patternLength:Int = 1; patternLength <= notePositions.length / 2; patternLength++)
 		{
-			var results:Array<PatternResult> = [];
+			var currentPattern:Array<Int> = notePositions.slice(0, patternLength);
+			var repetitions:Int = countPatternRepetitions(notePositions, currentPattern);
 
-			for (var patternLength:Int = 1; patternLength <= notePositions.length / 2; patternLength++)
+			if (repetitions > 1)
 			{
-				var currentPattern:Array<Int> = notePositions.slice(0, patternLength);
-				var repetitions:Int = countPatternRepetitions(notePositions, currentPattern);
-
-				if (repetitions > 1)
-				{
-					var result:PatternResult = new PatternResult();
-					result.pattern = currentPattern;
-					result.repetitions = repetitions;
-					result.start = notePositions.indexOf(currentPattern[0]);
-					result.patternLength = currentPattern.length
-					result.end = result.start + (currentPattern.length * repetitions) - 1;
-					results.push(result);
-				}
+				var result:PatternResult = {
+					pattern: currentPattern,
+					repetitions: repetitions,
+					start: notePositions.indexOf(currentPattern[0]),
+					patternLength: currentPattern.length,
+					end: notePositions.indexOf(currentPattern[0]) + (currentPattern.length * repetitions) - 1
+				};
+				results.push(result);
 			}
-
-			return results;
 		}
 
-		static function countPatternRepetitions(notePositions:Array<Int>, pattern:Array<Int>):Int
+		return results;
+	}
+
+	static function countPatternRepetitions(notePositions:Array<Int>, pattern:Array<Int>):Int
+	{
+		var repetitions:Int = 0;
+		var i:Int = 0;
+
+		while (i < notePositions.length)
 		{
-			var repetitions:Int = 0;
-			var i:Int = 0;
-
-			while (i < notePositions.length)
+			var currentIndex:Int = i % pattern.length;
+			if (notePositions[i] != pattern[currentIndex])
 			{
-				var currentIndex:Int = i % pattern.length;
-				if (notePositions[i] != pattern[currentIndex])
-				{
-					i += pattern.length - currentIndex; // Skip to the next potential pattern start
-					continue;
-				}
-
-				if (currentIndex == pattern.length - 1)
-				{
-					repetitions++;
-				}
-
-				i++;
+				i += pattern.length - currentIndex; // Skip to the next potential pattern start
+				continue;
 			}
 
-			return repetitions;
+			if (currentIndex == pattern.length - 1)
+			{
+				repetitions++;
+			}
+
+			i++;
 		}
+
+		return repetitions;
+	}
 
 	
 
