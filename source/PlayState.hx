@@ -470,13 +470,13 @@ class PlayState extends MusicBeatState
 						case 8:
 							trap = "Intense Window";
 					}
-
-					ArchPopup.startPopupCustom('You Got an Item!', "It's a trap!", 'Color');
 				}
-
-				maxHealth += activeItems[2];
+					ArchPopup.startPopupCustom('You Got an Item!', "Chart Modifier Trap (" + chartModifier + ")", 'Color');
 			}
+			maxHealth += activeItems[2];
 		}
+		
+		
 
 		// var gameCam:FlxCamera = FlxG.camera;
 		camGame = new FlxCamera();
