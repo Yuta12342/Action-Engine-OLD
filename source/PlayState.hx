@@ -2801,6 +2801,56 @@ class PlayState extends MusicBeatState
 		songStarted = true;
 	}
 
+	function findRepeatingPatterns(notePositions:Array<Int>):Array<PatternResult>
+	{
+		var results:Array<PatternResult> = [];
+
+		for (patternLength in 0...notePositions.length)
+		{
+			var currentPattern:Array<Int> = notePositions.slice(0, patternLength);
+			var repetitions:Int = countPatternRepetitions(notePositions, currentPattern);
+
+			if (repetitions > 1)
+			{
+				var result:PatternResult = {
+					pattern: currentPattern,
+					repetitions: repetitions,
+					start: Std.int(notePositions.indexOf(currentPattern[0])),
+					patternLength: currentPattern.length,
+					end: Std.int(notePositions.indexOf(currentPattern[0])) + (currentPattern.length * repetitions) - 1
+				};
+				results.push(result);
+			}
+		}
+
+		return results;
+	}
+
+	function countPatternRepetitions(notePositions:Array<Int>, pattern:Array<Int>):Int
+	{
+		var repetitions:Int = 0;
+		var i:Int = 0;
+
+		while (i < notePositions.length)
+		{
+			var currentIndex:Int = i % pattern.length;
+			if (notePositions[i] != pattern[currentIndex])
+			{
+				i += pattern.length - currentIndex; // Skip to the next potential pattern start
+				continue;
+			}
+
+			if (currentIndex == pattern.length - 1)
+			{
+				repetitions++;
+			}
+
+			i++;
+		}
+
+		return repetitions;
+	}
+
 	var debugNum:Int = 0;
 	var stair:Int = 0;
 	private var noteTypeMap:Map<String, Bool> = new Map<String, Bool>();
@@ -2861,11 +2911,9 @@ class PlayState extends MusicBeatState
 		var songName:String = Paths.formatToSongPath(SONG.song);
 		var file:String = Paths.json(songName + '/events');
 		#if MODS_ALLOWED
-		if (FileSystem.exists(Paths.modsJson(songName + '/events')) || FileSystem.exists(file))
-		{
+		if (FileSystem.exists(Paths.modsJson(songName + '/events')) || FileSystem.exists(file)) {
 		#else
-		if (OpenFlAssets.exists(file))
-		{
+		if (OpenFlAssets.exists(file)) {
 		#end
 			var eventsData:Array<Dynamic> = Song.loadFromJson('events', songName).events;
 			for (event in eventsData) // Event Notes
@@ -2919,7 +2967,8 @@ class PlayState extends MusicBeatState
 				allNotes.push(songNotes[1]);
 			}
 		}
-		static function findPatterns(noteData:Array<Int>):Array<PatternResult>
+
+		function findPatterns(noteData:Array<Int>):Array<PatternResult>
 		{
 			var notePositions:Array<Int> = allNotes;
 			var patternResults:Array<PatternResult> = findRepeatingPatterns(notePositions);
@@ -2941,56 +2990,6 @@ class PlayState extends MusicBeatState
 			}
 
 			return patternResults;
-		}
-
-		static function findRepeatingPatterns(notePositions:Array<Int>):Array<PatternResult>
-		{
-			var results:Array<PatternResult> = [];
-
-			for (patternLength in 0...notePositions.length)
-			{
-				var currentPattern:Array<Int> = notePositions.slice(0, patternLength);
-				var repetitions:Int = countPatternRepetitions(notePositions, currentPattern);
-
-				if (repetitions > 1)
-				{
-					var result:PatternResult = {
-						pattern: currentPattern,
-						repetitions: repetitions,
-						start: notePositions.indexOf(currentPattern[0]),
-						patternLength: currentPattern.length,
-						end: notePositions.indexOf(currentPattern[0]) + (currentPattern.length * repetitions) - 1
-					};
-					results.push(result);
-				}
-			}
-
-			return results;
-		}
-
-	static function countPatternRepetitions(notePositions:Array<Int>, pattern:Array<Int>):Int
-		{
-			var repetitions:Int = 0;
-			var i:Int = 0;
-
-			while (i < notePositions.length)
-			{
-				var currentIndex:Int = i % pattern.length;
-				if (notePositions[i] != pattern[currentIndex])
-				{
-					i += pattern.length - currentIndex; // Skip to the next potential pattern start
-					continue;
-				}
-
-				if (currentIndex == pattern.length - 1)
-				{
-					repetitions++;
-				}
-
-				i++;
-			}
-
-			return repetitions;
 		}
 	
 
