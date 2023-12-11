@@ -8467,3 +8467,4 @@ export/*
 .haxelib/lime/8,1,1/tools/utils/JavaExternGenerator.hx
 .haxelib/lime/8,1,1/tools/utils/PlatformSetup.hx
 .haxelib/lime/8,1,1/tools/utils/publish/FirefoxMarketplace.hx
+.haxelib/yaml/git/
