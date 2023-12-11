@@ -2958,15 +2958,7 @@ class PlayState extends MusicBeatState
 			}
 		}
 	 */
-		var allNotes:Array<Int> = [];
-
-		for (section in noteData)
-		{
-			for (songNotes in section.sectionNotes)
-			{
-				allNotes.push(songNotes[1]);
-			}
-		}
+	 var allNotes:Array<Int> = [];
 
 		function findPatterns(noteData:Array<Int>):Array<PatternResult>
 		{
@@ -2991,8 +2983,20 @@ class PlayState extends MusicBeatState
 
 			return patternResults;
 		}
-	
 
+
+// if (chartModifier == 'RandomPatterned')
+// {
+
+	for (section in noteData)
+	{
+		for (songNotes in section.sectionNotes)
+		{
+			allNotes.push(songNotes[1]);
+		}
+	}
+	var patterns:Array<PatternResult> = findPatterns(allNotes);
+// }
 	for (section in noteData)
 	{
 		for (songNotes in section.sectionNotes)
