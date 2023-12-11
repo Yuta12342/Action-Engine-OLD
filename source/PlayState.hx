@@ -2831,24 +2831,28 @@ class PlayState extends MusicBeatState
 		var repetitions:Int = 0;
 		var i:Int = 0;
 
-		while (i < notePositions.length)
+		if (repetitions != 0)
 		{
-			var currentIndex:Int = i % pattern.length;
-			if (notePositions[i] != pattern[currentIndex])
+			while (i < notePositions.length)
 			{
-				i += pattern.length - currentIndex; // Skip to the next potential pattern start
-				continue;
+				var currentIndex:Int = i % pattern.length;
+				if (notePositions[i] != pattern[currentIndex])
+				{
+					i += pattern.length - currentIndex; // Skip to the next potential pattern start
+					continue;
+				}
+
+				if (currentIndex == pattern.length - 1)
+				{
+					repetitions++;
+				}
+
+				i++;
 			}
 
-			if (currentIndex == pattern.length - 1)
-			{
-				repetitions++;
-			}
-
-			i++;
 		}
 
-		return repetitions;
+			return repetitions;
 	}
 
 	var debugNum:Int = 0;
