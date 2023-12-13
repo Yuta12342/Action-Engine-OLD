@@ -68,7 +68,8 @@ class ClientPrefs {
 		'botplay' => false,
 		'archMode' => false,
 		'opponentplay' => false,
-		'generatorType' => 'Chart'
+		'generatorType' => 'Chart',
+		'itemAmount' => 69,
 	];
 
 	public static var comboOffset:Array<Int> = [0, 0, 0, 0];

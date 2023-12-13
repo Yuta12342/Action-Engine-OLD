@@ -128,6 +128,7 @@ public static var initialState:Class<FlxState> = TitleState; // The FlxState the
 	}
 
 	static public function setExitHandler(func:Void->Void):Void {
+		FlxG.save.data.safeExit = true;
 	    #if openfl_legacy
 	    openfl.Lib.current.stage.onQuit = function() {
 	        func();

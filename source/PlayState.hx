@@ -375,6 +375,7 @@ class PlayState extends MusicBeatState
 
 	public var activeItems:Array<Int> = [0, 0, 0, 0]; // Shield, Curse, MHP, Traps
 	public var archMode:Bool = false;
+	public var itemAmount:Int = 0;
 	public var midSwitched:Bool = false;
 
 	var resistGroup:FlxTypedGroup<FlxSprite>;
@@ -447,6 +448,7 @@ class PlayState extends MusicBeatState
 		cpuControlled = ClientPrefs.getGameplaySetting('botplay', false);
 		chartModifier = ClientPrefs.getGameplaySetting('chartModifier', 'Normal');
 		archMode = ClientPrefs.getGameplaySetting('archMode', false);
+		itemAmount = ClientPrefs.getGameplaySetting('itemAmount', 69);
 
 		if (archMode)
 		{
@@ -1229,7 +1231,8 @@ class PlayState extends MusicBeatState
 
 		if (archMode)
 		{
-			itemAmount = FlxG.random.int(1, ClientPrefs.getGameplaySetting('ItemAmount', 69));
+			itemAmount = FlxG.random.int(1, ClientPrefs.getGameplaySetting('itemAmount', 69));
+			trace('Max Items = ' + ClientPrefs.getGameplaySetting('itemAmount', 69));
 			trace('itemAmount:' + itemAmount);
 		}
 
@@ -2394,13 +2397,14 @@ class PlayState extends MusicBeatState
 							unspawnNotes[i].isCheck = true;
 							did++;
 							foundOne = true;
-							trace('Found One! ' + did + '/' + itemAmount);
+							Sys.print('\rGenerating Checks: ' + did + '/' + itemAmount);
 						}
 						else if (unspawnNotes.filter(function(note:Note):Bool
 						{
 							return note.mustPress && !note.isSustainNote && !note.isCheck && !note.ignoreNote;
 						}).length == 0)
 						{
+							Sys.println('');
 							trace('Stuck!');
 							stuck = true;
 							// Additional handling for when it gets stuck
@@ -2410,6 +2414,7 @@ class PlayState extends MusicBeatState
 					// Check if there are no more mustPress notes that are not sustain notes, not isCheck, and not ignoreNote
 					if (stuck)
 					{
+						Sys.println('');
 						trace('No more suitable notes found. Stopping current Generation...');
 						trace('Waiting for Song Generator...');
 						break; // exit the loop if no more suitable notes are found
@@ -2417,11 +2422,12 @@ class PlayState extends MusicBeatState
 				}
 			}
 		}
-
+		Sys.println('');
 		trace("Note Generation complete.");
 
 		if (did == 0)
 		{
+			Sys.println('');
 			trace("No notes...? Impossible song detected! Fixing this blunder.");
 			check = itemAmount;
 			ArchPopup.startPopupCustom('You Found A Check!', check + '/' + itemAmount, 'Color');
@@ -2438,7 +2444,32 @@ class PlayState extends MusicBeatState
 				unspawnNotes[i].colorSwap.saturation = 50;
 				unspawnNotes[i].colorSwap.brightness = 50;
 			}
+			for (i in 0...unspawnNotes.length)
+			{
+				if (unspawnNotes[i].isSustainNote && unspawnNotes[i].noteIndex == unspawnNotes[i].noteIndex)
+				{
+					for (note in unspawnNotes)
+					{
+						if (note.isCheck && note.noteIndex == unspawnNotes[i].noteIndex)
+						{
+							unspawnNotes[i].colorSwap.hue = 40;
+							unspawnNotes[i].colorSwap.saturation = 50;
+							unspawnNotes[i].colorSwap.brightness = 50;
+
+							// Print progress and note being changed on a single line
+							//Sys.print('\rProgress: ' + (i + 1) + '/' + unspawnNotes.length + ', Changing note: ' + unspawnNotes[i].noteIndex);
+
+							break;
+						}
+					}
+				}
+			}
+
 		}
+		Sys.println('');
+		trace("Generation complete.");
+
+        trace('Starting Countdown...');
 		if (startedCountdown)
 		{
 			callOnLuas('onStartCountdown', []);
@@ -3921,13 +3952,14 @@ class PlayState extends MusicBeatState
 							unspawnNotes[i].noteType = 'Check Note';
 							did++;
 							foundOne = true;
-							trace('Found One! ' + did + '/' + itemAmount);
+							Sys.print('\rGenerating Checks: ' + did + '/' + itemAmount);
 						}
 						else if (unspawnNotes.filter(function(note:Note):Bool
 						{
 							return note.mustPress && note.noteType == '' && !note.isSustainNote;
 						}).length == 0)
 						{
+							Sys.println('');
 							trace('Stuck!');
 							stuck = true;
 							// Additional handling for when it gets stuck
@@ -3936,6 +3968,7 @@ class PlayState extends MusicBeatState
 					// Check if there are no more mustPress notes of type '' and not isSustainNote
 					if (stuck)
 					{
+						Sys.println('');
 						trace('No more mustPress notes of type \'\' found. Pausing Note Generation...');
 						trace('Waiting for Note Scripts...');
 						break; // exit the loop if no more mustPress notes of type '' are found
@@ -3943,10 +3976,10 @@ class PlayState extends MusicBeatState
 				}
 			}
 		}
+		Sys.println('');
 	}
 
 	public var did:Int = 0;
-	public var itemAmount:Int = 1;
 	public var stuck:Bool = false;
 
 	function timeModifierGeneratorInit():Void
@@ -3986,6 +4019,10 @@ class PlayState extends MusicBeatState
 			}
 
 			unspawnNotes = newUnspawnNotes; // replace the unspawnNotes array with the new array
+		}
+		for (i in 0...unspawnNotes.length)
+		{
+			unspawnNotes[i].reloadNote();
 		}
 	}
 
