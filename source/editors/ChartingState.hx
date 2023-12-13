@@ -2,7 +2,9 @@ package editors;
 
 #if desktop
 // @:native("../oggbpm.cpp")
+#if windows
 import Discord.DiscordClient;
+#end
 #end
 import flash.geom.Rectangle;
 import haxe.Json;

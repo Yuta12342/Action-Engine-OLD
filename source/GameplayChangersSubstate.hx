@@ -70,7 +70,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		optionsArray.push(option);
 		#end
 
-		var goption:GameplayOption = new GameplayOption('Chart Modifier', 'chartModifier', 'string', 'Normal', ["Normal", "4K Only", "Flip", "Random", "Stairs", "Wave", "Trills", "SpeedRando", "RandomBasic", "RandomComplex", "Amalgam"]);
+		var goption:GameplayOption = new GameplayOption('Chart Modifier', 'chartModifier', 'string', 'Normal', ["Normal", "4K Only", "Flip", "Random", "Stairs", "Wave", "Trills", "SpeedRando", "SpeedUp", "RandomBasic", "RandomComplex", "Amalgam"]);
 		optionsArray.push(goption);
 		
 		var option:GameplayOption = new GameplayOption('Generator Type', 'generatorType', 'string', 'Chart', ["Chart", "Time"]);
