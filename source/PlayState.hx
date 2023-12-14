@@ -2963,9 +2963,12 @@ class PlayState extends MusicBeatState
 				{
 					daNoteData = mania - Std.int(initNoteData % Note.ammo[mania]);
 				}
-			case "4K Only":
+			case "Pain":
 				daNoteData = daNoteData - Std.int(initNoteData % Note.ammo[mania]);
-
+				case "4K Only":
+					daNoteData = getNumberFromAnims(daNoteData, SONG.mania);
+				case "ManiaConverter":
+					daNoteData = getNumberFromAnims(daNoteData, SONG.mania);
 			case "Stairs":
 				daNoteData = stair % Note.ammo[mania];
 				stair++;
@@ -3492,6 +3495,8 @@ class PlayState extends MusicBeatState
 							{
 								daNoteData = mania - Std.int(songNotes[1] % Note.ammo[mania]);
 							}
+							case "Pain":
+								daNoteData = daNoteData - Std.int(initNoteData % Note.ammo[mania]);
 						case "4K Only":
 							daNoteData = getNumberFromAnims(daNoteData, SONG.mania);
 						case "ManiaConverter":
