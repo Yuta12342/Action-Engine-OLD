@@ -1,6 +1,11 @@
 /**
-    This is the most spammy class ever
-**/
+ * Determines certain information for notes in EKMode. Letters, animations, strums, and offsets.
+ * 
+ * 
+ */
+
+
+
 class EKData {
     public static var keysShit:Map<Int, Map<String, Dynamic>> = [ // Ammount of keys = num + 1
 		0 => [

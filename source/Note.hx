@@ -15,7 +15,9 @@ import flixel.graphics.FlxGraphic;
 
 
 using StringTools;
-
+/**
+ * A Note for the Chart Editor to execute events.
+ */
 typedef EventNote = {
 	strumTime:Float,
 	event:String,
@@ -23,7 +25,18 @@ typedef EventNote = {
 	value2:String
 }
 
-
+/**
+ * The notes that are displayed in the game!
+ * 
+ * It holds all info for how and when it will spawn, its texture, position in a song, etc.
+ * 
+ * Can have extra data, if given a extraData Map. <Map> (String -> Dynamic))
+ * @throws NullObjectException if the object is null, or properties are invalid.
+ *
+ * @see PlayState
+ * 
+ * 
+ */
 class Note extends FlxSprite
 {
 	//////////////////////////////////////////////////

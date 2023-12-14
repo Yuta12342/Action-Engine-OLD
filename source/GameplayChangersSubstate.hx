@@ -105,7 +105,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		optionsArray.push(option);
 
 		var option:GameplayOption = new GameplayOption('Maximum Items', 'itemAmount', 'int', 69);
-		option.scrollSpeed = 1;
+		option.scrollSpeed = 2;
 		option.minValue = 0;
 		option.maxValue = 9999;
 		optionsArray.push(option);

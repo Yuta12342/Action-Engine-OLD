@@ -2743,7 +2743,10 @@ class PlayState extends MusicBeatState
 		callOnLuas('onUpdateScore', [miss]);
 		if (archMode)
 		{
-			scoreTxt.text += ' | Checks Left: ' + check + '/' + did + '(Total: ' + itemAmount + ')';
+			scoreTxt.text += ' | Checks: ' + check + '/' + did;
+			if (did != itemAmount) {
+				scoreTxt.text += ' (T: ' + itemAmount + ')';
+			}
 		}
 		if (resistMode)
 		{

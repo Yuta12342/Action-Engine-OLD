@@ -58,7 +58,9 @@ import Discord;
 #end
 
 using StringTools;
-
+/**
+ * Class for running Lua Scripts in Friday Night Funkin'.
+ */
 class FunkinLua {
 	public static var Function_Stop:Dynamic = 1;
 	public static var Function_Continue:Dynamic = 0;
