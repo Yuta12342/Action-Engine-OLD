@@ -70,6 +70,7 @@ class ClientPrefs {
 		'opponentplay' => false,
 		'generatorType' => 'Chart',
 		'itemAmount' => 69,
+		'convertMania' => 3,
 	];
 
 	public static var comboOffset:Array<Int> = [0, 0, 0, 0];

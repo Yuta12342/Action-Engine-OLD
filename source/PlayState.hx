@@ -392,6 +392,10 @@ class PlayState extends MusicBeatState
 
 	override public function create()
 	{
+		if (chartModifier == '4K Only' && mania != 3)
+		{
+			mania = 3;
+		}
 		if (ClientPrefs.getGameplaySetting('archMode', false))
 		{
 			if (FlxG.save.data.activeItems != null)
@@ -474,6 +478,8 @@ class PlayState extends MusicBeatState
 							chartModifier = 'Trills';
 						case 8:
 							chartModifier = "SpeedUp";
+						case 9:
+							chartModifier = "ManiaConverter";
 					}
 				}
 				ArchPopup.startPopupCustom('You Got an Item!', "Chart Modifier Trap (" + chartModifier + ")", 'Color');
@@ -502,7 +508,18 @@ class PlayState extends MusicBeatState
 		if (SONG == null)
 			SONG = Song.loadFromJson('tutorial');
 
-		mania = SONG.mania;
+		if (chartModifier == "4K Only")
+		{
+			mania = 3;
+		}
+		else if (chartModifier == "ManiaConverter")
+		{
+			mania = ClientPrefs.getGameplaySetting('convertMania', 3);
+		}
+		else
+		{
+			mania = SONG.mania;
+		}
 		if (mania < Note.minMania || mania > Note.maxMania)
 			mania = Note.defaultMania;
 
@@ -2457,19 +2474,18 @@ class PlayState extends MusicBeatState
 							unspawnNotes[i].colorSwap.brightness = 50;
 
 							// Print progress and note being changed on a single line
-							//Sys.print('\rProgress: ' + (i + 1) + '/' + unspawnNotes.length + ', Changing note: ' + unspawnNotes[i].noteIndex);
+							// Sys.print('\rProgress: ' + (i + 1) + '/' + unspawnNotes.length + ', Changing note: ' + unspawnNotes[i].noteIndex);
 
 							break;
 						}
 					}
 				}
 			}
-
 		}
 		Sys.println('');
 		trace("Generation complete.");
 
-        trace('Starting Countdown...');
+		trace('Starting Countdown...');
 		if (startedCountdown)
 		{
 			callOnLuas('onStartCountdown', []);
@@ -2744,7 +2760,8 @@ class PlayState extends MusicBeatState
 		if (archMode)
 		{
 			scoreTxt.text += ' | Checks: ' + check + '/' + did;
-			if (did != itemAmount) {
+			if (did != itemAmount)
+			{
 				scoreTxt.text += ' (T: ' + itemAmount + ')';
 			}
 		}
@@ -2948,6 +2965,7 @@ class PlayState extends MusicBeatState
 				}
 			case "4K Only":
 				daNoteData = daNoteData - Std.int(initNoteData % Note.ammo[mania]);
+
 			case "Stairs":
 				daNoteData = stair % Note.ammo[mania];
 				stair++;
@@ -3037,7 +3055,7 @@ class PlayState extends MusicBeatState
 			case "Amalgam":
 				{
 					var modifierNames:Array<String> = [
-						"Random", "RandomBasic", "RandomComplex", "Flip", "4K Only", "Stairs", "Wave", "Huh", "Ew", "What", "Jack Wave", "SpeedRando", "Trills"
+						"Random", "RandomBasic", "RandomComplex", "Flip", "Pain", "Stairs", "Wave", "Huh", "Ew", "What", "Jack Wave", "SpeedRando", "Trills"
 					];
 
 					if (caseExecutionCount <= 0)
@@ -3092,7 +3110,7 @@ class PlayState extends MusicBeatState
 							{
 								daNoteData = mania - Std.int(initNoteData % Note.ammo[mania]);
 							}
-						case 4: // "4K Only"
+						case 4: // "Pain"
 							daNoteData = daNoteData - Std.int(initNoteData % Note.ammo[mania]);
 						case 5: // "Stairs"
 							daNoteData = stair % Note.ammo[mania];
@@ -3204,6 +3222,52 @@ class PlayState extends MusicBeatState
 		}
 		return daNoteData;
 	}
+
+	public static function getNumberFromAnims(note:Int, mania:Int):Int {
+		var animMap:Map<String, Int> = new Map<String, Int>();
+		animMap.set("LEFT", 0);
+		animMap.set("DOWN", 1);
+		animMap.set("UP", 2);
+		animMap.set("RIGHT", 3);
+
+		var anims:Array<String> = EKData.keysShit.get(mania).get("anims");
+		var animKeys:Array<String> = [for (key in animMap.keys()) key];
+
+		if (SONG.mania == 3 && mania > 3) {
+			if (note < animKeys.length) {
+				var anim = animKeys[note];
+				var matchingIndices:Array<Int> = [];
+				for (i in 0...anims.length) {
+					if (anims[i] == anim) {
+						matchingIndices.push(i);
+					}
+				}
+				if (matchingIndices.length > 0) {
+					var randomIndex = Std.int(Math.random() * matchingIndices.length);
+					return matchingIndices[randomIndex];
+				} else {
+					throw 'No matching animation found in keysShit';
+				}
+			} else {
+				throw 'Note value is out of range';
+			}
+		} else if (mania < 3) {
+			return Std.int(Math.random() * (mania + 1));
+		} else { // mania == 3
+			if (note < anims.length) {
+				var anim = anims[note];
+				if (animMap.exists(anim)) {
+					return animMap.get(anim);
+				} else {
+					throw 'No matching animation found';
+				}
+			} else {
+				throw 'Note value is out of range';
+			}
+		}
+	}
+
+	
 
 	var debugNum:Int = 0;
 	var stair:Int = 0;
@@ -3358,11 +3422,29 @@ class PlayState extends MusicBeatState
 			for (songNotes in section.sectionNotes)
 			{
 				var daStrumTime:Float = songNotes[0];
-				var daNoteData:Int = Std.int(songNotes[1] % Note.ammo[mania]);
-				var gottaHitNote:Bool = section.mustHitSection;
-				if (songNotes[1] > (Note.ammo[mania] - 1))
+				var daNoteData:Int;
+				if (chartModifier != "4K Only" && chartModifier != "ManiaConverter")
 				{
-					gottaHitNote = !section.mustHitSection;
+					daNoteData = Std.int(songNotes[1] % Note.ammo[mania]);
+				}
+				else
+				{
+					daNoteData = Std.int(songNotes[1] % Note.ammo[SONG.mania]);
+				}
+				var gottaHitNote:Bool = section.mustHitSection;
+				if (chartModifier != "4K Only")
+				{
+					if (songNotes[1] > (Note.ammo[mania] - 1))
+					{
+						gottaHitNote = !section.mustHitSection;
+					}
+				}
+				else
+				{
+					if (songNotes[1] > (Note.ammo[SONG.mania] - 1))
+					{
+						gottaHitNote = !section.mustHitSection;
+					}
 				}
 				if (ClientPrefs.getGameplaySetting('generatorType', 'Chart') != "Time")
 				{
@@ -3411,7 +3493,9 @@ class PlayState extends MusicBeatState
 								daNoteData = mania - Std.int(songNotes[1] % Note.ammo[mania]);
 							}
 						case "4K Only":
-							daNoteData = daNoteData - Std.int(songNotes[1] % Note.ammo[mania]);
+							daNoteData = getNumberFromAnims(daNoteData, SONG.mania);
+						case "ManiaConverter":
+							daNoteData = getNumberFromAnims(daNoteData, SONG.mania);
 						case "Stairs":
 							daNoteData = stair % Note.ammo[mania];
 							stair++;
@@ -3501,8 +3585,7 @@ class PlayState extends MusicBeatState
 						case "Amalgam":
 							{
 								var modifierNames:Array<String> = [
-									"Random", "RandomBasic", "RandomComplex", "Flip", "4K Only", "Stairs", "Wave", "Huh", "Ew", "What", "Jack Wave",
-									"SpeedRando",
+									"Random", "RandomBasic", "RandomComplex", "Flip", "Pain", "Stairs", "Wave", "Huh", "Ew", "What", "Jack Wave", "SpeedRando",
 									"Trills"
 								];
 
@@ -3558,7 +3641,7 @@ class PlayState extends MusicBeatState
 										{
 											daNoteData = mania - Std.int(songNotes[1] % Note.ammo[mania]);
 										}
-									case 4: // "4K Only"
+									case 4: // "Pain"
 										daNoteData = daNoteData - Std.int(songNotes[1] % Note.ammo[mania]);
 									case 5: // "Stairs"
 										daNoteData = stair % Note.ammo[mania];
@@ -4338,6 +4421,8 @@ class PlayState extends MusicBeatState
 
 	public function changeMania(newValue:Int, skipStrumFadeOut:Bool = false)
 	{
+		// Set EKMode based on newValue
+		EKMode = newValue != 3;
 		// funny dissapear transitions
 		// while new strums appear
 		var daOldMania = mania;
@@ -4668,6 +4753,11 @@ class PlayState extends MusicBeatState
 		{
 			iconP1.swapOldIcon();
 	}*/
+
+		if (chartModifier == '4K Only' && mania != 3)
+		{
+			changeMania(3);
+		}
 		if (archMode)
 		{
 			if (!endingSong)
