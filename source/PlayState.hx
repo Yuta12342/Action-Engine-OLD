@@ -402,13 +402,10 @@ class PlayState extends MusicBeatState
 			if (FlxG.save.data.activeItems != null)
 				activeItems = FlxG.save.data.activeItems;
 			if (FlxG.save.data.activeItems == null) {
-				if (mania != 3) {
-					activeItems[3] = FlxG.random.int(0, 8);
-				} else {
 					activeItems[3] = FlxG.random.int(0, 9);
 				}
 			}
-		}
+		
 		if (Main.args[0] == 'editorMode')
 		{
 			chartingMode = true;
@@ -485,8 +482,12 @@ class PlayState extends MusicBeatState
 						case 8:
 							chartModifier = "SpeedUp";
 						case 9:
-							chartModifier = "ManiaConverter";
-							convertMania = FlxG.random.int(4, Note.maxMania);
+							if (SONG.mania == 3) {
+								chartModifier = "ManiaConverter";
+								convertMania = FlxG.random.int(4, Note.maxMania);
+							} else {
+								chartModifier = "4K Only";
+							}
 					}
 				}
 				if (chartModifier == "ManiaConverter") {
@@ -2979,6 +2980,10 @@ class PlayState extends MusicBeatState
 				case "4K Only":
 					daNoteData = getNumberFromAnims(daNoteData, SONG.mania);
 				case "ManiaConverter":
+					if (SONG.mania != 3)
+					{
+						daNoteData = getNumberFromAnims(daNoteData, 3);
+					}
 					daNoteData = getNumberFromAnims(daNoteData, SONG.mania);
 			case "Stairs":
 				daNoteData = stair % Note.ammo[mania];
