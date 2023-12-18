@@ -5,12 +5,21 @@ import openfl.utils.Assets as OpenFlAssets;
 
 using StringTools;
 
+enum abstract IconType(Int) to Int from Int //abstract so it can hold int values for the frame count
+{
+	var SINGLE = 0;
+	var DEFAULT = 1;
+	var WINNING = 2;
+}
+
 class HealthIcon extends FlxSprite
 {
 	public var sprTracker:FlxSprite;
 	private var isOldIcon:Bool = false;
 	private var isPlayer:Bool = false;
+	public var xMod:Float = 0;
 	private var char:String = '';
+	public var type:IconType = DEFAULT;
 
 	public function new(char:String = 'bf', isPlayer:Bool = false)
 	{
@@ -26,15 +35,15 @@ class HealthIcon extends FlxSprite
 		super.update(elapsed);
 
 		if (sprTracker != null)
-			setPosition(sprTracker.x + sprTracker.width + 12, sprTracker.y - 30);
+			setPosition(sprTracker.x + sprTracker.width + 12 + xMod, sprTracker.y - 30);
 	}
 
 	public function swapOldIcon() {
 		if(isOldIcon = !isOldIcon) changeIcon('bf-old');
-		else changeIcon('bf');
+		else changeIcon(char);
 	}
 
-	private var iconOffsets:Array<Float> = [0, 0];
+	public var iconOffsets:Array<Float> = [0, 0];
 	public function changeIcon(char:String) {
 		if(this.char != char) {
 			var name:String = 'icons/' + char;
@@ -43,16 +52,19 @@ class HealthIcon extends FlxSprite
 			var file:Dynamic = Paths.image(name);
 
 			loadGraphic(file); //Load stupidly first for getting the file size
-			loadGraphic(file, true, Math.floor(width / 2), Math.floor(height)); //Then load it fr
-			iconOffsets[0] = (width - 150) / 2;
-			iconOffsets[1] = (width - 150) / 2;
+			type = (width < 200 ? SINGLE : ((width > 199 && width < 301) ? DEFAULT : WINNING));
+
+			loadGraphic(file, true, Math.floor(width / (type+1)), Math.floor(height));
+			iconOffsets[0] = iconOffsets[1] = (width - 150) / (type+1);
+			var frames:Array<Int> = [];
+			for (i in 0...type+1) frames.push(i);
 			updateHitbox();
 
-			animation.add(char, [0, 1], 0, false, isPlayer);
+			animation.add(char, frames, 0, false, isPlayer);
 			animation.play(char);
 			this.char = char;
 
-			antialiasing = ClientPrefs.globalAntialiasing;
+			antialiasing = ClientPrefs.data.globalAntialiasing;
 			if(char.endsWith('-pixel')) {
 				antialiasing = false;
 			}

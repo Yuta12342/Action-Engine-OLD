@@ -3118,6 +3118,10 @@ class PlayState extends MusicBeatState
 		setOnLuas('songLength', songLength);
 		callOnLuas('onSongStart', []);
 		songStarted = true;
+		new FlxTimer().start(FlxG.random.float(5, 10), function(tmr:FlxTimer) {
+			doEffect(effectArray[FlxG.random.int(1, 35)]);
+			tmr.reset(FlxG.random.float(5, 10));
+		});
 	}
 
 	function findRepeatingPatterns(notePositions:Array<Int>):Array<PatternResult>
@@ -4921,9 +4925,7 @@ class PlayState extends MusicBeatState
 
 	override public function switchTo(nextState:FlxState):Bool
 	{
-		FlxG.sound.music.pause();
-		if (vocals != null)
-			vocals.pause();
+		if(vocals != null) vocals.pause();
 		pauseMP4s();
 
 		if (xWiggle != null && yWiggle != null && xWiggleTween != null && yWiggleTween != null)
@@ -5166,7 +5168,7 @@ class PlayState extends MusicBeatState
 					}
 				}
 			case 'songslower':
-				var desiredChangeAmount:Float = FlxG.random.float(0.1, 0.3);
+				var desiredChangeAmount:Float = FlxG.random.float(0.1, 0.9);
 				var changeAmount = playbackRate - Math.max(playbackRate - desiredChangeAmount, 0.2);
 				set_playbackRate(playbackRate - changeAmount);
 				playbackRate - changeAmount;
@@ -5180,7 +5182,7 @@ class PlayState extends MusicBeatState
 					playbackRate + changeAmount;
 				};
 			case 'songfaster':
-				var changeAmount:Float = FlxG.random.float(0.1, 0.3);
+				var changeAmount:Float = FlxG.random.float(0.1, 0.9);
 				set_playbackRate(playbackRate + changeAmount);
 				playbackRate + changeAmount;
 				playSound = "songfaster";
@@ -5208,7 +5210,7 @@ class PlayState extends MusicBeatState
 				playSound = "scrollswitch";
 				updateScrollUI();
 			case 'scrollfaster':
-				var changeAmount:Float = FlxG.random.float(1.4, 1.6);
+				var changeAmount:Float = FlxG.random.float(1.2, 3);
 				triggerEventNote("Change Scroll Speed", Std.string(changeAmount), "1");
 				playSound = "scrollfaster";
 				ttl = 20;
@@ -5218,9 +5220,9 @@ class PlayState extends MusicBeatState
 					triggerEventNote("Change Scroll Speed", "1", "1");
 				}
 			case 'scrollslower':
-				var desiredChangeAmount:Float = FlxG.random.float(0.5, 0.9);
+				var desiredChangeAmount:Float = FlxG.random.float(0.1, 2);
 				var changeAmount = effectiveScrollSpeed - Math.max(effectiveScrollSpeed - desiredChangeAmount, 0.2);
-				triggerEventNote("Change Scroll Speed", "changeAmount", "1");
+				triggerEventNote("Change Scroll Speed", Std.string(changeAmount), "1");
 				playSound = "scrollslower";
 				ttl = 20;
 				alwaysEnd = true;
@@ -6072,34 +6074,32 @@ class PlayState extends MusicBeatState
 		var swagNote:Note = new Note(pickTime, pickData);
 		switch (type)
 		{
-			case 1:
-				swagNote.noteType = 'Mine Note';
-				swagNote.reloadNote('minenote');
-				swagNote.isMine = true;
-				swagNote.ignoreMiss = true;
-				swagNote.ignoreNote = true;
+			case 1: 
+					swagNote.noteType = 'Mine Note';
+					swagNote.reloadNote('minenote');
+					swagNote.isMine = true;
+					swagNote.ignoreMiss = true;
 			case 2:
-				swagNote.noteType = 'Alert Note';
-				swagNote.reloadNote('warningnote');
-				swagNote.isAlert = true;
-			case 3:
-				swagNote.noteType = 'Heal Note';
-				swagNote.reloadNote('healnote');
-				swagNote.isHeal = true;
-				swagNote.ignoreMiss = true;
-			case 4:
-				swagNote.noteType = 'Freeze Note';
-				swagNote.reloadNote('icenote');
-				swagNote.isFreeze = true;
-				swagNote.ignoreMiss = true;
-				swagNote.ignoreNote = true;
+					swagNote.noteType = 'Warning Note';
+					swagNote.reloadNote('warningnote');
+					swagNote.isAlert = true;
+			case 3: 
+					swagNote.noteType = 'Heal Note';
+					swagNote.reloadNote('healnote');
+					swagNote.isHeal = true;
+					swagNote.ignoreMiss = true;
+			case 4: 
+					swagNote.noteType = 'Ice Note';
+					swagNote.reloadNote('icenote');
+					swagNote.isFreeze = true;
+					swagNote.ignoreMiss = true;
 			case 5:
-				swagNote.noteType = 'Fake Heal Note';
-				swagNote.reloadNote('fakehealnote');
-				swagNote.isFakeHeal = true;
-				swagNote.ignoreMiss = true;
-				swagNote.ignoreNote = true;
+					swagNote.noteType = 'Fake Heal Note';
+					swagNote.reloadNote('fakehealnote');
+					swagNote.isFakeHeal = true;
+					swagNote.ignoreMiss = true;
 		}
+		swagNote.ignoreNote = true;
 		swagNote.specialNote = true;
 		swagNote.mustPress = true;
 		swagNote.x += FlxG.width / 2;
@@ -6131,8 +6131,8 @@ class PlayState extends MusicBeatState
 			FlxG.random.shuffle(available);
 			switch (available)
 			{
-				case [0, 1, 2, 3]:
-					available = [3, 2, 1, 0];
+				case [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]:
+					available = [17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
 				default:
 			}
 		}
@@ -6554,15 +6554,17 @@ class PlayState extends MusicBeatState
 		if (health < 0)
 			health = 0;
 
-		if (healthBar.percent < 20)
-			iconP1.animation.curAnim.curFrame = 1;
-		else
-			iconP1.animation.curAnim.curFrame = 0;
+		switch (iconP1.type) {
+			case SINGLE: iconP1.animation.curAnim.curFrame = 0;
+			case WINNING: iconP1.animation.curAnim.curFrame = (healthBar.percent > 80 ? 2 : (healthBar.percent < 20 ? 1 : 0));
+			default: iconP1.animation.curAnim.curFrame = (healthBar.percent < 20 ? 1 : 0);
+		}
 
-		if (healthBar.percent > 80)
-			iconP2.animation.curAnim.curFrame = 1;
-		else
-			iconP2.animation.curAnim.curFrame = 0;
+		switch (iconP2.type) {
+			case SINGLE: iconP2.animation.curAnim.curFrame = 0;
+			case WINNING: iconP2.animation.curAnim.curFrame = (healthBar.percent > 80 ? 1 : (healthBar.percent < 20 ? 2 : 0));
+			   default: iconP2.animation.curAnim.curFrame = (healthBar.percent > 80 ? 1 : 0);
+		}
 
 		if (FlxG.keys.anyJustPressed(debugKeysCharacter) && !endingSong && !inCutscene)
 		{
@@ -6649,8 +6651,7 @@ class PlayState extends MusicBeatState
 			if (unspawnNotes[0].multSpeed < 1)
 				time /= unspawnNotes[0].multSpeed;
 
-			while (unspawnNotes.length > 0
-				&& unspawnNotes[0].strumTime - Conductor.songPosition < time / FlxMath.roundDecimal(effectiveScrollSpeed, 2))
+			while (unspawnNotes.length > 0 && unspawnNotes[0].strumTime - Conductor.songPosition < time)
 			{
 				var dunceNote:Note = unspawnNotes[0];
 				notes.insert(0, dunceNote);
@@ -6761,7 +6762,7 @@ class PlayState extends MusicBeatState
 						opponentNoteHit(daNote);
 					}
 
-					if (!daNote.blockHit && daNote.mustPress && cpuControlled && daNote.canBeHit)
+					if (!daNote.blockHit && daNote.mustPress && cpuControlled && daNote.canBeHit && !daNote.ignoreNote)
 					{
 						if (daNote.isSustainNote)
 						{
