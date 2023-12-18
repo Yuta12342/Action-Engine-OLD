@@ -2387,8 +2387,10 @@ class PlayState extends MusicBeatState
 		if (stuck)
 		{
 			if (PlayState.SONG.song.toLowerCase().contains('resistance') || PlayState.SONG.song.toLowerCase() == 'resistalovania')
+			{
 				itemAmount = 69;
-			trace("RESISTANCE OVERRIDE!");
+				trace("RESISTANCE OVERRIDE!");
+			}
 			stuck = false;
 
 			// Check if there are any suitable mustPress notes available
