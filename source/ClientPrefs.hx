@@ -40,7 +40,7 @@ class ClientPrefs {
 	public static var noReset:Bool = false;
 	public static var healthBarAlpha:Float = 1;
 	public static var hitsoundVolume:Float = 0;
-	public static var pauseMusic:String = 'Tea Time';
+	public static var pauseMusic:String = 'Late Night Cafe';
 	public static var checkForUpdates:Bool = true;
 	public static var antimash:Bool = true;
 	public static var convertEK:Bool = true;
