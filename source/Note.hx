@@ -1,5 +1,8 @@
 package;
 
+import flixel.tweens.FlxTween;
+import flixel.tweens.FlxTween.FlxTweenManager;
+import flixel.util.FlxDestroyUtil;
 import flixel.input.keyboard.FlxKey;
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -163,6 +166,18 @@ class Note extends FlxSprite
 
 	//Archipelago
 	public var isCheck:Bool = false;
+	public var isMine:Bool = false;
+	public var isAlert:Bool = false;
+	public var isHeal:Bool = false;
+	public var isFreeze:Bool = false;
+	public var isFakeHeal:Bool = false;
+	var justMixedUp:Bool = false;
+	public var trueNoteData:Int = 0;
+	public var specialNote:Bool = false;
+	public var ignoreMiss:Bool = false;
+	public var spinAmount:Float = 0;
+	public var rootNote:Note;
+	var posTween:FlxTween;
 
 	public function resizeByRatio(ratio:Float) //haha funny twitter shit
 	{
@@ -241,6 +256,18 @@ class Note extends FlxSprite
 					colorSwap.brightness = 50;
 				case 'GF Sing':
 					gfNote = true;
+				case 'Mine Note':
+					ignoreNote = true;
+					lowPriority = true;
+					hitCausesMiss = true;
+				case 'Ice Note':
+					ignoreNote = true;
+					lowPriority = true;
+					hitCausesMiss = true;
+				case 'Fake Heal Note':
+					ignoreNote = true;
+					lowPriority = true;
+					hitCausesMiss = true;
 			}
 			noteType = value;
 		}
@@ -271,6 +298,7 @@ class Note extends FlxSprite
 		if(!inEditor) this.strumTime += ClientPrefs.noteOffset;
 
 		this.noteData = noteData;
+		trueNoteData = noteData;
 
 		if(noteData > -1) {
 			texture = '';
@@ -297,7 +325,7 @@ class Note extends FlxSprite
 			alpha = 0.6;
 			multAlpha = 0.6;
 			hitsoundDisabled = true;
-			if(ClientPrefs.downScroll) flipY = true;
+			if(ClientPrefs.downScroll || PlayState.effectiveDownScroll) flipY = true;
 
 			offsetX += width / 2;
 			copyAngle = false;
@@ -345,6 +373,16 @@ class Note extends FlxSprite
 		x += offsetX;
 	}
 
+	public function updateFlip()
+	{
+		if (isSustainNote && prevNote != null)
+		{
+			flipY = PlayState.effectiveDownScroll;
+			ClientPrefs.downScroll = PlayState.effectiveDownScroll;
+			updateHitbox();
+		}
+	}
+
 	var lastNoteOffsetXForPixelAutoAdjusting:Float = 0;
 	var lastNoteScaleToo:Float = 1;
 	public var originalHeightForCalcs:Float = 6;
@@ -376,8 +414,8 @@ class Note extends FlxSprite
 
 		defaultWidth = 157;
 		defaultHeight = 154;
-		if (isNewEngine())
-		{
+		trace('Special Note: ' + specialNote);
+		if (isNewEngine()) {
 			if(PlayState.isPixelStage) {
 				if(isSustainNote) {
 					loadGraphic(Paths.image('pixelUI/' + blahblah + 'ENDS'));
@@ -408,7 +446,8 @@ class Note extends FlxSprite
 						lastScaleY *= lastNoteScaleToo;
 					}*/
 				}
-			} else {
+		
+			}else {
 				frames = Paths.getSparrowAtlas(blahblah);
 				loadNoteAnims();
 				antialiasing = ClientPrefs.globalAntialiasing;
@@ -444,11 +483,30 @@ class Note extends FlxSprite
 					}*/
 				}
 			} else {
-				frames = Paths.getSparrowAtlas(blahblah);
-				loadNoteAnims();
-				antialiasing = ClientPrefs.globalAntialiasing;
+				if (specialNote) {
+					switch (noteType)
+					{
+						case 'Mine Note':
+							loadGraphic(Paths.image("minenote"), false);
+						case 'Warning Note':
+							loadGraphic(Paths.image("warningnote"), false);
+						case 'Heal Note':
+							loadGraphic(Paths.image("healnote"), false);
+						case 'Ice Note':
+							loadGraphic(Paths.image("icenote"), false);
+						case 'Fake Heal Note':
+							loadGraphic(Paths.image("fakehealnote"), false);
+					}
+					frames = null;
+				}
+				else
+				{		
+					frames = Paths.getSparrowAtlas(blahblah);
+					loadNoteAnims();
+					antialiasing = ClientPrefs.globalAntialiasing;
+				}
 			}
-		}
+		}	
 		if(isSustainNote) {
 			scale.y = lastScaleY;
 		}
@@ -530,7 +588,7 @@ class Note extends FlxSprite
 
 	public function applyManiaChange()
 	{
-	mania = PlayState.mania;
+		mania = PlayState.mania;
 		if (isSustainNote)
 			scale.y = 1;
 		reloadNote(texture);
@@ -556,12 +614,88 @@ class Note extends FlxSprite
 		updateHitbox();
 	}
 
+	public function swapPositions()
+	{
+		justMixedUp = true;
+		if (posTween != null && posTween.active)
+			posTween.cancel();
+		var newX = FlxG.width / 2
+			+ 100
+			+ swagWidth * PlayState.notePositions[noteData % Note.ammo[mania]]
+			+ (isSustainNote ? (PlayState.curStage.startsWith('school') ? width * 0.75 : width) : 0);
+		posTween = FlxTween.tween(this, {x: newX}, 0.25, {
+			onComplete: function(_)
+			{
+				justMixedUp = false;
+			}
+		});
+	}
+
+	function updateXPosition()
+	{
+		if (justMixedUp)
+			return;
+		if (mustPress)
+		{
+			var newX = FlxG.width / 2
+				+ 100
+				+ swagWidth * PlayState.notePositions[noteData % Note.ammo[mania]]
+				+ (isSustainNote ? (PlayState.curStage.startsWith('school') ? width * 0.75 : width) : 0);
+			x = newX;
+		}
+		else
+		{
+			var newX = 0 + 100 + swagWidth * noteData + (isSustainNote ? (PlayState.curStage.startsWith('school') ? width * 0.75 : width) : 0);
+			x = newX;
+		}
+	}
+
+	public var isGhosting:Bool = false;
+	public var ghostSpeed:Float = 1;
+	public var ghostSine:Bool = false;
+
+	public function doGhost(?speed:Float, ?sine:Bool)
+	{
+		if (speed == null)
+			speed = FlxG.random.float(0.003, 0.006);
+		if (sine == null)
+			sine = FlxG.random.bool();
+
+		ghostSine = sine;
+		ghostSpeed = speed;
+		isGhosting = true;
+	}
+
+	public function undoGhost()
+	{
+		isGhosting = false;
+		if (isSustainNote)
+			multAlpha = 0.6;
+		else
+			multAlpha = 1.0;
+	}
+
 
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
 
 		mania = PlayState.mania;
+
+		if (isGhosting)
+		{
+			if (ghostSine)
+			{
+				alpha = 0.1 + 0.65 * Math.abs(Math.sin(Conductor.songPosition * ghostSpeed));
+			}
+			else
+			{
+				alpha = 0.1 + 0.65 * Math.abs(Math.cos(Conductor.songPosition * ghostSpeed));
+			}
+			colorSwap.hue = 0;
+			colorSwap.saturation = 0;
+			colorSwap.brightness = 0;
+		}
 
 		/* im so stupid for that
 		if (noteData == 9)
@@ -574,16 +708,24 @@ class Note extends FlxSprite
 		}
 		*/
 
+		if (!specialNote)
+		{
+			if (spinAmount != 0)
+			{
+				offsetAngle += FlxG.elapsed * spinAmount;
+			}
+		}
+
 
 		if (ignoreNote && isCheck)
 		{
-		trace("What the heck??? INVALID CHECK??? REMOVE!!!");
-		PlayState.instance.did--;
-		trace("Removed Check: " + PlayState.instance.did);
-		isCheck = false;
-		colorSwap.hue = 0;
-		colorSwap.saturation = 0;
-		colorSwap.brightness = 0;
+			trace("What the heck??? INVALID CHECK??? REMOVE!!!");
+			PlayState.instance.did--;
+			trace("Removed Check: " + PlayState.instance.did);
+			isCheck = false;
+			colorSwap.hue = 0;
+			colorSwap.saturation = 0;
+			colorSwap.brightness = 0;
 		}
 		if (mustPress)
 		{
@@ -608,10 +750,43 @@ class Note extends FlxSprite
 			}
 		}
 
+		if (mustPress)
+		{
+			if (isMine || isFreeze || isFakeHeal)
+			{
+				canBeHit = (strumTime > Conductor.songPosition - Conductor.safeZoneOffset * 0.9
+					&& strumTime < Conductor.songPosition + Conductor.safeZoneOffset * 0.9);
+				colorSwap.hue = 0;
+				colorSwap.saturation = 0;
+				colorSwap.brightness = 0;
+			}
+			else if (isAlert || isHeal)
+			{
+				canBeHit = (strumTime > Conductor.songPosition - Conductor.safeZoneOffset * 1.2
+					&& strumTime < Conductor.songPosition + Conductor.safeZoneOffset * 1.2);
+				colorSwap.hue = 0;
+				colorSwap.saturation = 0;
+				colorSwap.brightness = 0;
+			}
+
+			if (strumTime < Conductor.songPosition - Conductor.safeZoneOffset && !wasGoodHit)
+				tooLate = true;
+		}
+
 		if (tooLate && !inEditor)
 		{
 			if (alpha > 0.3)
 				alpha = 0.3;
 		}
+	}
+
+	override public function destroy()
+	{
+		if (posTween != null && posTween.active)
+		{
+			posTween.cancel();
+		}
+		FlxDestroyUtil.destroy(posTween);
+		super.destroy();
 	}
 }
