@@ -2475,13 +2475,17 @@ class PlayState extends MusicBeatState
 				unspawnNotes[i].colorSwap.saturation = 50;
 				unspawnNotes[i].colorSwap.brightness = 50;
 			}
-			for (i in 0...unspawnNotes.length)
+			var checkedNoteIndices = new Array<Int>();
+
+			for (note in unspawnNotes)
 			{
-				if (unspawnNotes[i].isSustainNote && unspawnNotes[i].noteIndex == unspawnNotes[i].noteIndex)
+				if (note.isCheck && !checkedNoteIndices.contains(note.noteIndex))
 				{
-					for (note in unspawnNotes)
+					checkedNoteIndices.push(note.noteIndex);
+
+					for (i in 0...unspawnNotes.length)
 					{
-						if (note.isCheck && note.noteIndex == unspawnNotes[i].noteIndex)
+						if (unspawnNotes[i].isSustainNote && unspawnNotes[i].noteIndex == note.noteIndex)
 						{
 							unspawnNotes[i].colorSwap.hue = 40;
 							unspawnNotes[i].colorSwap.saturation = 50;
@@ -2490,7 +2494,7 @@ class PlayState extends MusicBeatState
 							// Print progress and note being changed on a single line
 							// Sys.print('\rProgress: ' + (i + 1) + '/' + unspawnNotes.length + ', Changing note: ' + unspawnNotes[i].noteIndex);
 
-							break;
+							
 						}
 					}
 				}
