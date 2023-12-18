@@ -59,11 +59,12 @@ class PauseSubState extends MusicBeatSubstate
 			difficultyChoices.push(diff);
 		}
 		difficultyChoices.push('BACK');
-
+		if ((PlayState.SONG.song.toLowerCase().contains('resistance') || PlayState.SONG.song.toLowerCase() == 'resistalovania') && ClientPrefs.pauseMusic == 'Late Night Cafe')
+			{songName = 'Late Night Cafe Resist';}
 
 		pauseMusic = new FlxSound();
-		if(songName != null) {
-			pauseMusic.loadEmbedded(Paths.music(songName), true, true);
+		if (songName != null) {
+			pauseMusic.loadEmbedded(Paths.music(Paths.formatToSongPath(songName)), true, true);
 		} else if (songName != 'None') {
 			pauseMusic.loadEmbedded(Paths.music(Paths.formatToSongPath(ClientPrefs.pauseMusic)), true, true);
 		}
