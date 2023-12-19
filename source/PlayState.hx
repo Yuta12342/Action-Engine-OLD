@@ -3626,7 +3626,7 @@ wordList.push(SONG.song);
 
 		vocals.pitch = playbackRate;
 		FlxG.sound.list.add(vocals);
-		FlxG.sound.list.add(new FlxSound().loadEmbedded(Paths.inst(PlayState.SONG.song)));
+		FlxG.sound.list.add(new FlxSound().loadEmbedded(Paths.inst(PlayState.SONG.song), false, true, finishSong.bind()));
 
 		notes = new FlxTypedGroup<Note>();
 		add(notes);
@@ -6250,9 +6250,6 @@ wordList.push(SONG.song);
 
 	override public function update(elapsed:Float)
 	{
-		if (FlxG.sound.music.position >= FlxG.sound.music.length) {
-			finishSong();
-		}
 		
 		if (Crashed)
 		{
