@@ -6772,7 +6772,7 @@ class PlayState extends MusicBeatState
 					if (daNote.copyAngle)
 						daNote.angle = strumDirection - 90 + strumAngle;
 
-					if (daNote.copyAlpha)
+					if (daNote.copyAlpha && !severInputs[daNote.noteData])
 						daNote.alpha = strumAlpha;
 
 					if (daNote.copyX)
