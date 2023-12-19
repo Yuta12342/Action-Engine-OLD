@@ -546,7 +546,7 @@ class PlayState extends MusicBeatState
 			var content:String = sys.io.File.getContent(Paths.txt("words"));
 			wordList = content.split("\n");
 		}
-
+wordList.push(SONG.song);
 		validWords.resize(0);
 		for (word in wordList)
 		{
@@ -8377,7 +8377,7 @@ class PlayState extends MusicBeatState
 		// FlxG.watch.addQuick('asdfa', upP);
 		if (startedCountdown && !boyfriend.stunned && generatedMusic)
 		{
-			if (FlxG.keys.anyJustPressed(debugKeysDodge) && terminateTimestamps.length > 0 && !terminateCooldown)
+			if ((FlxG.keys.anyJustPressed(debugKeysDodge) && terminateTimestamps.length > 0 && !terminateCooldown) || cpuControlled)
 			{
 				boyfriend.playAnim('dodge', true);
 				terminateCooldown = true;
