@@ -5233,25 +5233,43 @@ class PlayState extends MusicBeatState
 				playSound = "scrollswitch";
 				updateScrollUI();
 			case 'scrollfaster':
-				var changeAmount:Float = FlxG.random.float(1.2, 3);
-				triggerEventNote("Change Scroll Speed", Std.string(changeAmount), "1");
+				var changeAmount:Float = FlxG.random.float(1.1, 3);
+				songSpeed += changeAmount;
+				if (generatedMusic)
+				{
+					var ratio:Float = changeAmount / songSpeed; // funny word huh
+					for (note in notes)
+						note.resizeByRatio(ratio);
+					for (note in unspawnNotes)
+						note.resizeByRatio(ratio);
+				}
+				noteKillOffset = 350 / songSpeed;
 				playSound = "scrollfaster";
 				ttl = 20;
 				alwaysEnd = true;
 				onEnd = function()
 				{
-					triggerEventNote("Change Scroll Speed", "1", "1");
+					songSpeed -= changeAmount;
 				}
 			case 'scrollslower':
-				var desiredChangeAmount:Float = FlxG.random.float(0.1, 2);
-				var changeAmount = effectiveScrollSpeed - Math.max(effectiveScrollSpeed - desiredChangeAmount, 0.2);
-				triggerEventNote("Change Scroll Speed", Std.string(changeAmount), "1");
+				var desiredChangeAmount:Float = FlxG.random.float(0.1, 0.9);
+				var changeAmount = SONG.speed - Math.max(effectiveScrollSpeed - desiredChangeAmount, 0.2);
+				songSpeed -= changeAmount;
+				if (generatedMusic)
+				{
+					var ratio:Float = changeAmount / songSpeed; // funny word huh
+					for (note in notes)
+						note.resizeByRatio(ratio);
+					for (note in unspawnNotes)
+						note.resizeByRatio(ratio);
+				}
+				noteKillOffset = 350 / songSpeed;
 				playSound = "scrollslower";
 				ttl = 20;
 				alwaysEnd = true;
 				onEnd = function()
 				{
-					triggerEventNote("Change Scroll Speed", "1", "1");
+					songSpeed += changeAmount;
 				}
 			case 'rainbow':
 				for (daNote in unspawnNotes)
