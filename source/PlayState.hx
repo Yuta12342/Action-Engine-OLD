@@ -468,21 +468,24 @@ class PlayState extends MusicBeatState
 	];
 	var curEffect:Int = 0;
 
-	function generateGibberish(length:Int, exclude:String):String {
+	function generateGibberish(length:Int, exclude:String):String
+	{
 		var alphabet:String = "abcdefghijklmnopqrstuvwxyz";
 		var result:String = "";
-	
+
 		// Remove excluded characters from the alphabet
-		for (i in 0...exclude.length) {
+		for (i in 0...exclude.length)
+		{
 			alphabet = StringTools.replace(alphabet, exclude.charAt(i), "");
 		}
-	
+
 		// Generate the gibberish string
-		for (i in 0...length) {
+		for (i in 0...length)
+		{
 			var randomIndex:Int = Math.floor(Math.random() * alphabet.length);
 			result += alphabet.charAt(randomIndex);
 		}
-	
+
 		return result;
 	}
 
@@ -520,11 +523,21 @@ class PlayState extends MusicBeatState
 		var wordList:Array<String> = [];
 		var nonoLetters:String = "";
 
-		nonoLetters += StringTools.trim(Std.string(ClientPrefs.keyBinds.get('note_left'))) + ", ";
-		nonoLetters += StringTools.trim(Std.string(ClientPrefs.keyBinds.get('note_down'))) + ", ";
-		nonoLetters += StringTools.trim(Std.string(ClientPrefs.keyBinds.get('note_up'))) + ", ";
-		nonoLetters += StringTools.trim(Std.string(ClientPrefs.keyBinds.get('note_right'))) + ", ";
-		nonoLetters += StringTools.trim(Std.string(ClientPrefs.keyBinds.get('reset')));
+		function addNonoLetters(keyBind:String) {
+			var keys:Null<Array<FlxKey>> = ClientPrefs.keyBinds.get(keyBind);
+			if (keys != null) {
+				for (key in keys) {
+					// Assuming FlxKey has a method or property `asciiValue` that gives the ASCII value of the key
+					nonoLetters += String.fromCharCode((Std.parseInt(key.toString()))) + ", ";
+				}
+			}
+		}
+
+		addNonoLetters('note_left');
+		addNonoLetters('note_down');
+		addNonoLetters('note_up');
+		addNonoLetters('note_right');
+		addNonoLetters('reset');
 
 		trace(nonoLetters);
 		if (FileSystem.exists(Paths.txt("words")))
@@ -537,19 +550,22 @@ class PlayState extends MusicBeatState
 		trace(InputFormatter.getKeyName(ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_left'))[0]));
 		for (word in wordList)
 		{
-			if (StringTools.contains(word.toLowerCase(), StringTools.trim(Std.string(ClientPrefs.keyBinds.get('note_left'))).toLowerCase())
-				|| StringTools.contains(word.toLowerCase(), StringTools.trim(Std.string(ClientPrefs.keyBinds.get('note_down'))).toLowerCase())
-				|| StringTools.contains(word.toLowerCase(), StringTools.trim(Std.string(ClientPrefs.keyBinds.get('note_up'))).toLowerCase())
-				|| StringTools.contains(word.toLowerCase(), StringTools.trim(Std.string(ClientPrefs.keyBinds.get('note_right'))).toLowerCase())
-				|| StringTools.contains(word.toLowerCase(), StringTools.trim(Std.string(ClientPrefs.keyBinds.get('reset'))).toLowerCase()))
+			var containsNonoLetter:Bool = false;
+			for (nonoLetter in nonoLetters.split(", "))
 			{
-				continue;
+				if (word.contains(nonoLetter))
+				{
+					containsNonoLetter = true;
+					break;
+				}
 			}
-			else
+
+			if (!containsNonoLetter)
 			{
 				validWords.push(word.toLowerCase());
 			}
 		}
+
 		if (validWords.length <= 0)
 		{
 			trace("wtf no valid words");
@@ -3119,7 +3135,8 @@ class PlayState extends MusicBeatState
 		setOnLuas('songLength', songLength);
 		callOnLuas('onSongStart', []);
 		songStarted = true;
-		new FlxTimer().start(FlxG.random.float(5, 10), function(tmr:FlxTimer) {
+		new FlxTimer().start(FlxG.random.float(5, 10), function(tmr:FlxTimer)
+		{
 			doEffect(effectArray[FlxG.random.int(1, 35)]);
 			tmr.reset(FlxG.random.float(5, 10));
 		});
@@ -4926,7 +4943,8 @@ class PlayState extends MusicBeatState
 
 	override public function switchTo(nextState:FlxState):Bool
 	{
-		if(vocals != null) vocals.pause();
+		if (vocals != null)
+			vocals.pause();
 		pauseMP4s();
 
 		if (xWiggle != null && yWiggle != null && xWiggleTween != null && yWiggleTween != null)
@@ -6571,16 +6589,24 @@ class PlayState extends MusicBeatState
 		if (health < 0)
 			health = 0;
 
-		switch (iconP1.type) {
-			case SINGLE: iconP1.animation.curAnim.curFrame = 0;
-			case WINNING: iconP1.animation.curAnim.curFrame = (healthBar.percent > 80 ? 2 : (healthBar.percent < 20 ? 1 : 0));
-			default: iconP1.animation.curAnim.curFrame = (healthBar.percent < 20 ? 1 : 0);
+		switch (iconP1.type)
+		{
+			case SINGLE:
+				iconP1.animation.curAnim.curFrame = 0;
+			case WINNING:
+				iconP1.animation.curAnim.curFrame = (healthBar.percent > 80 ? 2 : (healthBar.percent < 20 ? 1 : 0));
+			default:
+				iconP1.animation.curAnim.curFrame = (healthBar.percent < 20 ? 1 : 0);
 		}
 
-		switch (iconP2.type) {
-			case SINGLE: iconP2.animation.curAnim.curFrame = 0;
-			case WINNING: iconP2.animation.curAnim.curFrame = (healthBar.percent > 80 ? 1 : (healthBar.percent < 20 ? 2 : 0));
-			   default: iconP2.animation.curAnim.curFrame = (healthBar.percent > 80 ? 1 : 0);
+		switch (iconP2.type)
+		{
+			case SINGLE:
+				iconP2.animation.curAnim.curFrame = 0;
+			case WINNING:
+				iconP2.animation.curAnim.curFrame = (healthBar.percent > 80 ? 1 : (healthBar.percent < 20 ? 2 : 0));
+			default:
+				iconP2.animation.curAnim.curFrame = (healthBar.percent > 80 ? 1 : 0);
 		}
 
 		if (FlxG.keys.anyJustPressed(debugKeysCharacter) && !endingSong && !inCutscene)
