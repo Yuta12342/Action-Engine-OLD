@@ -5286,11 +5286,7 @@ class PlayState extends MusicBeatState
 				{
 					if (daNote == null)
 						continue;
-					if (!daNote.isSustainNote)
-						daNote.setColorTransform(1, 1, 1, 1, FlxG.random.int(-255, 255), FlxG.random.int(-255, 255), FlxG.random.int(-255, 255));
-					else if (daNote.isSustainNote)
-						daNote.setColorTransform(1, 1, 1, 1, Std.int(daNote.prevNote.colorTransform.redOffset),
-							Std.int(daNote.prevNote.colorTransform.greenOffset), Std.int(daNote.prevNote.colorTransform.blueOffset));
+					daNote.setColorTransform(1, 1, 1, 1, FlxG.random.int(-255, 255), FlxG.random.int(-255, 255), FlxG.random.int(-255, 255));
 				}
 				playSound = "rainbow";
 				playSoundVol = 0.5;
