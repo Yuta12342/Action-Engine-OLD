@@ -5234,42 +5234,28 @@ class PlayState extends MusicBeatState
 				updateScrollUI();
 			case 'scrollfaster':
 				var changeAmount:Float = FlxG.random.float(1.1, 3);
-				songSpeed += changeAmount;
-				if (generatedMusic)
-				{
-					var ratio:Float = 1 / songSpeed; // funny word huh
-					for (note in notes)
-						note.resizeByRatio(ratio);
-					for (note in unspawnNotes)
-						note.resizeByRatio(ratio);
-				}
-				noteKillOffset = 350 / songSpeed;
+				effectiveScrollSpeed += changeAmount;
+				songSpeed = SONG.speed * ClientPrefs.getGameplaySetting('scrollspeed', 1) * effectiveScrollSpeed;
 				playSound = "scrollfaster";
 				ttl = 20;
 				alwaysEnd = true;
 				onEnd = function()
 				{
-					songSpeed -= changeAmount;
+					effectiveScrollSpeed -= changeAmount;
+					songSpeed = SONG.speed * ClientPrefs.getGameplaySetting('scrollspeed', 1) * effectiveScrollSpeed;
 				}
 			case 'scrollslower':
 				var desiredChangeAmount:Float = FlxG.random.float(0.1, 0.9);
 				var changeAmount = SONG.speed - Math.max(effectiveScrollSpeed - desiredChangeAmount, 0.2);
-				songSpeed -= changeAmount;
-				if (generatedMusic)
-				{
-					var ratio:Float = 1 / songSpeed; // funny word huh
-					for (note in notes)
-						note.resizeByRatio(ratio);
-					for (note in unspawnNotes)
-						note.resizeByRatio(ratio);
-				}
-				noteKillOffset = 350 / songSpeed;
+				effectiveScrollSpeed -= changeAmount;
+				songSpeed = SONG.speed * ClientPrefs.getGameplaySetting('scrollspeed', 1) * effectiveScrollSpeed;
 				playSound = "scrollslower";
 				ttl = 20;
 				alwaysEnd = true;
 				onEnd = function()
 				{
-					songSpeed += changeAmount;
+					effectiveScrollSpeed += changeAmount;
+					songSpeed = SONG.speed * ClientPrefs.getGameplaySetting('scrollspeed', 1) * effectiveScrollSpeed;
 				}
 			case 'rainbow':
 				for (daNote in unspawnNotes)
@@ -6266,6 +6252,7 @@ class PlayState extends MusicBeatState
 	}
 
 	public var Crashed:Bool;
+	var isFrozen:Bool = false;
 
 	override public function update(elapsed:Float)
 	{
@@ -6274,6 +6261,8 @@ class PlayState extends MusicBeatState
 			FlxG.switchState(new MainMenuState());
 			Crashed = false;
 		}
+
+		if (isFrozen) boyfriend.stunned = true;
 
 		if (notes != null)
 		{
@@ -6292,12 +6281,12 @@ class PlayState extends MusicBeatState
 				unspawnNotes[i].blockHit = true;
 		}
 
-		/*if (FlxG.keys.justPressed.NINE)
+		if (FlxG.keys.justPressed.NINE)
 		{
 			iconP1.swapOldIcon();
-	}*/
+		}
 
-		if (FlxG.keys.justPressed.H)
+		/*if (FlxG.keys.justPressed.H)
 		{
 			if (curEffect < effectArray.length)
 			{
@@ -6306,7 +6295,7 @@ class PlayState extends MusicBeatState
 			curEffect += 1;
 			trace(curEffect);
 			trace(effectArray.length);
-		}
+		}*/
 
 		if (chartModifier == '4K Only' && mania != 3)
 		{
@@ -8888,6 +8877,7 @@ class PlayState extends MusicBeatState
 				playerStrums.forEach(function(sprite)
 				{
 					sprite.color = 0x0073b5;
+					isFrozen = true;
 				});
 				new FlxTimer().start(2, function(timer)
 				{
@@ -8897,6 +8887,8 @@ class PlayState extends MusicBeatState
 						playerStrums.forEach(function(sprite)
 						{
 							sprite.color = 0xffffff;
+							isFrozen = false;
+							boyfriend.stunned = false;
 						});
 					}
 					FlxDestroyUtil.destroy(timer);
