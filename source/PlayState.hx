@@ -506,7 +506,7 @@ class PlayState extends MusicBeatState
 			if (FlxG.save.data.activeItems == null)
 			{
 				activeItems[3] = FlxG.random.int(0, 9);
-				activeItems[2] = maxHealth;
+				activeItems[2] = Std.int(maxHealth);
 			}
 		}
 
@@ -6339,7 +6339,7 @@ class PlayState extends MusicBeatState
 
 		curEffect = FlxG.random.int(1, 38);
 
-		if ((songPercent == 0 || songPercent == 1) && (notes.length <= 0 || unspawnNotes.length <= 0) || songStarted && !FlxG.sound.music.playing) endSong();
+		//if ((songPercent == 0 || songPercent == 1) && (notes.length <= 0 || unspawnNotes.length <= 0) || songStarted && !FlxG.sound.music.playing) endSong();
 
 		//trace(songPercent);
 

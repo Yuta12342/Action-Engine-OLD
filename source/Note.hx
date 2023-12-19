@@ -447,22 +447,42 @@ class Note extends FlxSprite
 				}
 		
 			}else {
-				switch (noteType)
-				{
-					case 'Mine Note':
-						loadGraphic(Paths.image("minenote"), false);
-					case 'Warning Note':
-						loadGraphic(Paths.image("warningnote"), false);
-					case 'Heal Note':
-						loadGraphic(Paths.image("healnote"), false);
-					case 'Ice Note':
-						loadGraphic(Paths.image("icenote"), false);
-					case 'Fake Heal Note':
-						loadGraphic(Paths.image("fakehealnote"), false);
-					default:
-						frames = Paths.getSparrowAtlas(blahblah);
-						loadNoteAnims();
-						antialiasing = ClientPrefs.globalAntialiasing;
+				if(PlayState.isPixelStage) {
+					switch (noteType)
+					{
+						case 'Mine Note':
+							loadGraphic(Paths.image("pixelUI/minenote"), false);
+						case 'Warning Note':
+							loadGraphic(Paths.image("pixelUI/warningnote"), false);
+						case 'Heal Note':
+							loadGraphic(Paths.image("pixelUI/healnote"), false);
+						case 'Ice Note':
+							loadGraphic(Paths.image("pixelUI/icenote"), false);
+						case 'Fake Heal Note':
+							loadGraphic(Paths.image("pixelUI/fakehealnote"), false);
+						default:
+							frames = Paths.getSparrowAtlas(blahblah);
+							loadNoteAnims();
+							antialiasing = ClientPrefs.globalAntialiasing;
+					}
+				} else {
+					switch (noteType)
+					{
+						case 'Mine Note':
+							loadGraphic(Paths.image("minenote"), false);
+						case 'Warning Note':
+							loadGraphic(Paths.image("warningnote"), false);
+						case 'Heal Note':
+							loadGraphic(Paths.image("healnote"), false);
+						case 'Ice Note':
+							loadGraphic(Paths.image("icenote"), false);
+						case 'Fake Heal Note':
+							loadGraphic(Paths.image("fakehealnote"), false);
+						default:
+							frames = Paths.getSparrowAtlas(blahblah);
+							loadNoteAnims();
+							antialiasing = ClientPrefs.globalAntialiasing;
+					}
 				}
 			}
 		} else {
