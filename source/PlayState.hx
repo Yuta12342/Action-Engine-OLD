@@ -5235,27 +5235,41 @@ class PlayState extends MusicBeatState
 			case 'scrollfaster':
 				var changeAmount:Float = FlxG.random.float(1.1, 3);
 				effectiveScrollSpeed += changeAmount;
-				songSpeed = SONG.speed * ClientPrefs.getGameplaySetting('scrollspeed', 1) * effectiveScrollSpeed;
+				for (daNote in unspawnNotes) {
+					if (daNote == null)
+						continue;
+					daNote.multSpeed *= effectiveScrollSpeed;
+				}
 				playSound = "scrollfaster";
 				ttl = 20;
 				alwaysEnd = true;
-				onEnd = function()
-				{
+				onEnd = function() {
 					effectiveScrollSpeed -= changeAmount;
-					songSpeed = SONG.speed * ClientPrefs.getGameplaySetting('scrollspeed', 1) * effectiveScrollSpeed;
+					for (daNote in unspawnNotes) {
+						if (daNote == null)
+							continue;
+						daNote.multSpeed /= effectiveScrollSpeed;
+					}
 				}
 			case 'scrollslower':
 				var desiredChangeAmount:Float = FlxG.random.float(0.1, 0.9);
 				var changeAmount = SONG.speed - Math.max(effectiveScrollSpeed - desiredChangeAmount, 0.2);
 				effectiveScrollSpeed -= changeAmount;
-				songSpeed = SONG.speed * ClientPrefs.getGameplaySetting('scrollspeed', 1) * effectiveScrollSpeed;
+				for (daNote in unspawnNotes) {
+					if (daNote == null)
+						continue;
+					daNote.multSpeed *= effectiveScrollSpeed;
+				}
 				playSound = "scrollslower";
 				ttl = 20;
 				alwaysEnd = true;
-				onEnd = function()
-				{
+				onEnd = function() {
 					effectiveScrollSpeed += changeAmount;
-					songSpeed = SONG.speed * ClientPrefs.getGameplaySetting('scrollspeed', 1) * effectiveScrollSpeed;
+					for (daNote in unspawnNotes) {
+						if (daNote == null)
+							continue;
+						daNote.multSpeed /= effectiveScrollSpeed;
+					}
 				}
 			case 'rainbow':
 				for (daNote in unspawnNotes)
