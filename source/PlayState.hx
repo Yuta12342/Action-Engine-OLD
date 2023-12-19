@@ -4095,7 +4095,7 @@ class PlayState extends MusicBeatState
 							+ (Conductor.stepCrochet / FlxMath.roundDecimal(songSpeed + swagNote.multSpeed, 2)),
 							daNoteData, oldNote, true);
 
-						sustainNote.rootNote = swagNote;
+						sustainNote.prevNote = swagNote;
 						sustainNote.mustPress = gottaHitNote;
 						sustainNote.gfNote = (section.gfSection && (songNotes[1] < Note.ammo[mania]));
 						sustainNote.noteType = swagNote.noteType;
@@ -5256,8 +5256,8 @@ class PlayState extends MusicBeatState
 					if (daNote.strumTime >= Conductor.songPosition && !daNote.isSustainNote)
 						daNote.setColorTransform(1, 1, 1, 1, FlxG.random.int(-255, 255), FlxG.random.int(-255, 255), FlxG.random.int(-255, 255));
 					else if (daNote.strumTime >= Conductor.songPosition && daNote.isSustainNote)
-						daNote.setColorTransform(1, 1, 1, 1, Std.int(daNote.rootNote.colorTransform.redOffset),
-							Std.int(daNote.rootNote.colorTransform.greenOffset), Std.int(daNote.rootNote.colorTransform.blueOffset));
+						daNote.setColorTransform(1, 1, 1, 1, Std.int(daNote.prevNote.colorTransform.redOffset),
+							Std.int(daNote.prevNote.colorTransform.greenOffset), Std.int(daNote.prevNote.colorTransform.blueOffset));
 				}
 				for (daNote in notes)
 				{
@@ -5266,8 +5266,8 @@ class PlayState extends MusicBeatState
 					if (!daNote.isSustainNote)
 						daNote.setColorTransform(1, 1, 1, 1, FlxG.random.int(-255, 255), FlxG.random.int(-255, 255), FlxG.random.int(-255, 255));
 					else if (daNote.isSustainNote)
-						daNote.setColorTransform(1, 1, 1, 1, Std.int(daNote.rootNote.colorTransform.redOffset),
-							Std.int(daNote.rootNote.colorTransform.greenOffset), Std.int(daNote.rootNote.colorTransform.blueOffset));
+						daNote.setColorTransform(1, 1, 1, 1, Std.int(daNote.prevNote.colorTransform.redOffset),
+							Std.int(daNote.prevNote.colorTransform.greenOffset), Std.int(daNote.prevNote.colorTransform.blueOffset));
 				}
 				playSound = "rainbow";
 				playSoundVol = 0.5;
@@ -5457,7 +5457,7 @@ class PlayState extends MusicBeatState
 					if (daNote.strumTime >= Conductor.songPosition && !daNote.isSustainNote)
 						daNote.doGhost();
 					else if (daNote.strumTime >= Conductor.songPosition && daNote.isSustainNote)
-						daNote.doGhost(daNote.rootNote.ghostSpeed, daNote.rootNote.ghostSine);
+						daNote.doGhost(daNote.prevNote.ghostSpeed, daNote.prevNote.ghostSine);
 				}
 				for (daNote in notes)
 				{
@@ -5466,7 +5466,7 @@ class PlayState extends MusicBeatState
 					if (!daNote.isSustainNote)
 						daNote.doGhost();
 					else if (daNote.isSustainNote)
-						daNote.doGhost(daNote.rootNote.ghostSpeed, daNote.rootNote.ghostSine);
+						daNote.doGhost(daNote.prevNote.ghostSpeed, daNote.prevNote.ghostSine);
 				}
 				playSound = "ghost";
 				playSoundVol = 0.5;
