@@ -532,8 +532,10 @@ class PlayState extends MusicBeatState
 			var keys:Null<Array<FlxKey>> = ClientPrefs.keyBinds.get(keyBind);
 			if (keys != null) {
 				for (key in keys) {
-					// Assuming FlxKey has a method or property `asciiValue` that gives the ASCII value of the key
-					nonoLetters += String.fromCharCode((Std.parseInt(key.toString()))) + ", ";
+					var keyName:String = InputFormatter.getKeyName(key);
+					if (keyName.length == 1 && keyName != "-") {
+						nonoLetters += keyName.toLowerCase();
+					}
 				}
 			}
 		}
@@ -548,14 +550,18 @@ class PlayState extends MusicBeatState
 		if (FileSystem.exists(Paths.txt("words")))
 		{
 			var content:String = sys.io.File.getContent(Paths.txt("words"));
-			wordList = content.split("\n");
+			wordList = content.toLowerCase().split("\n");
 		}
 		wordList.push(SONG.song);
+		trace(wordList.length + " words loaded");
+		trace(wordList);
 		validWords.resize(0);
 		for (word in wordList)
 		{
 			var containsNonoLetter:Bool = false;
-			for (nonoLetter in nonoLetters.split(", "))
+			var nonoLettersArray:Array<String> = nonoLetters.split("");
+
+			for (nonoLetter in nonoLettersArray)
 			{
 				if (word.contains(nonoLetter))
 				{
@@ -577,7 +583,8 @@ class PlayState extends MusicBeatState
 
 			validWords = [for (i in 0...numWords) generateGibberish(5, nonoLetters)];
 		}
-
+		trace(validWords.length + " words accepted");
+		trace(validWords);
 		controlButtons.resize(0);
 		for (thing in [
 			ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_left')).toString(),
