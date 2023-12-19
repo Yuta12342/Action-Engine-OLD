@@ -411,7 +411,8 @@ class PlayState extends MusicBeatState
 	var xWiggleTween:Array<NumTween> = [null, null, null, null];
 	var yWiggleTween:Array<NumTween> = [null, null, null, null];
 
-	public var severInputs:Array<Bool> = [false, false, false, false];
+	public var severInputs:Array<Bool> = new Array<Bool>();
+
 
 	var drainHealth:Bool = false;
 
@@ -771,6 +772,10 @@ class PlayState extends MusicBeatState
 		if (EKMode == null)
 		{
 			EKMode = true;
+		}
+
+		for (i in 0...mania + 1) {
+			severInputs.push(false);
 		}
 
 		trace("song keys: " + (mania + 1) + " / mania value: " + mania);
