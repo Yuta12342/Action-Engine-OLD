@@ -546,7 +546,7 @@ class PlayState extends MusicBeatState
 			var content:String = sys.io.File.getContent(Paths.txt("words"));
 			wordList = content.split("\n");
 		}
-
+wordList.push(SONG.song);
 		validWords.resize(0);
 		for (word in wordList)
 		{
