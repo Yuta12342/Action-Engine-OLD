@@ -468,21 +468,24 @@ class PlayState extends MusicBeatState
 	];
 	var curEffect:Int = 0;
 
-	function generateGibberish(length:Int, exclude:String):String {
+	function generateGibberish(length:Int, exclude:String):String
+	{
 		var alphabet:String = "abcdefghijklmnopqrstuvwxyz";
 		var result:String = "";
-	
+
 		// Remove excluded characters from the alphabet
-		for (i in 0...exclude.length) {
+		for (i in 0...exclude.length)
+		{
 			alphabet = StringTools.replace(alphabet, exclude.charAt(i), "");
 		}
-	
+
 		// Generate the gibberish string
-		for (i in 0...length) {
+		for (i in 0...length)
+		{
 			var randomIndex:Int = Math.floor(Math.random() * alphabet.length);
 			result += alphabet.charAt(randomIndex);
 		}
-	
+
 		return result;
 	}
 
@@ -536,19 +539,22 @@ class PlayState extends MusicBeatState
 		validWords.resize(0);
 		for (word in wordList)
 		{
-			if (StringTools.contains(word.toLowerCase(), StringTools.trim(Std.string(ClientPrefs.keyBinds.get('note_left'))).toLowerCase())
-				|| StringTools.contains(word.toLowerCase(), StringTools.trim(Std.string(ClientPrefs.keyBinds.get('note_down'))).toLowerCase())
-				|| StringTools.contains(word.toLowerCase(), StringTools.trim(Std.string(ClientPrefs.keyBinds.get('note_up'))).toLowerCase())
-				|| StringTools.contains(word.toLowerCase(), StringTools.trim(Std.string(ClientPrefs.keyBinds.get('note_right'))).toLowerCase())
-				|| StringTools.contains(word.toLowerCase(), StringTools.trim(Std.string(ClientPrefs.keyBinds.get('reset'))).toLowerCase()))
+			var containsNonoLetter:Bool = false;
+			for (nonoLetter in nonoLetters.split(", "))
 			{
-				continue;
+				if (word.contains(nonoLetter))
+				{
+					containsNonoLetter = true;
+					break;
+				}
 			}
-			else
+
+			if (!containsNonoLetter)
 			{
 				validWords.push(word.toLowerCase());
 			}
 		}
+
 		if (validWords.length <= 0)
 		{
 			trace("wtf no valid words");
@@ -3118,7 +3124,8 @@ class PlayState extends MusicBeatState
 		setOnLuas('songLength', songLength);
 		callOnLuas('onSongStart', []);
 		songStarted = true;
-		new FlxTimer().start(FlxG.random.float(5, 10), function(tmr:FlxTimer) {
+		new FlxTimer().start(FlxG.random.float(5, 10), function(tmr:FlxTimer)
+		{
 			doEffect(effectArray[FlxG.random.int(1, 35)]);
 			tmr.reset(FlxG.random.float(5, 10));
 		});
@@ -4925,7 +4932,8 @@ class PlayState extends MusicBeatState
 
 	override public function switchTo(nextState:FlxState):Bool
 	{
-		if(vocals != null) vocals.pause();
+		if (vocals != null)
+			vocals.pause();
 		pauseMP4s();
 
 		if (xWiggle != null && yWiggle != null && xWiggleTween != null && yWiggleTween != null)
@@ -6074,30 +6082,30 @@ class PlayState extends MusicBeatState
 		var swagNote:Note = new Note(pickTime, pickData);
 		switch (type)
 		{
-			case 1: 
-					swagNote.noteType = 'Mine Note';
-					swagNote.reloadNote('minenote');
-					swagNote.isMine = true;
-					swagNote.ignoreMiss = true;
+			case 1:
+				swagNote.noteType = 'Mine Note';
+				swagNote.reloadNote('minenote');
+				swagNote.isMine = true;
+				swagNote.ignoreMiss = true;
 			case 2:
-					swagNote.noteType = 'Warning Note';
-					swagNote.reloadNote('warningnote');
-					swagNote.isAlert = true;
-			case 3: 
-					swagNote.noteType = 'Heal Note';
-					swagNote.reloadNote('healnote');
-					swagNote.isHeal = true;
-					swagNote.ignoreMiss = true;
-			case 4: 
-					swagNote.noteType = 'Ice Note';
-					swagNote.reloadNote('icenote');
-					swagNote.isFreeze = true;
-					swagNote.ignoreMiss = true;
+				swagNote.noteType = 'Warning Note';
+				swagNote.reloadNote('warningnote');
+				swagNote.isAlert = true;
+			case 3:
+				swagNote.noteType = 'Heal Note';
+				swagNote.reloadNote('healnote');
+				swagNote.isHeal = true;
+				swagNote.ignoreMiss = true;
+			case 4:
+				swagNote.noteType = 'Ice Note';
+				swagNote.reloadNote('icenote');
+				swagNote.isFreeze = true;
+				swagNote.ignoreMiss = true;
 			case 5:
-					swagNote.noteType = 'Fake Heal Note';
-					swagNote.reloadNote('fakehealnote');
-					swagNote.isFakeHeal = true;
-					swagNote.ignoreMiss = true;
+				swagNote.noteType = 'Fake Heal Note';
+				swagNote.reloadNote('fakehealnote');
+				swagNote.isFakeHeal = true;
+				swagNote.ignoreMiss = true;
 		}
 		swagNote.ignoreNote = true;
 		swagNote.specialNote = true;
@@ -6554,16 +6562,24 @@ class PlayState extends MusicBeatState
 		if (health < 0)
 			health = 0;
 
-		switch (iconP1.type) {
-			case SINGLE: iconP1.animation.curAnim.curFrame = 0;
-			case WINNING: iconP1.animation.curAnim.curFrame = (healthBar.percent > 80 ? 2 : (healthBar.percent < 20 ? 1 : 0));
-			default: iconP1.animation.curAnim.curFrame = (healthBar.percent < 20 ? 1 : 0);
+		switch (iconP1.type)
+		{
+			case SINGLE:
+				iconP1.animation.curAnim.curFrame = 0;
+			case WINNING:
+				iconP1.animation.curAnim.curFrame = (healthBar.percent > 80 ? 2 : (healthBar.percent < 20 ? 1 : 0));
+			default:
+				iconP1.animation.curAnim.curFrame = (healthBar.percent < 20 ? 1 : 0);
 		}
 
-		switch (iconP2.type) {
-			case SINGLE: iconP2.animation.curAnim.curFrame = 0;
-			case WINNING: iconP2.animation.curAnim.curFrame = (healthBar.percent > 80 ? 1 : (healthBar.percent < 20 ? 2 : 0));
-			   default: iconP2.animation.curAnim.curFrame = (healthBar.percent > 80 ? 1 : 0);
+		switch (iconP2.type)
+		{
+			case SINGLE:
+				iconP2.animation.curAnim.curFrame = 0;
+			case WINNING:
+				iconP2.animation.curAnim.curFrame = (healthBar.percent > 80 ? 1 : (healthBar.percent < 20 ? 2 : 0));
+			default:
+				iconP2.animation.curAnim.curFrame = (healthBar.percent > 80 ? 1 : 0);
 		}
 
 		if (FlxG.keys.anyJustPressed(debugKeysCharacter) && !endingSong && !inCutscene)
