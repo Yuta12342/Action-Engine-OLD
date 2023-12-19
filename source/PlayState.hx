@@ -464,7 +464,7 @@ class PlayState extends MusicBeatState
 
 	var effectArray:Array<String> = [
 		'colorblind', 'blur', 'lag', 'mine', 'warning', 'heal', 'spin', 'songslower', 'songfaster', 'scrollswitch', 'scrollfaster', 'scrollslower', 'rainbow',
-		'cover', 'mixup', 'ghost', 'wiggle', 'flashbang', 'nostrum', 'jackspam', 'spam', 'sever', 'shake', 'poison', 'dizzy', 'noise', 'flip', 'invuln',
+		'cover', 'ghost', 'flashbang', 'nostrum', 'jackspam', 'spam', 'sever', 'shake', 'poison', 'dizzy', 'noise', 'flip', 'invuln',
 		'desync', 'mute', 'ice', 'randomize', 'fakeheal', 'spell', 'terminate'
 	];
 	var curEffect:Int = 0;
@@ -5464,14 +5464,14 @@ class PlayState extends MusicBeatState
 					FlxDestroyUtil.destroy(errorMessage);
 				}
 
-			case 'mixup':
+			/*case 'mixup':
 				mixUp();
 				playSound = "mixup";
 				ttl = 7;
 				onEnd = function()
 				{
 					mixUp(true);
-				}
+				}*/
 			case 'ghost':
 				for (daNote in unspawnNotes)
 				{
@@ -5510,7 +5510,7 @@ class PlayState extends MusicBeatState
 						daNote.undoGhost();
 					}
 				};
-			case 'wiggle':
+			/*case 'wiggle':
 				xWiggle = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 				yWiggle = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 				for (i in [xWiggleTween, yWiggleTween])
@@ -5684,7 +5684,7 @@ class PlayState extends MusicBeatState
 								j.cancel();
 						}
 					}
-				}
+				}*/
 			case 'flashbang':
 				playSound = "bang";
 				if (flashbangTimer != null && flashbangTimer.active)
@@ -6119,29 +6119,34 @@ class PlayState extends MusicBeatState
 				swagNote.noteType = 'Mine Note';
 				swagNote.reloadNote('minenote');
 				swagNote.isMine = true;
-				swagNote.ignoreMiss = true;
+				swagNote.ignoreNote = true;
+				swagNote.specialNote = true;
 			case 2:
 				swagNote.noteType = 'Warning Note';
 				swagNote.reloadNote('warningnote');
 				swagNote.isAlert = true;
+				swagNote.specialNote = true;
 			case 3:
 				swagNote.noteType = 'Heal Note';
 				swagNote.reloadNote('healnote');
 				swagNote.isHeal = true;
-				swagNote.ignoreMiss = true;
+				swagNote.specialNote = true;
 			case 4:
 				swagNote.noteType = 'Ice Note';
 				swagNote.reloadNote('icenote');
 				swagNote.isFreeze = true;
-				swagNote.ignoreMiss = true;
+				swagNote.ignoreNote = true;
+				swagNote.specialNote = true;
 			case 5:
 				swagNote.noteType = 'Fake Heal Note';
 				swagNote.reloadNote('fakehealnote');
 				swagNote.isFakeHeal = true;
-				swagNote.ignoreMiss = true;
+				swagNote.ignoreNote = true;
+				swagNote.specialNote = true;
+			default:
+				swagNote.ignoreNote = false;
+				swagNote.specialNote = false;
 		}
-		swagNote.ignoreNote = true;
-		swagNote.specialNote = true;
 		swagNote.mustPress = true;
 		swagNote.x += FlxG.width / 2;
 		unspawnNotes.push(swagNote);
