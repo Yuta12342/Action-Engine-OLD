@@ -523,11 +523,21 @@ class PlayState extends MusicBeatState
 		var wordList:Array<String> = [];
 		var nonoLetters:String = "";
 
-		nonoLetters += StringTools.trim(Std.string(ClientPrefs.keyBinds.get('note_left'))) + ", ";
-		nonoLetters += StringTools.trim(Std.string(ClientPrefs.keyBinds.get('note_down'))) + ", ";
-		nonoLetters += StringTools.trim(Std.string(ClientPrefs.keyBinds.get('note_up'))) + ", ";
-		nonoLetters += StringTools.trim(Std.string(ClientPrefs.keyBinds.get('note_right'))) + ", ";
-		nonoLetters += StringTools.trim(Std.string(ClientPrefs.keyBinds.get('reset')));
+		function addNonoLetters(keyBind:String) {
+			var keys:Null<Array<FlxKey>> = ClientPrefs.keyBinds.get(keyBind);
+			if (keys != null) {
+				for (key in keys) {
+					// Assuming FlxKey has a method or property `asciiValue` that gives the ASCII value of the key
+					nonoLetters += String.fromCharCode((Std.parseInt(key.toString()))) + ", ";
+				}
+			}
+		}
+
+		addNonoLetters('note_left');
+		addNonoLetters('note_down');
+		addNonoLetters('note_up');
+		addNonoLetters('note_right');
+		addNonoLetters('reset');
 
 		trace(nonoLetters);
 		if (FileSystem.exists(Paths.txt("words")))
