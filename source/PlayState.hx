@@ -8911,10 +8911,22 @@ class PlayState extends MusicBeatState
 				boyfriend.playAnim('hey', true);
 			}
 
-			var spr = playerStrums.members[note.noteData];
-			if (spr != null)
+			if (cpuControlled)
 			{
-				spr.playAnim('confirm', true);
+				var time:Float = 0.15;
+				if (note.isSustainNote && !(note.animation.curAnim.name.endsWith('tail') || note.animation.curAnim.name.endsWith('end')))
+				{
+					time += 0.15;
+				}
+				StrumPlayAnim(false, Std.int(Math.abs(note.noteData)) % Note.ammo[mania], time);
+			}
+			else
+			{
+				var spr = playerStrums.members[note.noteData];
+				if (spr != null)
+				{
+					spr.playAnim('confirm', true);
+				}
 			}
 
 			note.wasGoodHit = true;
