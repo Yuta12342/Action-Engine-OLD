@@ -694,11 +694,11 @@ class Note extends FlxSprite
 		{
 			if (ghostSine)
 			{
-				alpha = 0.1 + 0.65 * Math.abs(Math.sin(Conductor.songPosition * ghostSpeed));
+				multAlpha = 0.1 + 0.65 * Math.abs(Math.sin(Conductor.songPosition * ghostSpeed));
 			}
 			else
 			{
-				alpha = 0.1 + 0.65 * Math.abs(Math.cos(Conductor.songPosition * ghostSpeed));
+				multAlpha = 0.1 + 0.65 * Math.abs(Math.cos(Conductor.songPosition * ghostSpeed));
 			}
 			colorSwap.hue = 0;
 			colorSwap.saturation = 0;

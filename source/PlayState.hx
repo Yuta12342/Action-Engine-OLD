@@ -463,7 +463,7 @@ class PlayState extends MusicBeatState
 
 	var effectArray:Array<String> = [
 		'colorblind', 'blur', 'lag', 'mine', 'warning', 'heal', 'spin', 'songslower', 'songfaster', 'scrollswitch', 'scrollfaster', 'scrollslower', 'rainbow',
-		'cover', 'mixup', 'ghost', 'wiggle', 'flashbang', 'nostrum', 'jackspam', 'spam', 'sever', 'shake', 'poison', 'dizzy', 'noise', 'flip', 'invuln',
+		'cover', 'ghost', 'flashbang', 'nostrum', 'jackspam', 'spam', 'sever', 'shake', 'poison', 'dizzy', 'noise', 'flip', 'invuln',
 		'desync', 'mute', 'ice', 'randomize', 'fakeheal', 'spell', 'terminate'
 	];
 	var curEffect:Int = 0;
@@ -534,6 +534,7 @@ class PlayState extends MusicBeatState
 		}
 
 		validWords.resize(0);
+		trace(InputFormatter.getKeyName(ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_left'))[0]));
 		for (word in wordList)
 		{
 			if (StringTools.contains(word.toLowerCase(), StringTools.trim(Std.string(ClientPrefs.keyBinds.get('note_left'))).toLowerCase())
@@ -5210,46 +5211,56 @@ class PlayState extends MusicBeatState
 				playSound = "scrollswitch";
 				updateScrollUI();
 			case 'scrollfaster':
-				var changeAmount:Float = FlxG.random.float(1.2, 3);
-				triggerEventNote("Change Scroll Speed", Std.string(changeAmount), "1");
+				var changeAmount:Float = FlxG.random.float(1.1, 3);
+				effectiveScrollSpeed += changeAmount;
+				triggerEventNote("Change Scroll Speed", Std.string(effectiveScrollSpeed), "1");
 				playSound = "scrollfaster";
 				ttl = 20;
 				alwaysEnd = true;
 				onEnd = function()
 				{
-					triggerEventNote("Change Scroll Speed", "1", "1");
+					effectiveScrollSpeed -= changeAmount;
+					triggerEventNote("Change Scroll Speed", Std.string(effectiveScrollSpeed), "1");
 				}
 			case 'scrollslower':
-				var desiredChangeAmount:Float = FlxG.random.float(0.1, 2);
+				var desiredChangeAmount:Float = FlxG.random.float(0.1, 0.9);
 				var changeAmount = effectiveScrollSpeed - Math.max(effectiveScrollSpeed - desiredChangeAmount, 0.2);
-				triggerEventNote("Change Scroll Speed", Std.string(changeAmount), "1");
+				effectiveScrollSpeed -= changeAmount;
+				triggerEventNote("Change Scroll Speed", Std.string(effectiveScrollSpeed), "1");
 				playSound = "scrollslower";
 				ttl = 20;
 				alwaysEnd = true;
 				onEnd = function()
 				{
-					triggerEventNote("Change Scroll Speed", "1", "1");
+					effectiveScrollSpeed += changeAmount;
+					triggerEventNote("Change Scroll Speed", Std.string(effectiveScrollSpeed), "1");
 				}
 			case 'rainbow':
 				for (daNote in unspawnNotes)
 				{
 					if (daNote == null)
 						continue;
-					if (daNote.strumTime >= Conductor.songPosition && !daNote.isSustainNote)
-						daNote.setColorTransform(1, 1, 1, 1, FlxG.random.int(-255, 255), FlxG.random.int(-255, 255), FlxG.random.int(-255, 255));
-					else if (daNote.strumTime >= Conductor.songPosition && daNote.isSustainNote)
-						daNote.setColorTransform(1, 1, 1, 1, Std.int(daNote.rootNote.colorTransform.redOffset),
-							Std.int(daNote.rootNote.colorTransform.greenOffset), Std.int(daNote.rootNote.colorTransform.blueOffset));
+					else
+					{
+						if (daNote.strumTime >= Conductor.songPosition && !daNote.isSustainNote)
+							daNote.setColorTransform(1, 1, 1, 1, FlxG.random.int(-255, 255), FlxG.random.int(-255, 255), FlxG.random.int(-255, 255));
+						else if (daNote.strumTime >= Conductor.songPosition && daNote.isSustainNote)
+							daNote.setColorTransform(1, 1, 1, 1, Std.int(daNote.colorTransform.redOffset),
+								Std.int(daNote.colorTransform.greenOffset), Std.int(daNote.colorTransform.blueOffset));
+					}
 				}
 				for (daNote in notes)
 				{
 					if (daNote == null)
 						continue;
-					if (!daNote.isSustainNote)
-						daNote.setColorTransform(1, 1, 1, 1, FlxG.random.int(-255, 255), FlxG.random.int(-255, 255), FlxG.random.int(-255, 255));
-					else if (daNote.isSustainNote)
-						daNote.setColorTransform(1, 1, 1, 1, Std.int(daNote.rootNote.colorTransform.redOffset),
-							Std.int(daNote.rootNote.colorTransform.greenOffset), Std.int(daNote.rootNote.colorTransform.blueOffset));
+					else
+					{
+						if (!daNote.isSustainNote)
+							daNote.setColorTransform(1, 1, 1, 1, FlxG.random.int(-255, 255), FlxG.random.int(-255, 255), FlxG.random.int(-255, 255));
+						else if (daNote.isSustainNote)
+							daNote.setColorTransform(1, 1, 1, 1, Std.int(daNote.colorTransform.redOffset),
+								Std.int(daNote.colorTransform.greenOffset), Std.int(daNote.colorTransform.blueOffset));
+					}
 				}
 				playSound = "rainbow";
 				playSoundVol = 0.5;
@@ -5274,6 +5285,7 @@ class PlayState extends MusicBeatState
 				var errorMessage = new FlxSprite();
 				var random = FlxG.random.int(0, 13);
 				var randomPosition:Bool = true;
+				trace(random);
 
 				switch (random)
 				{
@@ -5303,7 +5315,7 @@ class PlayState extends MusicBeatState
 						errorMessage.antialiasing = true;
 						errorMessage.updateHitbox();
 					case 5:
-						errorMessage.loadGraphic(Paths.image("banana.png"), true, 397, 750);
+						errorMessage.loadGraphic(Paths.image("banana"), true, 397, 750);
 						errorMessage.animation.add("dance", [0, 1, 2, 3, 4, 5, 6, 7, 8], 9, true);
 						errorMessage.animation.play("dance");
 						playSound = 'banana';
@@ -5423,14 +5435,14 @@ class PlayState extends MusicBeatState
 					FlxDestroyUtil.destroy(errorMessage);
 				}
 
-			case 'mixup':
+			/*case 'mixup':
 				mixUp();
 				playSound = "mixup";
 				ttl = 7;
 				onEnd = function()
 				{
 					mixUp(true);
-				}
+				}*/ //disable for now
 			case 'ghost':
 				for (daNote in unspawnNotes)
 				{
@@ -5439,7 +5451,7 @@ class PlayState extends MusicBeatState
 					if (daNote.strumTime >= Conductor.songPosition && !daNote.isSustainNote)
 						daNote.doGhost();
 					else if (daNote.strumTime >= Conductor.songPosition && daNote.isSustainNote)
-						daNote.doGhost(daNote.rootNote.ghostSpeed, daNote.rootNote.ghostSine);
+						daNote.doGhost(daNote.ghostSpeed, daNote.ghostSine);
 				}
 				for (daNote in notes)
 				{
@@ -5448,7 +5460,7 @@ class PlayState extends MusicBeatState
 					if (!daNote.isSustainNote)
 						daNote.doGhost();
 					else if (daNote.isSustainNote)
-						daNote.doGhost(daNote.rootNote.ghostSpeed, daNote.rootNote.ghostSine);
+						daNote.doGhost(daNote.ghostSpeed, daNote.ghostSine);
 				}
 				playSound = "ghost";
 				playSoundVol = 0.5;
@@ -5469,7 +5481,7 @@ class PlayState extends MusicBeatState
 						daNote.undoGhost();
 					}
 				};
-			case 'wiggle':
+			/*case 'wiggle':
 				xWiggle = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 				yWiggle = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 				for (i in [xWiggleTween, yWiggleTween])
@@ -5494,7 +5506,7 @@ class PlayState extends MusicBeatState
 				{
 					case 0:
 						var ranTime = FlxG.random.float(0.3, 0.9);
-						var ranMove = FlxG.random.float(25, 50);
+						var ranMove = FlxG.random.float(25/4, 50/4);
 						for (i in 0...xFrom.length)
 							xFrom[i] = -ranMove;
 						for (i in 0...xTo.length)
@@ -5504,7 +5516,7 @@ class PlayState extends MusicBeatState
 						disableY = true;
 					case 1:
 						var ranTime = FlxG.random.float(0.3, 0.9);
-						var ranMove = FlxG.random.float(25, 50);
+						var ranMove = FlxG.random.float(25/4, 50/4);
 						for (i in 0...yFrom.length)
 							yFrom[i] = -ranMove;
 						for (i in 0...yTo.length)
@@ -5514,7 +5526,7 @@ class PlayState extends MusicBeatState
 						disableX = true;
 					case 2:
 						var ranTime = FlxG.random.float(0.3, 0.9);
-						var ranMove = FlxG.random.float(25, 50);
+						var ranMove = FlxG.random.float(25/4, 50/4);
 						for (i in 0...xFrom.length)
 							xFrom[i] = -ranMove;
 						for (i in 0...xTo.length)
@@ -5529,7 +5541,7 @@ class PlayState extends MusicBeatState
 							yTime[i] = ranTime;
 					case 3:
 						var ranTime = FlxG.random.float(0.3, 0.9);
-						var ranMove = FlxG.random.float(25, 50);
+						var ranMove = FlxG.random.float(25/4, 50/4);
 						for (i in 0...xFrom.length)
 							xFrom[i] = -ranMove * (i % 2 == 0 ? -1 : 1);
 						for (i in 0...xTo.length)
@@ -5544,7 +5556,7 @@ class PlayState extends MusicBeatState
 							yTime[i] = ranTime;
 					case 4:
 						var ranTime = FlxG.random.float(0.3, 0.9);
-						var ranMove = FlxG.random.float(25, 50);
+						var ranMove = FlxG.random.float(25/4, 50/4);
 						for (i in 0...xFrom.length)
 							xFrom[i] = -ranMove * (i % 2 == 0 ? -1 : 1);
 						for (i in 0...xTo.length)
@@ -5559,8 +5571,8 @@ class PlayState extends MusicBeatState
 							yTime[i] = ranTime;
 					case 5:
 						var ranTime = FlxG.random.float(0.3, 0.9);
-						var ranMoveX = FlxG.random.float(25, 50);
-						var ranMoveY = FlxG.random.float(25, 50);
+						var ranMoveX = FlxG.random.float(25/4, 50/4);
+						var ranMoveY = FlxG.random.float(25/4, 50/4);
 						for (i in 0...xFrom.length)
 							xFrom[i] = -ranMoveX * (i % 2 == 0 ? -1 : 1);
 						for (i in 0...xTo.length)
@@ -5576,29 +5588,29 @@ class PlayState extends MusicBeatState
 					case 6:
 						var ranTime = FlxG.random.float(0.3, 0.9);
 						for (i in 0...xFrom.length)
-							xFrom[i] = -FlxG.random.float(25, 50) * (i % 2 == 0 ? -1 : 1);
+							xFrom[i] = -FlxG.random.float(25/4, 50/4) * (i % 2 == 0 ? -1 : 1);
 						for (i in 0...xTo.length)
-							xTo[i] = FlxG.random.float(25, 50) * (i % 2 == 0 ? -1 : 1);
+							xTo[i] = FlxG.random.float(25/4, 50/4) * (i % 2 == 0 ? -1 : 1);
 						for (i in 0...xTime.length)
 							xTime[i] = ranTime;
 						for (i in 0...yFrom.length)
-							yFrom[i] = -FlxG.random.float(25, 50) * (i % 2 == 0 ? 1 : -1);
+							yFrom[i] = -FlxG.random.float(25/4, 50/4) * (i % 2 == 0 ? 1 : -1);
 						for (i in 0...yTo.length)
-							yTo[i] = FlxG.random.float(25, 50) * (i % 2 == 0 ? 1 : -1);
+							yTo[i] = FlxG.random.float(25/4, 50/4) * (i % 2 == 0 ? 1 : -1);
 						for (i in 0...yTime.length)
 							yTime[i] = ranTime;
 					case 7:
 						var ranTime = FlxG.random.float(0.3, 0.9);
 						for (i in 0...xFrom.length)
-							xFrom[i] = FlxG.random.float(25, 50) * (FlxG.random.bool() ? 1 : -1);
+							xFrom[i] = FlxG.random.float(25/4, 50/4) * (FlxG.random.bool() ? 1 : -1);
 						for (i in 0...xTo.length)
-							xTo[i] = FlxG.random.float(25, 50) * (FlxG.random.bool() ? 1 : -1);
+							xTo[i] = FlxG.random.float(25/4, 50/4) * (FlxG.random.bool() ? 1 : -1);
 						for (i in 0...xTime.length)
 							xTime[i] = ranTime;
 						for (i in 0...yFrom.length)
-							yFrom[i] = -FlxG.random.float(25, 50) * (FlxG.random.bool() ? 1 : -1);
+							yFrom[i] = -FlxG.random.float(25/4, 50/4) * (FlxG.random.bool() ? 1 : -1);
 						for (i in 0...yTo.length)
-							yTo[i] = FlxG.random.float(25, 50) * (FlxG.random.bool() ? 1 : -1);
+							yTo[i] = FlxG.random.float(25/4, 50/4) * (FlxG.random.bool() ? 1 : -1);
 						for (i in 0...yTime.length)
 							yTime[i] = ranTime;
 				}
@@ -5643,7 +5655,7 @@ class PlayState extends MusicBeatState
 								j.cancel();
 						}
 					}
-				}
+				}*/ //disable for now
 			case 'flashbang':
 				playSound = "bang";
 				if (flashbangTimer != null && flashbangTimer.active)
@@ -5956,6 +5968,8 @@ class PlayState extends MusicBeatState
 				return;
 		}
 
+		trace(effect);
+
 		effectsActive[effect] = (effectsActive[effect] == null ? 0 : effectsActive[effect] + 1);
 
 		if (playSound != "")
@@ -6078,29 +6092,35 @@ class PlayState extends MusicBeatState
 					swagNote.noteType = 'Mine Note';
 					swagNote.reloadNote('minenote');
 					swagNote.isMine = true;
-					swagNote.ignoreMiss = true;
+					swagNote.ignoreNote = true;
+					swagNote.specialNote = true;
 			case 2:
 					swagNote.noteType = 'Warning Note';
 					swagNote.reloadNote('warningnote');
 					swagNote.isAlert = true;
+					swagNote.specialNote = true;
 			case 3: 
 					swagNote.noteType = 'Heal Note';
 					swagNote.reloadNote('healnote');
 					swagNote.isHeal = true;
-					swagNote.ignoreMiss = true;
+					swagNote.specialNote = true;
 			case 4: 
 					swagNote.noteType = 'Ice Note';
 					swagNote.reloadNote('icenote');
 					swagNote.isFreeze = true;
-					swagNote.ignoreMiss = true;
+					swagNote.ignoreNote = true;
+					swagNote.specialNote = true;
 			case 5:
 					swagNote.noteType = 'Fake Heal Note';
 					swagNote.reloadNote('fakehealnote');
 					swagNote.isFakeHeal = true;
-					swagNote.ignoreMiss = true;
+					swagNote.ignoreNote = true;
+					swagNote.specialNote = true;
+			default:
+				swagNote.specialNote = false;
+				swagNote.ignoreNote = false;
+
 		}
-		swagNote.ignoreNote = true;
-		swagNote.specialNote = true;
 		swagNote.mustPress = true;
 		swagNote.x += FlxG.width / 2;
 		unspawnNotes.push(swagNote);
@@ -6480,9 +6500,6 @@ class PlayState extends MusicBeatState
 		for (i in 0...opponentStrums.length)
 			additionalOffset(opponentStrums.members[i], i);
 
-		for (i in 0...playerStrums.length)
-			additionalOffset(playerStrums.members[i], i);
-
 		if (!inCutscene)
 		{
 			var lerpVal:Float = CoolUtil.boundTo(elapsed * 2.4 * cameraSpeed * playbackRate, 0, 1);
@@ -6853,7 +6870,7 @@ class PlayState extends MusicBeatState
 
 		if (drainHealth)
 		{
-			health = Math.max(0.25, health - (FlxG.elapsed * 0.125 * dmgMultiplier));
+			health = Math.max(0.25, health - (FlxG.elapsed * 0.425 * dmgMultiplier));
 		}
 
 		for (i in 0...spellPrompts.length)
@@ -8323,6 +8340,8 @@ class PlayState extends MusicBeatState
 
 	private function dataKeyIsPressed(data:Int):Bool
 	{
+		for (i in 0...playerStrums.length)
+			additionalOffset(playerStrums.members[i], i);
 		for (i in 0...keysArray[mania][data].length)
 		{
 			if (FlxG.keys.checkStatus(keysArray[mania][data][i], PRESSED))
@@ -8377,6 +8396,8 @@ class PlayState extends MusicBeatState
 				{
 					goodNoteHit(daNote);
 				}
+				for (i in 0...playerStrums.length)
+					additionalOffset(playerStrums.members[i], i);
 			});
 
 			if (keysArePressed() && !endingSong)
@@ -8398,12 +8419,14 @@ class PlayState extends MusicBeatState
 				// boyfriend.animation.curAnim.finish();
 			}
 		}
+		for (i in 0...playerStrums.length)
+			additionalOffset(playerStrums.members[i], i);
 	}
 
 	function additionalOffset(spr:StrumNote, i:Int)
 	{
-		spr.offset.x += xWiggle[spr.ID % 4];
-		spr.offset.y += yWiggle[spr.ID % 4];
+		spr.offset.x += xWiggle[spr.ID % Note.ammo[mania]];
+		spr.offset.y += yWiggle[spr.ID % Note.ammo[mania]];
 	}
 
 	function noteMiss(daNote:Note, ?playAudio:Bool = true, ?skipInvCheck:Bool = false, isAlert:Bool = false):Void

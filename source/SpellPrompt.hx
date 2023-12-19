@@ -65,6 +65,7 @@ class SpellPrompt extends FlxSprite
 		if (curChar >= word.length)
 		{
 			this.kill();
+			this.destroy();
 			return;
 		}
 		ttl -= FlxG.elapsed;
