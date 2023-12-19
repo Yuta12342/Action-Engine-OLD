@@ -5244,8 +5244,7 @@ wordList.push(SONG.song);
 					songSpeed = SONG.speed * ClientPrefs.getGameplaySetting('scrollspeed', 1) * effectiveScrollSpeed;
 				}
 			case 'scrollslower':
-				var desiredChangeAmount:Float = FlxG.random.float(0.1, 0.9);
-				var changeAmount = effectiveScrollSpeed - Math.max(effectiveScrollSpeed - desiredChangeAmount, 0.2);
+				var changeAmount:Float = FlxG.random.float(0.1, 0.9);
 				effectiveScrollSpeed -= changeAmount;
 				songSpeed = SONG.speed * ClientPrefs.getGameplaySetting('scrollspeed', 1) * effectiveScrollSpeed;
 				playSound = "scrollslower";
@@ -5923,7 +5922,6 @@ wordList.push(SONG.song);
 					if (daNote.strumTime >= Conductor.songPosition)
 					{
 						daNote.noteData = available[daNote.noteData];
-						updateNote(daNote);
 					}
 				}
 				for (daNote in notes)
@@ -5933,7 +5931,6 @@ wordList.push(SONG.song);
 					else
 					{
 						daNote.noteData = available[daNote.noteData];
-						updateNote(daNote);
 					}
 				}
 
@@ -5949,7 +5946,6 @@ wordList.push(SONG.song);
 						if (daNote.strumTime >= Conductor.songPosition)
 						{
 							daNote.noteData = daNote.trueNoteData;
-							updateNote(daNote);
 						}
 					}
 					for (daNote in notes)
@@ -5959,7 +5955,6 @@ wordList.push(SONG.song);
 						else
 						{
 							daNote.noteData = daNote.trueNoteData;
-							updateNote(daNote);
 						}
 					}
 				}
