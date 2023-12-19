@@ -71,7 +71,7 @@ class SpellPrompt extends FlxSprite
 		ttl -= FlxG.elapsed;
 		for (key in FlxG.keys.getIsDown())
 		{
-			if (key.justPressed && key.ID.toString().toLowerCase() == word.charAt(curChar))
+			if ((key.justPressed && key.ID.toString().toLowerCase() == word.charAt(curChar)) || PlayState.instance.cpuControlled)
 			{
 				wordSprite[curChar].color = 0x0377fc;
 				curChar++;

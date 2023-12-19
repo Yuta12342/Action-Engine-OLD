@@ -8393,7 +8393,7 @@ wordList.push(SONG.song);
 		// FlxG.watch.addQuick('asdfa', upP);
 		if (startedCountdown && !boyfriend.stunned && generatedMusic)
 		{
-			if (FlxG.keys.anyJustPressed(debugKeysDodge) && terminateTimestamps.length > 0 && !terminateCooldown)
+			if ((FlxG.keys.anyJustPressed(debugKeysDodge) && terminateTimestamps.length > 0 && !terminateCooldown) || cpuControlled)
 			{
 				boyfriend.playAnim('dodge', true);
 				terminateCooldown = true;
