@@ -5974,6 +5974,7 @@ class PlayState extends MusicBeatState
 				var available:Array<Int> = [];
 				for (i in 0...mania+1) {
 					available.push(i);
+					trace("available: " + available);
 				}
 				FlxG.random.shuffle(available);
 				switch (available)
@@ -6328,6 +6329,10 @@ class PlayState extends MusicBeatState
 
 	override public function update(elapsed:Float)
 	{
+		if (FlxG.sound.music.position >= FlxG.sound.music.length) {
+			finishSong();
+		}
+		
 		if (Crashed)
 		{
 			FlxG.switchState(new MainMenuState());
