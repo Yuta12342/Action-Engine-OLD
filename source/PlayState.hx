@@ -404,6 +404,7 @@ class PlayState extends MusicBeatState
 	var effectsActive:Map<String, Int> = new Map<String, Int>();
 
 	var effectTimer:FlxTimer = new FlxTimer();
+	var randoTimer:FlxTimer = new FlxTimer();
 
 	public static var xWiggle:Array<Float> = [0, 0, 0, 0];
 	public static var yWiggle:Array<Float> = [0, 0, 0, 0];
@@ -468,6 +469,8 @@ class PlayState extends MusicBeatState
 		'desync', 'mute', 'ice', 'randomize', 'fakeheal', 'spell', 'terminate'
 	];
 	var curEffect:Int = 0;
+
+	var ogScroll:Bool = ClientPrefs.downScroll;
 
 	function generateGibberish(length:Int, exclude:String):String
 	{
@@ -546,7 +549,7 @@ class PlayState extends MusicBeatState
 			var content:String = sys.io.File.getContent(Paths.txt("words"));
 			wordList = content.split("\n");
 		}
-wordList.push(SONG.song);
+		wordList.push(SONG.song);
 		validWords.resize(0);
 		for (word in wordList)
 		{
@@ -1726,6 +1729,7 @@ wordList.push(SONG.song);
 					whiteScreen.scrollFactor.set();
 					whiteScreen.blend = ADD;
 					camHUD.visible = false;
+					camNotes.visible = false;
 					snapCamFollowToPos(dad.getMidpoint().x + 150, dad.getMidpoint().y - 100);
 					inCutscene = true;
 
@@ -1735,6 +1739,7 @@ wordList.push(SONG.song);
 						onComplete: function(twn:FlxTween)
 						{
 							camHUD.visible = true;
+							camNotes.visible = true;
 							remove(whiteScreen);
 							startCountdown();
 						}
@@ -1749,6 +1754,7 @@ wordList.push(SONG.song);
 					add(blackScreen);
 					blackScreen.scrollFactor.set();
 					camHUD.visible = false;
+					camNotes.visible = false;
 					inCutscene = true;
 
 					FlxTween.tween(blackScreen, {alpha: 0}, 0.7, {
@@ -1766,6 +1772,7 @@ wordList.push(SONG.song);
 					new FlxTimer().start(0.8, function(tmr:FlxTimer)
 					{
 						camHUD.visible = true;
+						camNotes.visible = true;
 						remove(blackScreen);
 						FlxTween.tween(FlxG.camera, {zoom: defaultCamZoom}, 2.5, {
 							ease: FlxEase.quadInOut,
@@ -2229,6 +2236,7 @@ wordList.push(SONG.song);
 			{
 				add(red);
 				camHUD.visible = false;
+				camNotes.visible = false;
 			}
 		}
 
@@ -2266,6 +2274,7 @@ wordList.push(SONG.song);
 									{
 										add(dialogueBox);
 										camHUD.visible = true;
+										camNotes.visible = true;
 									}, true);
 								});
 								new FlxTimer().start(3.2, function(deadTime:FlxTimer)
@@ -2295,6 +2304,7 @@ wordList.push(SONG.song);
 		var songName:String = Paths.formatToSongPath(SONG.song);
 		dadGroup.alpha = 0.00001;
 		camHUD.visible = false;
+		camNotes.visible = false;
 		// inCutscene = true; //this would stop the camera movement, oops
 
 		var tankman:FlxSprite = new FlxSprite(-20, 320);
@@ -2330,6 +2340,7 @@ wordList.push(SONG.song);
 
 			dadGroup.alpha = 1;
 			camHUD.visible = true;
+			camNotes.visible = true;
 			boyfriend.animation.finishCallback = null;
 			gf.animation.finishCallback = null;
 			gf.dance();
@@ -3139,9 +3150,24 @@ wordList.push(SONG.song);
 		setOnLuas('songLength', songLength);
 		callOnLuas('onSongStart', []);
 		songStarted = true;
-		new FlxTimer().start(FlxG.random.float(5, 10), function(tmr:FlxTimer)
+		randoTimer.start(FlxG.random.float(5, 10), function(tmr:FlxTimer)
 		{
-			doEffect(effectArray[FlxG.random.int(1, 35)]);
+			if (curEffect <= 35) doEffect(effectArray[curEffect]);
+			else if (curEffect >= 36)
+			{
+				switch (curEffect)
+				{
+					case 36:
+						activeItems[0] += 1;
+						ArchPopup.startPopupCustom('You Got an Item!', '+1 Shield ( ' + activeItems[0] + ' Left)', 'Color');
+					case 37:
+						activeItems[1] = 1;
+						ArchPopup.startPopupCustom('You Got an Item!', "Blue Ball's Curse", 'Color');
+					case 38:
+						activeItems[2] += 1;
+						ArchPopup.startPopupCustom('You Got an Item!', "Max HP Up!", 'Color');
+				}
+			}
 			tmr.reset(FlxG.random.float(5, 10));
 		});
 	}
@@ -4972,6 +4998,8 @@ wordList.push(SONG.song);
 
 		if (effectTimer != null && effectTimer.active)
 			effectTimer.cancel();
+		if (randoTimer != null && randoTimer.active)
+			randoTimer.cancel();
 
 		return super.switchTo(nextState);
 	}
@@ -5038,6 +5066,7 @@ wordList.push(SONG.song);
 	}
 
 	var oldRate:Int = 60;
+	var noIcon:Bool = false;
 
 	function doEffect(effect:String)
 	{
@@ -5065,6 +5094,7 @@ wordList.push(SONG.song);
 					filters.remove(filterMap.get("Grayscale").filter);
 					filtersGame.remove(filterMap.get("Grayscale").filter);
 				}
+				noIcon = false;
 			case 'blur':
 				if (effectsActive[effect] == null || effectsActive[effect] <= 0)
 				{
@@ -5095,7 +5125,7 @@ wordList.push(SONG.song);
 					dad.shader = blurEffect.shader;
 					if (gf != null) gf.shader = blurEffect.shader;
 				}
-
+				noIcon = false;
 				playSound = "blur";
 				playSoundVol = 0.7;
 				ttl = 12;
@@ -5126,6 +5156,7 @@ wordList.push(SONG.song);
 					filtersGame.remove(filterMap.get("BlurLittle").filter);
 				}
 			case 'lag':
+				noIcon = false;
 				lagOn = true;
 				playSound = "lag";
 				playSoundVol = 0.7;
@@ -5135,6 +5166,7 @@ wordList.push(SONG.song);
 					lagOn = false;
 				}
 			case 'mine':
+				noIcon = true;
 				var startPoint:Int = FlxG.random.int(5, 9);
 				var nextPoint:Int = FlxG.random.int(startPoint + 2, startPoint + 6);
 				var lastPoint:Int = FlxG.random.int(nextPoint + 2, nextPoint + 6);
@@ -5142,6 +5174,7 @@ wordList.push(SONG.song);
 				addNote(1, nextPoint, nextPoint);
 				addNote(1, lastPoint, lastPoint);
 			case 'warning':
+				noIcon = true;
 				var startPoint:Int = FlxG.random.int(5, 9);
 				var nextPoint:Int = FlxG.random.int(startPoint + 2, startPoint + 6);
 				var lastPoint:Int = FlxG.random.int(nextPoint + 2, nextPoint + 6);
@@ -5149,8 +5182,10 @@ wordList.push(SONG.song);
 				addNote(2, nextPoint, nextPoint, -1);
 				addNote(2, lastPoint, lastPoint, -1);
 			case 'heal':
+				noIcon = true;
 				addNote(3, 5, 9);
 			case 'spin':
+				noIcon = false;
 				for (daNote in unspawnNotes)
 				{
 					if (daNote == null)
@@ -5191,6 +5226,7 @@ wordList.push(SONG.song);
 					}
 				}
 			case 'songslower':
+				noIcon = false;
 				var desiredChangeAmount:Float = FlxG.random.float(0.1, 0.9);
 				var changeAmount = playbackRate - Math.max(playbackRate - desiredChangeAmount, 0.2);
 				set_playbackRate(playbackRate - changeAmount);
@@ -5205,6 +5241,7 @@ wordList.push(SONG.song);
 					playbackRate + changeAmount;
 				};
 			case 'songfaster':
+				noIcon = false;
 				var changeAmount:Float = FlxG.random.float(0.1, 0.9);
 				set_playbackRate(playbackRate + changeAmount);
 				playbackRate + changeAmount;
@@ -5217,6 +5254,7 @@ wordList.push(SONG.song);
 					playbackRate - changeAmount;
 				};
 			case 'scrollswitch':
+				noIcon = false;
 				effectiveDownScroll = !effectiveDownScroll;
 				for (daNote in unspawnNotes)
 				{
@@ -5233,6 +5271,7 @@ wordList.push(SONG.song);
 				playSound = "scrollswitch";
 				updateScrollUI();
 			case 'scrollfaster':
+				noIcon = false;
 				var changeAmount:Float = FlxG.random.float(1.1, 3);
 				effectiveScrollSpeed += changeAmount;
 				songSpeed = SONG.speed * ClientPrefs.getGameplaySetting('scrollspeed', 1) * effectiveScrollSpeed;
@@ -5244,6 +5283,7 @@ wordList.push(SONG.song);
 					songSpeed = SONG.speed * ClientPrefs.getGameplaySetting('scrollspeed', 1) * effectiveScrollSpeed;
 				}
 			case 'scrollslower':
+				noIcon = false;
 				var changeAmount:Float = FlxG.random.float(0.1, 0.9);
 				effectiveScrollSpeed -= changeAmount;
 				songSpeed = SONG.speed * ClientPrefs.getGameplaySetting('scrollspeed', 1) * effectiveScrollSpeed;
@@ -5255,6 +5295,7 @@ wordList.push(SONG.song);
 					songSpeed = SONG.speed * ClientPrefs.getGameplaySetting('scrollspeed', 1) * effectiveScrollSpeed;
 				}
 			case 'rainbow':
+				noIcon = false;
 				for (daNote in unspawnNotes)
 				{
 					if (daNote == null)
@@ -5291,6 +5332,7 @@ wordList.push(SONG.song);
 					}
 				};
 			case 'cover':
+				noIcon = false;
 				var errorMessage = new FlxSprite();
 				var random = FlxG.random.int(0, 13);
 				var randomPosition:Bool = true;
@@ -5444,6 +5486,7 @@ wordList.push(SONG.song);
 				}
 
 			/*case 'mixup':
+				noIcon = false;
 				mixUp();
 				playSound = "mixup";
 				ttl = 7;
@@ -5452,6 +5495,7 @@ wordList.push(SONG.song);
 					mixUp(true);
 				}*/
 			case 'ghost':
+				noIcon = false;
 				for (daNote in unspawnNotes)
 				{
 					if (daNote == null)
@@ -5490,6 +5534,7 @@ wordList.push(SONG.song);
 					}
 				};
 			/*case 'wiggle':
+				noIcon = false;
 				xWiggle = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 				yWiggle = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 				for (i in [xWiggleTween, yWiggleTween])
@@ -5665,6 +5710,7 @@ wordList.push(SONG.song);
 					}
 				}*/
 			case 'flashbang':
+				noIcon = true;
 				playSound = "bang";
 				if (flashbangTimer != null && flashbangTimer.active)
 					flashbangTimer.cancel();
@@ -5680,6 +5726,7 @@ wordList.push(SONG.song);
 				});
 
 			case 'nostrum':
+				noIcon = false;
 				for (i in 0...playerStrums.length)
 					playerStrums.members[i].visible = false;
 				playSound = "nostrum";
@@ -5690,6 +5737,7 @@ wordList.push(SONG.song);
 						playerStrums.members[i].visible = true;
 				}
 			case 'jackspam':
+				noIcon = true;
 				var startingPoint = FlxG.random.int(5, 9);
 				var endingPoint = FlxG.random.int(startingPoint + 6, startingPoint + 12);
 				var dataPicked = FlxG.random.int(0, mania);
@@ -5698,6 +5746,7 @@ wordList.push(SONG.song);
 					addNote(0, i, i, dataPicked);
 				}
 			case 'spam':
+				noIcon = true;
 				var startingPoint = FlxG.random.int(5, 9);
 				var endingPoint = FlxG.random.int(startingPoint + 5, startingPoint + 10);
 				for (i in startingPoint...endingPoint)
@@ -5705,6 +5754,7 @@ wordList.push(SONG.song);
 					addNote(0, i, i);
 				}
 			case 'sever':
+				noIcon = false;
 				var chooseFrom:Array<Int> = [];
 				for (i in 0...severInputs.length)
 				{
@@ -5747,11 +5797,13 @@ wordList.push(SONG.song);
 					severInputs[picked] = false;
 				}
 			case 'shake':
+				noIcon = false;
 				playSound = "shake";
 				playSoundVol = 0.5;
 				camHUD.shake(FlxG.random.float(0.03, 0.06), 9, null, true);
 				camNotes.shake(FlxG.random.float(0.03, 0.06), 9, null, true);
 			case 'poison':
+				noIcon = false;
 				drainHealth = true;
 				playSound = "poison";
 				playSoundVol = 0.6;
@@ -5763,6 +5815,7 @@ wordList.push(SONG.song);
 					boyfriend.color = 0xffffff;
 				}
 			case 'dizzy':
+				noIcon = false;
 				if (effectsActive[effect] == null || effectsActive[effect] <= 0)
 				{
 					if (drunkTween != null && drunkTween.active)
@@ -5795,6 +5848,7 @@ wordList.push(SONG.song);
 					camGame.angle = camAngle;
 				}
 			case 'noise':
+				noIcon = false;
 				var noisysound:String = "";
 				var noisysoundVol:Float = 1.0;
 				switch (FlxG.random.int(0, 9))
@@ -5836,6 +5890,7 @@ wordList.push(SONG.song);
 				noiseSound.play(true);
 
 			case 'flip':
+				noIcon = false;
 				playSound = "flip";
 				ttl = 5;
 				camAngle = 180;
@@ -5850,6 +5905,7 @@ wordList.push(SONG.song);
 					camGame.angle = camAngle;
 				}
 			case 'invuln':
+				noIcon = false;
 				playSound = "invuln";
 				playSoundVol = 0.5;
 				ttl = 5;
@@ -5872,6 +5928,7 @@ wordList.push(SONG.song);
 				}
 
 			case 'desync':
+				noIcon = true;
 				playSound = "delay";
 				delayOffset = FlxG.random.int(Std.int(Conductor.stepCrochet), Std.int(Conductor.stepCrochet) * 3);
 				FlxG.sound.music.time -= delayOffset;
@@ -5885,16 +5942,26 @@ wordList.push(SONG.song);
 				}
 
 			case 'mute':
+				noIcon = true;
 				playSound = "delay";
-				volumeMultiplier = 0;
-				vocals.volume = 0;
+				if (FlxG.random.bool(15)) 
+				{
+					FlxG.sound.music.volume = 0;
+				}
+				else 
+				{
+					volumeMultiplier = 0;
+					vocals.volume = 0;
+				}
 				ttl = 8;
 				onEnd = function()
 				{
+					FlxG.sound.music.volume = 1;
 					volumeMultiplier = 1;
 				}
 
 			case 'ice':
+				noIcon = true;
 				var startPoint:Int = FlxG.random.int(5, 9);
 				var nextPoint:Int = FlxG.random.int(startPoint + 2, startPoint + 6);
 				var lastPoint:Int = FlxG.random.int(nextPoint + 2, nextPoint + 6);
@@ -5903,6 +5970,7 @@ wordList.push(SONG.song);
 				addNote(4, lastPoint, lastPoint, -1);
 
 			case 'randomize':
+				noIcon = false;
 				var available:Array<Int> = [];
 				for (i in 0...mania+1) {
 					available.push(i);
@@ -5961,15 +6029,18 @@ wordList.push(SONG.song);
 				}
 
 			case 'fakeheal':
+				noIcon = true;
 				addNote(5, 5, 9);
 
 			case 'spell':
+				noIcon = false;
 				var spellThing = new SpellPrompt();
 				spellPrompts.push(spellThing);
 				playSound = "spell";
 				playSoundVol = 0.66;
 
 			case 'terminate':
+				noIcon = true;
 				terminateStep = 3;
 
 			default:
@@ -5995,45 +6066,48 @@ wordList.push(SONG.song);
 			FlxDestroyUtil.destroy(tmr);
 		});
 
-		if (lagOn)
+		if (!noIcon)
 		{
-			var icon = new FlxSprite().loadGraphic(Paths.image("effectIcons/" + effect));
-			icon.cameras = [camOther];
-			icon.screenCenter(X);
-			icon.y = (effectiveDownScroll ? FlxG.height - icon.height - 10 : 10);
-			add(icon);
-			new FlxTimer().start(2, function(tmr:FlxTimer)
+			if (lagOn)
 			{
-				icon.kill();
-				remove(icon);
-				FlxDestroyUtil.destroy(icon);
-				FlxDestroyUtil.destroy(tmr);
-			});
-		}
-		else
-		{
-			var icon = new FlxSprite().loadGraphic(Paths.image("effectIcons/" + effect));
-			icon.cameras = [camOther];
-			icon.screenCenter(X);
-			icon.y = (effectiveDownScroll ? FlxG.height - icon.frameHeight - 10 : 10);
-			icon.scale.x = icon.scale.y = 0.5;
-			icon.updateHitbox();
-			FlxTween.tween(icon, {"scale.x": 1, "scale.y": 1}, 0.1, {
-				onUpdate: function(tween)
+				var icon = new FlxSprite().loadGraphic(Paths.image("effectIcons/" + effect));
+				icon.cameras = [camOther];
+				icon.screenCenter(X);
+				icon.y = (effectiveDownScroll ? FlxG.height - icon.height - 10 : 10);
+				add(icon);
+				new FlxTimer().start(2, function(tmr:FlxTimer)
 				{
-					icon.updateHitbox();
-					icon.screenCenter(X);
-					icon.y = (effectiveDownScroll ? FlxG.height - icon.frameHeight - 10 : 10);
-				}
-			});
-			add(icon);
-			new FlxTimer().start(2, function(tmr:FlxTimer)
+					icon.kill();
+					remove(icon);
+					FlxDestroyUtil.destroy(icon);
+					FlxDestroyUtil.destroy(tmr);
+				});
+			}
+			else
 			{
-				icon.kill();
-				remove(icon);
-				FlxDestroyUtil.destroy(icon);
-				FlxDestroyUtil.destroy(tmr);
-			});
+				var icon = new FlxSprite().loadGraphic(Paths.image("effectIcons/" + effect));
+				icon.cameras = [camOther];
+				icon.screenCenter(X);
+				icon.y = (effectiveDownScroll ? FlxG.height - icon.frameHeight - 10 : 10);
+				icon.scale.x = icon.scale.y = 0.5;
+				icon.updateHitbox();
+				FlxTween.tween(icon, {"scale.x": 1, "scale.y": 1}, 0.1, {
+					onUpdate: function(tween)
+					{
+						icon.updateHitbox();
+						icon.screenCenter(X);
+						icon.y = (effectiveDownScroll ? FlxG.height - icon.frameHeight - 10 : 10);
+					}
+				});
+				add(icon);
+				new FlxTimer().start(2, function(tmr:FlxTimer)
+				{
+					icon.kill();
+					remove(icon);
+					FlxDestroyUtil.destroy(icon);
+					FlxDestroyUtil.destroy(tmr);
+				});
+			}
 		}
 
 		resetChatData();
@@ -6134,6 +6208,10 @@ wordList.push(SONG.song);
 
 	function updateScrollUI()
 	{
+		ClientPrefs.downScroll = effectiveDownScroll;
+		timeTxt.y = (effectiveDownScroll ? FlxG.height - 44 : 19);
+		timeBarBG.y = timeTxt.y + (timeTxt.height / 4);
+		timeBar.y = timeBarBG.y + 4;
 		strumLine.y = (effectiveDownScroll ? 570 : 30);
 		healthBarBG.y = (effectiveDownScroll ? FlxG.height * 0.1 : FlxG.height * 0.875);
 		healthBar.y = healthBarBG.y + 4;
@@ -6142,6 +6220,7 @@ wordList.push(SONG.song);
 		strumLineNotes.forEach(function(sprite)
 		{
 			sprite.y = strumLine.y;
+			sprite.downScroll = ClientPrefs.downScroll;
 		});
 		scoreTxt.y = (effectiveDownScroll ? FlxG.height * 0.1 - 72 : FlxG.height * 0.9 + 36);
 	}
@@ -6257,6 +6336,12 @@ wordList.push(SONG.song);
 			Crashed = false;
 		}
 
+		curEffect = FlxG.random.int(1, 38);
+
+		if ((songPercent == 0 || songPercent == 1) && (notes.length <= 0 || unspawnNotes.length <= 0) || songStarted && !FlxG.sound.music.playing) endSong();
+
+		//trace(songPercent);
+
 		if (isFrozen) boyfriend.stunned = true;
 
 		if (notes != null)
@@ -6305,7 +6390,7 @@ wordList.push(SONG.song);
 				if (i == 0)
 					FlxG.save.data.activeItems = null;
 
-			if (FlxG.keys.justPressed.F)
+			/*if (FlxG.keys.justPressed.F)
 			{
 				switch (FlxG.random.int(0, 2))
 				{
@@ -6322,7 +6407,7 @@ wordList.push(SONG.song);
 						keybindSwitch('SAND');
 						ArchPopup.startPopupCustom('You Got an Item!', "Keybind Switch (S A N D)", 'Color');
 				}
-			}
+			}*/
 
 			if (activeItems[0] > 0 && health <= 0)
 			{
@@ -6666,6 +6751,7 @@ wordList.push(SONG.song);
 		{
 			FlxG.camera.zoom = FlxMath.lerp(defaultCamZoom, FlxG.camera.zoom, CoolUtil.boundTo(1 - (elapsed * 3.125 * camZoomingDecay * playbackRate), 0, 1));
 			camHUD.zoom = FlxMath.lerp(1, camHUD.zoom, CoolUtil.boundTo(1 - (elapsed * 3.125 * camZoomingDecay * playbackRate), 0, 1));
+			camNotes.zoom = FlxMath.lerp(1, camNotes.zoom, CoolUtil.boundTo(1 - (elapsed * 3.125 * camZoomingDecay * playbackRate), 0, 1));
 		}
 
 		FlxG.watch.addQuick("secShit", curSection);
@@ -6890,7 +6976,7 @@ wordList.push(SONG.song);
 
 		if (drainHealth)
 		{
-			health = Math.max(0.25, health - (FlxG.elapsed * 0.125 * dmgMultiplier));
+			health = Math.max(0.25, health - (FlxG.elapsed * 0.325 * dmgMultiplier));
 		}
 
 		for (i in 0...spellPrompts.length)
@@ -7011,8 +7097,11 @@ wordList.push(SONG.song);
 		{
 			if ((((skipHealthCheck && instakillOnMiss) || health <= 0) && !practiceMode && !isDead) || instaKill)
 			{
+				ClientPrefs.downScroll = ogScroll;
 				if (effectTimer != null && effectTimer.active)
 					effectTimer.cancel();
+				if (randoTimer != null && randoTimer.active)
+					randoTimer.cancel();
 				pauseMP4s();
 				noiseSound.pause();
 				var ret:Dynamic = callOnLuas('onGameOver', [], false);
@@ -7054,6 +7143,7 @@ wordList.push(SONG.song);
 		{
 			if ((((skipHealthCheck && instakillOnMiss) || health <= 0) && !practiceMode && !isDead) || instaKill)
 			{
+				ClientPrefs.downScroll = ogScroll;
 				var ret:Dynamic = callOnLuas('onGameOver', [], false);
 				if (ret != FunkinLua.Function_Stop)
 				{
@@ -7238,6 +7328,7 @@ wordList.push(SONG.song);
 							{
 								FlxG.camera.zoom += 0.5;
 								camHUD.zoom += 0.1;
+								camNotes.zoom += 0.1;
 							}
 
 							blammedLightsBlack.visible = false;
@@ -7264,6 +7355,7 @@ wordList.push(SONG.song);
 							{
 								FlxG.camera.zoom += 0.5;
 								camHUD.zoom += 0.1;
+								camNotes.zoom += 0.1;
 							}
 
 							blammedLightsBlack.visible = true;
@@ -7337,6 +7429,7 @@ wordList.push(SONG.song);
 
 					FlxG.camera.zoom += camZoom;
 					camHUD.zoom += hudZoom;
+					camNotes.zoom += hudZoom;
 				}
 
 			case 'Trigger BG Ghouls':
@@ -7693,6 +7786,8 @@ wordList.push(SONG.song);
 	{
 		if (effectTimer != null && effectTimer.active)
 			effectTimer.cancel();
+
+		ClientPrefs.downScroll = ogScroll;
 		// Should kill you if you tried to cheat
 		if (!startingSong)
 		{
@@ -7823,6 +7918,7 @@ wordList.push(SONG.song);
 						blackShit.scrollFactor.set();
 						add(blackShit);
 						camHUD.visible = false;
+						camNotes.visible = false;
 
 						FlxG.sound.play(Paths.sound('Lights_Shut_off'));
 					}
@@ -8444,7 +8540,8 @@ wordList.push(SONG.song);
 	}
 
 	function noteMiss(daNote:Note, ?playAudio:Bool = true, ?skipInvCheck:Bool = false, isAlert:Bool = false):Void
-	{ // You didn't hit the key and let it go offscreen, also used by Hurt Notes
+	{	
+		// You didn't hit the key and let it go offscreen, also used by Hurt Notes
 		// Dupe note remove
 		notes.forEachAlive(function(note:Note)
 		{
@@ -8459,79 +8556,80 @@ wordList.push(SONG.song);
 				note.destroy();
 			}
 		});
-		combo = 0;
-
-		health -= daNote.missHealth * healthLoss * dmgMultiplier;
-		if (instakillOnMiss)
+		if (!boyfriend.invuln)
 		{
+			combo = 0;
+
+			health -= daNote.missHealth * healthLoss * dmgMultiplier;
+			if (instakillOnMiss)
+			{
+				vocals.volume = 0;
+				doDeathCheck(true);
+			}
+
+			if (playAudio)
+			{
+				FlxG.sound.play(Paths.sound('missnote' + FlxG.random.int(1, 3)), FlxG.random.float(0.1, 0.2));
+			}
+
+			// For testing purposes
+			// trace(daNote.missHealth);
+			songMisses++;
 			vocals.volume = 0;
-			doDeathCheck(true);
-		}
+			if (!practiceMode)
+				songScore -= 10;
 
-		if (playAudio)
-		{
-			FlxG.sound.play(Paths.sound('missnote' + FlxG.random.int(1, 3)), FlxG.random.float(0.1, 0.2));
-		}
+			totalPlayed++;
+			RecalculateRating(true);
 
-		// For testing purposes
-		// trace(daNote.missHealth);
-		songMisses++;
-		vocals.volume = 0;
-		if (!practiceMode)
-			songScore -= 10;
+			var char:Character = boyfriend;
+			if (daNote.gfNote)
+			{
+				char = gf;
+			}
 
-		totalPlayed++;
-		RecalculateRating(true);
-
-		var char:Character = boyfriend;
-		if (daNote.gfNote)
-		{
-			char = gf;
-		}
-
-		if (isAlert)
-		{
-			FlxG.sound.play(Paths.sound('warning'));
-			var fist:FlxSprite = new FlxSprite().loadGraphic("assets/images/thepunch.png");
-			fist.x = FlxG.width / camGame.zoom;
-			fist.y = char.y + char.height / 2 - fist.height / 2;
-			add(fist);
-			FlxTween.tween(fist, {x: char.x + char.frameWidth / 2}, 0.1, {
-				onComplete: function(tween)
-				{
-					if (tween.executions >= 2)
+			if (daNote.isAlert)
+			{
+				FlxG.sound.play(Paths.sound('warning'));
+				var fist:FlxSprite = new FlxSprite().loadGraphic("assets/images/thepunch.png");
+				fist.x = FlxG.width / camGame.zoom;
+				fist.y = char.y + char.height / 2 - fist.height / 2;
+				add(fist);
+				FlxTween.tween(fist, {x: char.x + char.frameWidth / 2}, 0.1, {
+					onComplete: function(tween)
 					{
-						fist.kill();
-						FlxDestroyUtil.destroy(fist);
-						tween.cancel();
-						FlxDestroyUtil.destroy(tween);
-					}
-				},
-				type: PINGPONG
-			});
+						if (tween.executions >= 2)
+						{
+							fist.kill();
+							FlxDestroyUtil.destroy(fist);
+							tween.cancel();
+							FlxDestroyUtil.destroy(tween);
+						}
+					},
+					type: PINGPONG
+				});
+			}
+
+			if (daNote.isAlert)
+			{
+				char.playAnim('hit', true);
+			}
+			else if (char != null && !daNote.noMissAnimation && char.hasMissAnimations)
+			{
+				var animToPlay:String = 'sing' + Note.keysShit.get(mania).get('anims')[daNote.noteData] + 'miss' + daNote.animSuffix;
+				char.playAnim(animToPlay, true);
+			}
+
+			callOnLuas('noteMiss', [
+				notes.members.indexOf(daNote),
+				daNote.noteData,
+				daNote.noteType,
+				daNote.isSustainNote
+			]);
+
+			if (daNote.noteType == '' && currentBarPorcent < 1)
+				currentBarPorcent += 0.053;
 		}
-
-		setBoyfriendInvuln(5 / 60);
-
-		if (isAlert)
-		{
-			char.playAnim('hit', true);
-		}
-		else if (char != null && !daNote.noMissAnimation && char.hasMissAnimations)
-		{
-			var animToPlay:String = 'sing' + Note.keysShit.get(mania).get('anims')[daNote.noteData] + 'miss' + daNote.animSuffix;
-			char.playAnim(animToPlay, true);
-		}
-
-		callOnLuas('noteMiss', [
-			notes.members.indexOf(daNote),
-			daNote.noteData,
-			daNote.noteType,
-			daNote.isSustainNote
-		]);
-
-		if (daNote.noteType == '' && currentBarPorcent < 1)
-			currentBarPorcent += 0.053;
 	}
 
 	function noteMissPress(direction:Int = 1):Void // You pressed a key when there was no notes to press for this key
@@ -9083,6 +9181,7 @@ wordList.push(SONG.song);
 		{
 			FlxG.camera.zoom += 0.015;
 			camHUD.zoom += 0.03;
+			camNotes.zoom += 0.03;
 
 			if (!camZooming)
 			{ // Just a way for preventing it to be permanently zoomed until Skid & Pump hits a note
@@ -9407,6 +9506,7 @@ wordList.push(SONG.song);
 			{
 				FlxG.camera.zoom += 0.015 * camZoomingMult;
 				camHUD.zoom += 0.03 * camZoomingMult;
+				camNotes.zoom += 0.03 * camZoomingMult;
 			}
 
 			if (SONG.notes[curSection].changeBPM)
