@@ -5237,7 +5237,7 @@ class PlayState extends MusicBeatState
 				songSpeed += changeAmount;
 				if (generatedMusic)
 				{
-					var ratio:Float = changeAmount / songSpeed; // funny word huh
+					var ratio:Float = 1 / songSpeed; // funny word huh
 					for (note in notes)
 						note.resizeByRatio(ratio);
 					for (note in unspawnNotes)
@@ -5257,7 +5257,7 @@ class PlayState extends MusicBeatState
 				songSpeed -= changeAmount;
 				if (generatedMusic)
 				{
-					var ratio:Float = changeAmount / songSpeed; // funny word huh
+					var ratio:Float = 1 / songSpeed; // funny word huh
 					for (note in notes)
 						note.resizeByRatio(ratio);
 					for (note in unspawnNotes)
