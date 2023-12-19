@@ -5921,7 +5921,7 @@ class PlayState extends MusicBeatState
 
 			case 'randomize':
 				var available:Array<Int> = [];
-				for (i in 0...mania+1) {
+				for (i in 0...mania) {
 					available.push(i);
 				}
 				FlxG.random.shuffle(available);
