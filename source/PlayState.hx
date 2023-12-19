@@ -5904,8 +5904,9 @@ wordList.push(SONG.song);
 
 			case 'randomize':
 				var available:Array<Int> = [];
-				for (i in 0...mania) {
+				for (i in 0...mania+1) {
 					available.push(i);
+					trace("available: " + available);
 				}
 				FlxG.random.shuffle(available);
 				switch (available)
@@ -6249,6 +6250,10 @@ wordList.push(SONG.song);
 
 	override public function update(elapsed:Float)
 	{
+		if (FlxG.sound.music.position >= FlxG.sound.music.length) {
+			finishSong();
+		}
+		
 		if (Crashed)
 		{
 			FlxG.switchState(new MainMenuState());
