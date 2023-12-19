@@ -506,6 +506,7 @@ class PlayState extends MusicBeatState
 			if (FlxG.save.data.activeItems == null)
 			{
 				activeItems[3] = FlxG.random.int(0, 9);
+				activeItems[2] = maxHealth;
 			}
 		}
 
@@ -686,7 +687,7 @@ class PlayState extends MusicBeatState
 
 				ArchPopup.startPopupCustom('You Got an Item!', "Chart Modifier Trap (" + chartModifier + ")", 'Color');
 			}
-			maxHealth += activeItems[2];
+			maxHealth = activeItems[2];
 		}
 
 		filterMap = [
@@ -6979,7 +6980,8 @@ class PlayState extends MusicBeatState
 
 		if (drainHealth)
 		{
-			health = Math.max(0.25, health - (FlxG.elapsed * 0.325 * dmgMultiplier));
+			maxHealth = Math.max(0.0000000001, maxHealth - (FlxG.elapsed * 0.325 * dmgMultiplier));
+			reloadHealthBarColors();
 		}
 
 		for (i in 0...spellPrompts.length)
@@ -8593,6 +8595,7 @@ class PlayState extends MusicBeatState
 
 			if (daNote.isAlert)
 			{
+				health -= daNote.missHealth * healthLoss * 2;
 				FlxG.sound.play(Paths.sound('warning'));
 				var fist:FlxSprite = new FlxSprite().loadGraphic("assets/images/thepunch.png");
 				fist.x = FlxG.width / camGame.zoom;
