@@ -5093,7 +5093,7 @@ class PlayState extends MusicBeatState
 					}
 					boyfriend.shader = blurEffect.shader;
 					dad.shader = blurEffect.shader;
-					gf.shader = blurEffect.shader;
+					if (gf != null) gf.shader = blurEffect.shader;
 				}
 
 				playSound = "blur";
@@ -5121,7 +5121,7 @@ class PlayState extends MusicBeatState
 					}
 					boyfriend.shader = null;
 					dad.shader = null;
-					gf.shader = null;
+					if(gf != null) gf.shader = null;
 					blurEffect.setStrength(0, 0);
 					filtersGame.remove(filterMap.get("BlurLittle").filter);
 				}
@@ -5235,41 +5235,25 @@ class PlayState extends MusicBeatState
 			case 'scrollfaster':
 				var changeAmount:Float = FlxG.random.float(1.1, 3);
 				effectiveScrollSpeed += changeAmount;
-				for (daNote in unspawnNotes) {
-					if (daNote == null)
-						continue;
-					daNote.multSpeed *= effectiveScrollSpeed;
-				}
+				songSpeed = SONG.speed * ClientPrefs.getGameplaySetting('scrollspeed', 1) * effectiveScrollSpeed;
 				playSound = "scrollfaster";
 				ttl = 20;
 				alwaysEnd = true;
 				onEnd = function() {
 					effectiveScrollSpeed -= changeAmount;
-					for (daNote in unspawnNotes) {
-						if (daNote == null)
-							continue;
-						daNote.multSpeed /= effectiveScrollSpeed;
-					}
+					songSpeed = SONG.speed * ClientPrefs.getGameplaySetting('scrollspeed', 1) * effectiveScrollSpeed;
 				}
 			case 'scrollslower':
 				var desiredChangeAmount:Float = FlxG.random.float(0.1, 0.9);
-				var changeAmount = SONG.speed - Math.max(effectiveScrollSpeed - desiredChangeAmount, 0.2);
+				var changeAmount = effectiveScrollSpeed - Math.max(effectiveScrollSpeed - desiredChangeAmount, 0.2);
 				effectiveScrollSpeed -= changeAmount;
-				for (daNote in unspawnNotes) {
-					if (daNote == null)
-						continue;
-					daNote.multSpeed *= effectiveScrollSpeed;
-				}
+				songSpeed = SONG.speed * ClientPrefs.getGameplaySetting('scrollspeed', 1) * effectiveScrollSpeed;
 				playSound = "scrollslower";
 				ttl = 20;
 				alwaysEnd = true;
 				onEnd = function() {
 					effectiveScrollSpeed += changeAmount;
-					for (daNote in unspawnNotes) {
-						if (daNote == null)
-							continue;
-						daNote.multSpeed /= effectiveScrollSpeed;
-					}
+					songSpeed = SONG.speed * ClientPrefs.getGameplaySetting('scrollspeed', 1) * effectiveScrollSpeed;
 				}
 			case 'rainbow':
 				for (daNote in unspawnNotes)
