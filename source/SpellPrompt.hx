@@ -17,12 +17,14 @@ class SpellPrompt extends FlxSprite
 	var charSize:Int = 24;
 	var timeBar:FlxBar;
 	var curChar:Int = 0;
-
+	var alphabet:String = "abcdefghijklmnopqrstuvwxyz";
+	var letterArray:Array<String>;
 	public var ttl:Float = 15;
 
 	override public function new()
 	{
 		super();
+		letterArray = alphabet.split("");
 		loadGraphic(Paths.image("spell"));
 
 		x = FlxG.random.float(0, FlxG.width - width);
@@ -62,7 +64,7 @@ class SpellPrompt extends FlxSprite
 	override public function update(elapsed:Float)
 	{
 		super.update(elapsed);
-		if (curChar >= word.length)
+		if (curChar >= word.length - 1)
 		{
 			this.kill();
 			this.destroy();
@@ -71,7 +73,7 @@ class SpellPrompt extends FlxSprite
 		ttl -= FlxG.elapsed;
 		for (key in FlxG.keys.getIsDown())
 		{
-			if ((key.justPressed && key.ID.toString().toLowerCase() == word.charAt(curChar)) || PlayState.instance.cpuControlled)
+			if ((key.justPressed && key.ID.toString().toLowerCase() == word.charAt(curChar) || (word.charAt(curChar) == "" || word.charAt(curChar) == " " || word.charAt(curChar) == "\n") || PlayState.instance.cpuControlled || !letterArray.contains(key.ID.toString().toLowerCase())))
 			{
 				wordSprite[curChar].color = 0x0377fc;
 				curChar++;

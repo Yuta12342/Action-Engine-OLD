@@ -2931,6 +2931,7 @@ class PlayState extends MusicBeatState
 						});
 						FlxG.sound.play(Paths.sound('introGo' + introSoundsSuffix), 0.6);
 					case 4:
+						doEffect("spell");
 						if (chartModifier == "Amalgam")
 						{
 							var previousPlaybackRate = playbackRate;
