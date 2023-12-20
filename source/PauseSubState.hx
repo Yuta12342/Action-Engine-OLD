@@ -265,6 +265,7 @@ class PauseSubState extends MusicBeatSubstate
 				case "Exit to menu":
 					PlayState.deathCounter = 0;
 					PlayState.seenCutscene = false;
+					ClientPrefs.downScroll = PlayState.ogScroll;
 
 					WeekData.loadTheFirstEnabledMod();
 					if(PlayState.isStoryMode) {
