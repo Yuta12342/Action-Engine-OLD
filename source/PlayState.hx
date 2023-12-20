@@ -3161,7 +3161,7 @@ class PlayState extends MusicBeatState
 		randoTimer.start(FlxG.random.float(5, 10), function(tmr:FlxTimer)
 		{
 			if (curEffect <= 35) doEffect(effectArray[curEffect]);
-			else if (curEffect >= 36)
+			else if (curEffect >= 36 && archMode)
 			{
 				switch (curEffect)
 				{
@@ -5373,7 +5373,7 @@ class PlayState extends MusicBeatState
 						errorMessage.antialiasing = true;
 						errorMessage.updateHitbox();
 					case 5:
-						errorMessage.loadGraphic(Paths.image("banana.png"), true, 397, 750);
+						errorMessage.loadGraphic(Paths.image("banana"), true, 397, 750);
 						errorMessage.animation.add("dance", [0, 1, 2, 3, 4, 5, 6, 7, 8], 9, true);
 						errorMessage.animation.play("dance");
 						playSound = 'banana';
