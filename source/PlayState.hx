@@ -470,7 +470,7 @@ class PlayState extends MusicBeatState
 	];
 	var curEffect:Int = 0;
 
-	var ogScroll:Bool = ClientPrefs.downScroll;
+	public static var ogScroll:Bool = ClientPrefs.downScroll;
 
 	function generateGibberish(length:Int, exclude:String):String
 	{
@@ -6984,8 +6984,7 @@ class PlayState extends MusicBeatState
 
 		if (drainHealth)
 		{
-			maxHealth = Math.max(0.0000000001, maxHealth - (FlxG.elapsed * 0.325 * dmgMultiplier));
-			reloadHealthBarColors();
+			health = Math.max(0.0000000001, health - (FlxG.elapsed * 0.425 * dmgMultiplier));
 		}
 
 		for (i in 0...spellPrompts.length)
