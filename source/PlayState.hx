@@ -6211,6 +6211,8 @@ class PlayState extends MusicBeatState
 		swagNote.mustPress = true;
 		if (chartModifier == "SpeedRando")
 			{swagNote.multSpeed = FlxG.random.float(0.1, 2);}
+		if (chartModifier == "SpeedUp")
+			{}
 		swagNote.x += FlxG.width / 2;
 		unspawnNotes.push(swagNote);
 		unspawnNotes.sort(sortByShit);
