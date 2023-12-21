@@ -135,6 +135,12 @@ class ChartingState extends MusicBeatState
 			+ Note.minMania
 			+ "; max: "
 			+ Note.maxMania
+			+ ")\nValue 2: Skip old strum fade tween\nPut 'true' to skip it, anything else or blank to not."],
+		['Change Mania (Special)',
+			"Value 1: The new special mania value (min: "
+			+ Note.minMania
+			+ "; max: "
+			+ Note.maxMania
 			+ ")\nValue 2: Skip old strum fade tween\nPut 'true' to skip it, anything else or blank to not."]
 	];
 
@@ -1583,6 +1589,8 @@ class ChartingState extends MusicBeatState
 			try
 			{
 				vocals = new FlxSound().loadEmbedded(Paths.voices(PlayState.SONG.song));
+				vocals.autoDestroy = false;
+				FlxG.sound.list.add(vocals);
 			}
 			catch (error:Dynamic)
 			{
@@ -3961,6 +3969,11 @@ class AttachedFlxText extends FlxText
 		super(X, Y, FieldWidth, Text, Size, EmbeddedFont);
 	}
 
+/*	override public function onFocusLost():Void
+		{
+super.onFocusLost();
+		}
+		*/
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);

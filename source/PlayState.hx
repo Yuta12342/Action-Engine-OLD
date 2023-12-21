@@ -3159,6 +3159,8 @@ class PlayState extends MusicBeatState
 		setOnLuas('songLength', songLength);
 		callOnLuas('onSongStart', []);
 		songStarted = true;
+		if (archMode)
+			{
 		randoTimer.start(FlxG.random.float(5, 10), function(tmr:FlxTimer)
 		{
 			if (curEffect <= 35) doEffect(effectArray[curEffect]);
@@ -3178,7 +3180,7 @@ class PlayState extends MusicBeatState
 				}
 			}
 			tmr.reset(FlxG.random.float(5, 10));
-		});
+		});}
 	}
 
 	function findRepeatingPatterns(notePositions:Array<Int>):Array<PatternResult>
@@ -3614,6 +3616,48 @@ class PlayState extends MusicBeatState
 			{
 				throw 'Note value is out of range';
 			}
+		}
+	}
+
+	public static function getNumberFromAnimsSpecial(note:Int, mania:Int):Int
+	{
+		var animMap:Map<String, Int> = new Map<String, Int>();
+		animMap.set("LEFT", 0);
+		animMap.set("DOWN", 1);
+		animMap.set("UP", 2);
+		animMap.set("RIGHT", 3);
+
+		var anims:Array<String> = EKData.keysShit.get(mania).get("anims");
+		var animKeys:Array<String> = [
+			for (key in animMap.keys())
+				if (key == "LEFT") "RIGHT" else if (key == "RIGHT") "LEFT" else key
+		];
+
+		if (note < animKeys.length)
+		{
+			var anim = animKeys[note];
+			var matchingIndices:Array<Int> = [];
+			for (i in 0...anims.length)
+			{
+				if (anims[i] == anim)
+				{
+					matchingIndices.push(i);
+				}
+			}
+			if (matchingIndices.length > 0)
+			{
+				var randomIndex = Std.int(Math.random() * matchingIndices.length);
+				return matchingIndices[randomIndex];
+			}
+			else
+			{
+				var randomIndex = Std.int(Math.random() * anims.length);
+				return randomIndex;
+			}
+		}
+		else
+		{
+			throw 'Note value is out of range';
 		}
 	}
 
@@ -7553,6 +7597,28 @@ class PlayState extends MusicBeatState
 				newMania = Std.parseInt(value1);
 				if (Math.isNaN(newMania) && newMania < 0 && newMania > 9)
 					newMania = 0;
+				changeMania(newMania, skipTween);
+			
+			case 'Change Mania (Special)':
+				var newMania:Int = 0;
+				var skipTween:Bool = value2 == "true" ? true : false;
+
+				if (value1.toLowerCase().trim() == "random") {
+					newMania = FlxG.random.int(0, 8);
+				} else {
+					newMania = Std.parseInt(value1);
+				}
+				if (Math.isNaN(newMania) && newMania < 0 && newMania > 9)
+					newMania = 0;
+				for (i in 0...unspawnNotes.length)
+				{
+					unspawnNotes[i].noteData = getNumberFromAnims(unspawnNotes[i].noteData, newMania);
+				}
+				notes.forEachAlive(function(note:Note)
+					{
+						updateNote(note);
+					});
+			
 				changeMania(newMania, skipTween);
 
 			case 'Change Character':

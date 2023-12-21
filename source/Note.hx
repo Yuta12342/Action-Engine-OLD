@@ -218,6 +218,10 @@ class Note extends FlxSprite
 		return value;
 	}
 
+	public function reloadTexture(note:Note, texture:String)
+		{
+			reloadNote('', texture);
+		}
 
 	private function set_noteType(value:String):String {
 		noteSplashTexture = PlayState.SONG.splashSkin;
