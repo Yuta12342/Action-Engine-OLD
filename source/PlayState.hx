@@ -2931,7 +2931,7 @@ class PlayState extends MusicBeatState
 						});
 						FlxG.sound.play(Paths.sound('introGo' + introSoundsSuffix), 0.6);
 					case 4:
-						doEffect("spell");
+						//doEffect("spell");
 						if (chartModifier == "Amalgam")
 						{
 							var previousPlaybackRate = playbackRate;
@@ -4726,37 +4726,31 @@ class PlayState extends MusicBeatState
 			note.setGraphicSize(Std.int(note.width * daPixelZoom * (Note.noteScales[mania] + 0.3)));
 			note.updateHitbox();
 		}
-	 */
+		*/
 
 		// Like reloadNote()
 
 		var lastScaleY:Float = note.scale.y;
-		if (isPixelStage)
-		{
-			// if (note.isSustainNote) {note.originalHeightForCalcs = note.height;}
+		if (isPixelStage) {
+			if (note.isSustainNote) {note.originalHeightForCalcs = note.height;}
 
 			note.setGraphicSize(Std.int(note.width * daPixelZoom * Note.pixelScales[mania]));
-		}
-		else
-		{
+		} else {
 			// Like loadNoteAnims()
 
 			note.setGraphicSize(Std.int(note.width * Note.scales[mania]));
 			note.updateHitbox();
 		}
 
-		if (note.isSustainNote)
-		{
-			note.scale.y = lastScaleY;
-		}
+		//if (note.isSustainNote) {note.scale.y = lastScaleY;}
 		note.updateHitbox();
 
 		// Like new()
 
 		var prevNote:Note = note.prevNote;
-
-		if (note.isSustainNote && prevNote != null)
-		{
+		
+		if (note.isSustainNote && prevNote != null) {
+			
 			note.offsetX += note.width / 2;
 
 			note.animation.play(Note.keysShit.get(mania).get('letters')[noteData] + ' tail');
@@ -4765,45 +4759,40 @@ class PlayState extends MusicBeatState
 
 			note.offsetX -= note.width / 2;
 
-			if (note != null && prevNote != null && prevNote.isSustainNote && prevNote.animation != null)
-			{ // haxe flixel
+			if (note != null && prevNote != null && prevNote.isSustainNote && prevNote.animation != null) { // haxe flixel
 				prevNote.animation.play(Note.keysShit.get(mania).get('letters')[noteData % tMania] + ' hold');
 
 				prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.05;
 				prevNote.scale.y *= songSpeed;
 
-				if (isPixelStage)
-				{
+				if(isPixelStage) {
 					prevNote.scale.y *= 1.19;
 					prevNote.scale.y *= (6 / note.height);
 				}
 
 				prevNote.updateHitbox();
-				// trace(prevNote.scale.y);
+				//trace(prevNote.scale.y);
 			}
-
-			if (isPixelStage)
-			{
-				prevNote.scale.y *= daPixelZoom * (Note.pixelScales[mania]); // Fuck urself
+			
+			if (isPixelStage){
+				prevNote.scale.y *= daPixelZoom * (Note.pixelScales[mania]); //Fuck urself
 				prevNote.updateHitbox();
 			}
-		}
-		else if (!note.isSustainNote && noteData > -1 && noteData < tMania)
-		{
-			if (note.changeAnim)
-			{
+		} else if (!note.isSustainNote && noteData > - 1 && noteData < tMania) {
+			if (note.changeAnim) {
 				var animToPlay:String = '';
 
 				animToPlay = Note.keysShit.get(mania).get('letters')[noteData % tMania];
-
+				
 				note.animation.play(animToPlay);
 			}
 		}
 
 		// Like set_noteType()
 
-		if (note.changeColSwap)
-		{
+		note.applyManiaChange();
+
+		if (note.changeColSwap) {
 			var hsvNumThing = Std.int(Note.keysShit.get(mania).get('pixelAnimIndex')[noteData % tMania]);
 			var colSwap = note.colorSwap;
 
@@ -4824,10 +4813,8 @@ class PlayState extends MusicBeatState
 		var daOldMania = mania;
 
 		mania = newValue;
-		if (!skipStrumFadeOut)
-		{
-			for (i in 0...strumLineNotes.members.length)
-			{
+		if (!skipStrumFadeOut) {
+			for (i in 0...strumLineNotes.members.length) {
 				var oldStrum:FlxSprite = strumLineNotes.members[i].clone();
 				oldStrum.x = strumLineNotes.members[i].x;
 				oldStrum.y = strumLineNotes.members[i].y;
@@ -4837,13 +4824,10 @@ class PlayState extends MusicBeatState
 				oldStrum.setGraphicSize(Std.int(oldStrum.width * Note.scales[daOldMania]));
 				oldStrum.updateHitbox();
 				add(oldStrum);
-
-				FlxTween.tween(oldStrum, {alpha: 0}, 0.3, {
-					onComplete: function(_)
-					{
-						remove(oldStrum);
-					}
-				});
+	
+				FlxTween.tween(oldStrum, {alpha: 0}, 0.3, {onComplete: function(_) {
+					remove(oldStrum);
+				}});
 			}
 		}
 
@@ -7592,7 +7576,7 @@ class PlayState extends MusicBeatState
 				}
 			case 'Change Mania':
 				var newMania:Int = 0;
-				var skipTween:Bool = value2 == "true" ? true : false;
+				var skipTween:Bool = value2.toLowerCase().trim() == "true" ? true : false;
 
 				newMania = Std.parseInt(value1);
 				if (Math.isNaN(newMania) && newMania < 0 && newMania > 9)

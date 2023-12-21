@@ -634,20 +634,43 @@ class Note extends FlxSprite
 		reloadNote(texture);
 		if (isSustainNote)
 			offsetX = width / 2;
-		if (!isSustainNote)
-		{
-			var animToPlay:String = '';
-			animToPlay = Note.keysShit.get(mania).get('letters')[noteData % Note.ammo[mania]];
-			animation.play(animToPlay);
-		}
-
-		if (isSustainNote && prevNote != null) //someone please tell me why this wont work
-		{
-			animation.play(Note.keysShit.get(mania).get('letters')[noteData % Note.ammo[mania]] + ' tail');
-			if (prevNote != null && prevNote.isSustainNote)
+		if (isNewEngine()) {
+			// Code for the new engine
+			if (!isSustainNote)
 			{
-				prevNote.animation.play(Note.keysShit.get(mania).get('letters')[prevNote.noteData % Note.ammo[mania]] + ' hold');
-				prevNote.updateHitbox();
+				var animToPlay:String = '';
+				animToPlay = Note.keysShit.get(mania).get('letters')[noteData % Note.ammo[mania]];
+				animation.play(animToPlay);
+			}
+
+			if (isSustainNote && prevNote != null) //someone please tell me why this wont work
+			{
+				animation.play(Note.keysShit.get(mania).get('letters')[noteData % Note.ammo[mania]] + ' tail');
+				if (prevNote != null && prevNote.isSustainNote)
+				{
+					prevNote.animation.play(Note.keysShit.get(mania).get('letters')[prevNote.noteData % Note.ammo[mania]] + ' hold');
+					prevNote.updateHitbox();
+				}
+			}
+		}
+		else
+		{
+			if (!isSustainNote)
+			{
+				var animToPlay:String = '';
+				animToPlay = colArray[noteData % 4];
+				animation.play(animToPlay + 'Scroll');
+			}
+
+			if (isSustainNote && prevNote != null) //someone please tell me why this wont work
+			{
+				// Code for the old engine
+				animation.play(colArray[noteData % 4] + 'holdend');
+				if (prevNote != null && prevNote.isSustainNote)
+				{
+					prevNote.animation.play(colArray[prevNote.noteData % 4] + 'hold');
+					prevNote.updateHitbox();
+				}
 			}
 		}
 
