@@ -3573,10 +3573,10 @@ class PlayState extends MusicBeatState
 
 		if (mania > 3)
 		{
+			var anim = animKeys[note];
+			var matchingIndices:Array<Int> = [];
 			if (note < animKeys.length)
 			{
-				var anim = animKeys[note];
-				var matchingIndices:Array<Int> = [];
 				for (i in 0...anims.length)
 				{
 					if (anims[i] == anim)
@@ -3597,14 +3597,23 @@ class PlayState extends MusicBeatState
 			}
 			else
 			{
-				//throw 'Note value is out of range';
+				if (matchingIndices.length > 0)
+				{
+					var randomIndex = Std.int(Math.random() * matchingIndices.length);
+					return matchingIndices[randomIndex];
+				}
+				else
+				{
+					var randomIndex = Std.int(Math.random() * anims.length);
+					return randomIndex;
+				}
 			}
 		}
 		else
 		{ // mania == 3
+			var anim = anims[note];
 			if (note < anims.length)
 			{
-				var anim = anims[note];
 				if (animMap.exists(anim))
 				{
 					return animMap.get(anim);
@@ -3616,7 +3625,7 @@ class PlayState extends MusicBeatState
 			}
 			else
 			{
-				//throw 'Note value is out of range';
+				return animMap.get(anim);
 			}
 		}
 	}
@@ -4835,6 +4844,7 @@ class PlayState extends MusicBeatState
 		var daOldMania = mania;
 
 		mania = newValue;
+		skipArrowStartTween = skipStrumFadeOut;
 		if (!skipStrumFadeOut) {
 			for (i in 0...strumLineNotes.members.length) {
 				var oldStrum:FlxSprite = strumLineNotes.members[i].clone();
@@ -7618,7 +7628,7 @@ class PlayState extends MusicBeatState
 					newMania = 0;
 				for (i in 0...unspawnNotes.length)
 				{
-					unspawnNotes[i].noteData = getNumberFromAnims(allNotes[i], newMania);
+					unspawnNotes[i].noteData = getNumberFromAnims(unspawnNotes[i].noteData, newMania);
 				}
 				changeMania(newMania, skipTween);
 
