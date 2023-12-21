@@ -126,7 +126,7 @@ class Note extends FlxSprite
 	public static var BLUE_NOTE:Int = 1;
 	public static var RED_NOTE:Int = 3;
 
-	private var colArray:Array<String> = ['purple', 'blue', 'green', 'red'];
+	public static var colArray:Array<String> = ['purple', 'blue', 'green', 'red'];
 	private var pixelInt:Array<Int> = [0, 1, 2, 3];
 
 	// Lua shit
@@ -666,9 +666,10 @@ class Note extends FlxSprite
 			{
 				// Code for the old engine
 				animation.play(colArray[noteData % 4] + 'holdend');
+				updateHitbox();
 				if (prevNote != null && prevNote.isSustainNote)
 				{
-					prevNote.animation.play(colArray[prevNote.noteData % 4] + 'hold');
+					prevNote.animation.play(colArray[prevNote.noteData % 4] + 'hold', true);
 					prevNote.updateHitbox();
 				}
 			}

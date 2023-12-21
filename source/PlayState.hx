@@ -4753,25 +4753,44 @@ class PlayState extends MusicBeatState
 			
 			note.offsetX += note.width / 2;
 
-			note.animation.play(Note.keysShit.get(mania).get('letters')[noteData] + ' tail');
+			if (EKMode) {
+				note.animation.play(Note.keysShit.get(mania).get('letters')[noteData] + ' tail');
+			} else {
+				note.animation.play(Note.colArray[noteData % 4] + 'holdend');
+			}
 
 			note.updateHitbox();
 
 			note.offsetX -= note.width / 2;
 
+			if (PlayState.isPixelStage)
+				note.offsetX += 30 * Note.pixelScales[mania];
+
 			if (note != null && prevNote != null && prevNote.isSustainNote && prevNote.animation != null) { // haxe flixel
-				prevNote.animation.play(Note.keysShit.get(mania).get('letters')[noteData % tMania] + ' hold');
+				if (EKMode) {
+					prevNote.animation.play(Note.keysShit.get(mania).get('letters')[prevNote.noteData] + ' hold');}
+				else {
+					prevNote.animation.play(Note.colArray[prevNote.noteData % 4] + 'hold');
+				}
 
 				prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.05;
-				prevNote.scale.y *= songSpeed;
+				if(PlayState.instance != null)
+				{
+					prevNote.scale.y *= PlayState.instance.songSpeed;
+				}
 
-				if(isPixelStage) {
+				if(PlayState.isPixelStage) { ///Y E  A H
 					prevNote.scale.y *= 1.19;
-					prevNote.scale.y *= (6 / note.height);
+					prevNote.scale.y *= (6 / prevNote.height); //Auto adjust note size
 				}
 
 				prevNote.updateHitbox();
 				//trace(prevNote.scale.y);
+			}
+
+			if(PlayState.isPixelStage) {
+				note.scale.y *= PlayState.daPixelZoom;
+				note.updateHitbox();
 			}
 			
 			if (isPixelStage){
@@ -4786,11 +4805,13 @@ class PlayState extends MusicBeatState
 				
 				note.animation.play(animToPlay);
 			}
+		} else if(!note.isSustainNote) {
+			note.earlyHitMult = 1;
 		}
 
 		// Like set_noteType()
 
-		note.applyManiaChange();
+		note.applyManiaChange(); //yep
 
 		if (note.changeColSwap) {
 			var hsvNumThing = Std.int(Note.keysShit.get(mania).get('pixelAnimIndex')[noteData % tMania]);
