@@ -7614,11 +7614,6 @@ class PlayState extends MusicBeatState
 				{
 					unspawnNotes[i].noteData = getNumberFromAnims(unspawnNotes[i].noteData, newMania);
 				}
-				notes.forEachAlive(function(note:Note)
-					{
-						updateNote(note);
-					});
-			
 				changeMania(newMania, skipTween);
 
 			case 'Change Character':
