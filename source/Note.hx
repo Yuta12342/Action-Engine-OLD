@@ -645,10 +645,10 @@ class Note extends FlxSprite
 
 			if (isSustainNote && prevNote != null) //someone please tell me why this wont work
 			{
-				animation.play(Note.keysShit.get(mania).get('letters')[noteData % Note.ammo[mania]] + ' tail');
-				if (prevNote != null && prevNote.isSustainNote)
+				animation.play(Note.keysShit.get(mania).get('letters')[noteData % Note.ammo[mania]] + ' hold');
+				if (prevNote.isSustainNote)
 				{
-					prevNote.animation.play(Note.keysShit.get(mania).get('letters')[prevNote.noteData % Note.ammo[mania]] + ' hold');
+					prevNote.animation.play(Note.keysShit.get(mania).get('letters')[prevNote.noteData % Note.ammo[mania]] + ' tail');
 					prevNote.updateHitbox();
 				}
 			}
@@ -667,7 +667,7 @@ class Note extends FlxSprite
 				// Code for the old engine
 				animation.play(colArray[noteData % 4] + 'holdend');
 				updateHitbox();
-				if (prevNote != null && prevNote.isSustainNote)
+				if (prevNote.isSustainNote)
 				{
 					prevNote.animation.play(colArray[prevNote.noteData % 4] + 'hold', true);
 					prevNote.updateHitbox();

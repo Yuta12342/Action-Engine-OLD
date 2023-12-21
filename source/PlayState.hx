@@ -472,6 +472,8 @@ class PlayState extends MusicBeatState
 
 	public static var ogScroll:Bool = ClientPrefs.downScroll;
 
+	var allNotes:Array<Int> = [];
+
 	function generateGibberish(length:Int, exclude:String):String
 	{
 		var alphabet:String = "abcdefghijklmnopqrstuvwxyz";
@@ -3569,7 +3571,7 @@ class PlayState extends MusicBeatState
 				if (key == "LEFT") "RIGHT" else if (key == "RIGHT") "LEFT" else key
 		];
 
-		if (SONG.mania == 3 && mania > 3)
+		if (mania > 3)
 		{
 			if (note < animKeys.length)
 			{
@@ -3595,7 +3597,7 @@ class PlayState extends MusicBeatState
 			}
 			else
 			{
-				throw 'Note value is out of range';
+				//throw 'Note value is out of range';
 			}
 		}
 		else
@@ -3614,7 +3616,7 @@ class PlayState extends MusicBeatState
 			}
 			else
 			{
-				throw 'Note value is out of range';
+				//throw 'Note value is out of range';
 			}
 		}
 	}
@@ -3771,7 +3773,6 @@ class PlayState extends MusicBeatState
 			}
 		}
 	 */
-		var allNotes:Array<Int> = [];
 
 		function findPatterns(noteData:Array<Int>):Array<PatternResult>
 		{
@@ -7609,7 +7610,7 @@ class PlayState extends MusicBeatState
 				var skipTween:Bool = value2 == "true" ? true : false;
 
 				if (value1.toLowerCase().trim() == "random") {
-					newMania = FlxG.random.int(0, 8);
+					newMania = FlxG.random.int(3, 8);
 				} else {
 					newMania = Std.parseInt(value1);
 				}
@@ -7617,7 +7618,7 @@ class PlayState extends MusicBeatState
 					newMania = 0;
 				for (i in 0...unspawnNotes.length)
 				{
-					unspawnNotes[i].noteData = getNumberFromAnims(unspawnNotes[i].noteData, newMania);
+					unspawnNotes[i].noteData = getNumberFromAnims(allNotes[i], newMania);
 				}
 				changeMania(newMania, skipTween);
 
