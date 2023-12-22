@@ -602,27 +602,27 @@ class Note extends FlxSprite
 	}
 
 	public function loadPixelNoteAnims():Void {
-			if (isNewEngine()) {
-					// Code for the new engine
-					if (isSustainNote) {
-							for (i in 0...gfxLetter.length) {
-									animation.add(gfxLetter[i] + ' hold', [i]);
-									animation.add(gfxLetter[i] + ' tail', [i + pixelNotesDivisionValue]);
-							}
-					} else {
-							for (i in 0...gfxLetter.length) {
-									animation.add(gfxLetter[i], [i + pixelNotesDivisionValue]);
-							}
-					}
-			} else {
-					// Code for the old engine
-					if (isSustainNote) {
-							animation.add(colArray[noteData] + 'holdend', [pixelInt[noteData] + 4]);
-							animation.add(colArray[noteData] + 'hold', [pixelInt[noteData]]);
-					} else {
-							animation.add(colArray[noteData] + 'Scroll', [pixelInt[noteData] + 4]);
-					}
-			}
+		if (isNewEngine()) {
+				// Code for the new engine
+				if (isSustainNote) {
+						for (i in 0...gfxLetter.length) {
+								animation.add(gfxLetter[i] + ' hold', [i]);
+								animation.add(gfxLetter[i] + ' tail', [i + pixelNotesDivisionValue]);
+						}
+				} else {
+						for (i in 0...gfxLetter.length) {
+								animation.add(gfxLetter[i], [i + pixelNotesDivisionValue]);
+						}
+				}
+		} else {
+				// Code for the old engine
+				if (isSustainNote) {
+						animation.add(colArray[noteData] + 'holdend', [pixelInt[noteData] + 4]);
+						animation.add(colArray[noteData] + 'hold', [pixelInt[noteData]]);
+				} else {
+						animation.add(colArray[noteData] + 'Scroll', [pixelInt[noteData] + 4]);
+				}
+		}
 	}
 
 

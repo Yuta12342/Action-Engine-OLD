@@ -76,16 +76,11 @@ import openfl.filters.ShaderFilter;
 import sys.FileSystem;
 import sys.io.File;
 #end
-#if VIDEOS_ALLOWED
-#if (hxCodec >= "3.0.0")
-import hxcodec.flixel.FlxVideo as VideoHandler;
-#elseif (hxCodec >= "2.6.1")
-import hxcodec.VideoHandler as VideoHandler;
-#elseif (hxCodec == "2.6.0")
-import VideoHandler;
-#else
-import vlc.MP4Handler as VideoHandler;
-#end
+#if VIDEOS_ALLOWED 
+#if (hxCodec >= "3.0.0") import hxcodec.flixel.FlxVideo as VideoHandler;
+#elseif (hxCodec >= "2.6.1") import hxcodec.VideoHandler as VideoHandler;
+#elseif (hxCodec == "2.6.0") import VideoHandler;
+#else import vlc.MP4Handler as VideoHandler; #end
 #end
 using StringTools;
 
@@ -2121,9 +2116,9 @@ class PlayState extends MusicBeatState
 
 		var filepath:String = Paths.video(name);
 		#if sys
-		if (!FileSystem.exists(filepath))
+		if(!FileSystem.exists(filepath))
 		#else
-		if (!OpenFlAssets.exists(filepath))
+		if(!OpenFlAssets.exists(filepath))
 		#end
 		{
 			FlxG.log.warn('Couldnt find video file: ' + name);
@@ -2131,25 +2126,18 @@ class PlayState extends MusicBeatState
 			return;
 		}
 
-		var video:VideoHandler = new VideoHandler();
-		#if (hxCodec >= "3.0.0")
-		// Recent versions
-		video.play(filepath);
-		video.onEndReached.add(function()
-		{
-			video.dispose();
-			startAndEnd();
-			return;
-		}, true);
-		#else
-		// Older versions
-		video.playVideo(filepath);
+		var video:VideoHandlerMP4 = new VideoHandlerMP4();
+		video.cameras = [camHUD];
+		video.playMP4(filepath, null, false, true);
 		video.finishCallback = function()
 		{
+			addedMP4s.remove(video);
+			remove(video);
 			startAndEnd();
 			return;
 		}
-		#end
+		add(video);
+		addedMP4s.push(video);
 		#else
 		FlxG.log.warn('Platform not supported!');
 		startAndEnd();
@@ -4467,6 +4455,10 @@ class PlayState extends MusicBeatState
 				}
 			}
 		}
+		for (i in 0...unspawnNotes.length)
+		{
+			if (unspawnNotes[i].noteType == 'Hurt Note') unspawnNotes[i].reloadNote('HURT');
+		}
 		Sys.println('');
 	}
 
@@ -4478,32 +4470,76 @@ class PlayState extends MusicBeatState
 		if (ClientPrefs.getGameplaySetting('generatorType', 'Chart') == 'Time')
 		{
 			var newUnspawnNotes:Array<Note> = []; // create a new array
-
-			for (i in 0...unspawnNotes.length)
+			for (section in SONG.notes)
 			{
-				if (!unspawnNotes[i].isSustainNote)
+				for (songNotes in section.sectionNotes)
 				{
-					var modifiedNoteData = modifyNoteData(unspawnNotes[i].noteData, unspawnNotes[i].mustPress);
-					var newNote = new Note(unspawnNotes[i].strumTime, unspawnNotes[i].noteData); // create a new Note object with the data of the original note
-					newNote.noteData = modifiedNoteData; // modify the noteData of the new note
-					newUnspawnNotes.push(newNote); // push the new note into the new array
-				}
-			}
-
-			for (i in 0...unspawnNotes.length)
-			{
-				if (unspawnNotes[i].isSustainNote)
-				{
-					var noteIndex = unspawnNotes[i].noteIndex;
-					for (j in 0...newUnspawnNotes.length) // iterate over the new array
+					var gottaHitNote:Bool = section.mustHitSection;
+					if (chartModifier != "4K Only" && chartModifier != "ManiaConverter")
 					{
-						if (!newUnspawnNotes[j].isSustainNote && newUnspawnNotes[j].noteIndex == noteIndex)
+						if (songNotes[1] > (Note.ammo[mania] - 1))
 						{
-							var newNote = new Note(unspawnNotes[i].strumTime,
-								unspawnNotes[i].noteData); // create a new Note object with the data of the original note
-							newNote.noteData = newUnspawnNotes[j].noteData; // modify the noteData of the new note
+							gottaHitNote = !section.mustHitSection;
+						}
+					}
+					else
+					{
+						if (songNotes[1] > (Note.ammo[SONG.mania] - 1))
+						{
+							gottaHitNote = !section.mustHitSection;
+						}
+					}
+					for (i in 0...unspawnNotes.length)
+					{
+						if (!unspawnNotes[i].isSustainNote)
+						{
+							var modifiedNoteData = modifyNoteData(unspawnNotes[i].noteData, unspawnNotes[i].mustPress);
+							var newNote = new Note(unspawnNotes[i].strumTime, unspawnNotes[i].noteData); // create a new Note object with the data of the original note
+							newNote.mustPress = gottaHitNote;
+							newNote.sustainLength = songNotes[2];
+							newNote.gfNote = (section.gfSection && (songNotes[1] < Note.ammo[mania]));
+							newNote.noteType = songNotes[3];
+							newNote.noteIndex = noteIndex++;
+							if (chartModifier == 'Amalgam' && currentModifier == 11)
+							{
+								newNote.multSpeed = FlxG.random.float(0.1, 2);
+							}
+							if (!Std.isOfType(songNotes[3], String))
+								newNote.noteType = editors.ChartingState.noteTypeList[songNotes[3]]; // Backward compatibility + compatibility with Week 7 charts
+							newNote.scrollFactor.set();
+							newNote.noteData = modifiedNoteData; // modify the noteData of the new note
 							newUnspawnNotes.push(newNote); // push the new note into the new array
-							break;
+						}
+					}
+
+					for (i in 0...unspawnNotes.length)
+					{
+						if (unspawnNotes[i].isSustainNote)
+						{
+							var noteIndex = unspawnNotes[i].noteIndex;
+							for (j in 0...newUnspawnNotes.length) // iterate over the new array
+							{
+								if (!newUnspawnNotes[j].isSustainNote && newUnspawnNotes[j].noteIndex == noteIndex)
+								{
+									var newNote = new Note(unspawnNotes[i].strumTime,
+										unspawnNotes[i].noteData); // create a new Note object with the data of the original note
+									newNote.mustPress = gottaHitNote;
+									newNote.sustainLength = songNotes[2];
+									newNote.gfNote = (section.gfSection && (songNotes[1] < Note.ammo[mania]));
+									newNote.noteType = songNotes[3];
+									newNote.noteIndex = noteIndex++;
+									if (chartModifier == 'Amalgam' && currentModifier == 11)
+									{
+										newNote.multSpeed = FlxG.random.float(0.1, 2);
+									}
+									if (!Std.isOfType(songNotes[3], String))
+										newNote.noteType = editors.ChartingState.noteTypeList[songNotes[3]]; // Backward compatibility + compatibility with Week 7 charts
+									newNote.scrollFactor.set();
+									newNote.noteData = newUnspawnNotes[j].noteData; // modify the noteData of the new note
+									newUnspawnNotes.push(newNote); // push the new note into the new array
+									break;
+								}
+							}
 						}
 					}
 				}
@@ -4720,6 +4756,9 @@ class PlayState extends MusicBeatState
 		}
 	}
 
+	var lastNoteOffsetXForPixelAutoAdjusting:Float = 0;
+	var defaultWidth:Float = 0;
+	var defaultHeight:Float = 0;
 	function updateNote(note:Note)
 	{
 		var tMania:Int = mania + 1;
@@ -4739,17 +4778,50 @@ class PlayState extends MusicBeatState
 		*/
 
 		// Like reloadNote()
-
+		defaultWidth = 157;
+		defaultHeight = 154;
 		var lastScaleY:Float = note.scale.y;
-		if (isPixelStage) {
-			if (note.isSustainNote) {note.originalHeightForCalcs = note.height;}
+		if (EKMode) {
+			if (isPixelStage) {
+				note.setGraphicSize(Std.int(note.width * PlayState.daPixelZoom * Note.pixelScales[mania]));
+				if(note.isSustainNote) {
+					note.offsetX += lastNoteOffsetXForPixelAutoAdjusting;
+					lastNoteOffsetXForPixelAutoAdjusting = (note.width - 7) * (PlayState.daPixelZoom / 2);
+					note.offsetX -= lastNoteOffsetXForPixelAutoAdjusting;
+				}
+			} else {
+				// Like loadNoteAnims()
 
-			note.setGraphicSize(Std.int(note.width * daPixelZoom * Note.pixelScales[mania]));
-		} else {
-			// Like loadNoteAnims()
+				if (!note.isSustainNote) {
+					note.setGraphicSize(Std.int(defaultWidth * Note.scales[mania]));
+				} else {
+					note.setGraphicSize(Std.int(defaultWidth * Note.scales[mania]), Std.int(defaultHeight * Note.scales[0]));
+				}
+				note.updateHitbox();
+			}
+		}
+		else
+		{
+			if (isPixelStage) {
+				note.setGraphicSize(Std.int(note.width * PlayState.daPixelZoom));
+				if(note.isSustainNote) {
+					note.offsetX += lastNoteOffsetXForPixelAutoAdjusting;
+					lastNoteOffsetXForPixelAutoAdjusting = (note.width - 7) * (PlayState.daPixelZoom / 2);
+					note.offsetX -= lastNoteOffsetXForPixelAutoAdjusting;
+	
+					/*if(animName != null && !animName.endsWith('end'))
+					{
+						lastScaleY /= lastNoteScaleToo;
+						lastNoteScaleToo = (6 / height);
+						lastScaleY *= lastNoteScaleToo;
+					}*/
+				}
+			} else {
+				// Like loadNoteAnims()
 
-			note.setGraphicSize(Std.int(note.width * Note.scales[mania]));
-			note.updateHitbox();
+				note.setGraphicSize(Std.int(note.width * 0.7));
+				note.updateHitbox();
+			}
 		}
 
 		//if (note.isSustainNote) {note.scale.y = lastScaleY;}
@@ -6409,6 +6481,10 @@ class PlayState extends MusicBeatState
 			Crashed = false;
 		}
 
+		if (SONG.speed < 0) SONG.speed = 0;
+
+		camNotes.zoom = camHUD.zoom;
+
 		curEffect = FlxG.random.int(1, 38);
 
 		//if ((songPercent == 0 || songPercent == 1) && (notes.length <= 0 || unspawnNotes.length <= 0) || songStarted && !FlxG.sound.music.playing) endSong();
@@ -7618,17 +7694,40 @@ class PlayState extends MusicBeatState
 			case 'Change Mania (Special)':
 				var newMania:Int = 0;
 				var skipTween:Bool = value2 == "true" ? true : false;
+				var prevNote1:Note = null;
+				var prevNote2:Note = null;
 
 				if (value1.toLowerCase().trim() == "random") {
-					newMania = FlxG.random.int(3, 8);
+					newMania = FlxG.random.int(0, 8);
 				} else {
 					newMania = Std.parseInt(value1);
 				}
 				if (Math.isNaN(newMania) && newMania < 0 && newMania > 9)
 					newMania = 0;
+				notes.forEach(function(daNote:Note)
+				{
+					daNote.noteData = getNumberFromAnims(daNote.noteData, newMania);
+				});
 				for (i in 0...unspawnNotes.length)
 				{
-					unspawnNotes[i].noteData = getNumberFromAnims(unspawnNotes[i].noteData, newMania);
+					if (unspawnNotes[i].mustPress)
+					{
+						if (!unspawnNotes[i].isSustainNote)
+						{
+							unspawnNotes[i].noteData = getNumberFromAnims(unspawnNotes[i].noteData, newMania);
+							prevNote1 = unspawnNotes[i];
+						}
+						else if (prevNote1 != null && unspawnNotes[i].isSustainNote) unspawnNotes[i].noteData = prevNote1.noteData;
+					}
+					if (!unspawnNotes[i].mustPress)
+					{
+						if (!unspawnNotes[i].isSustainNote)
+						{
+							unspawnNotes[i].noteData = getNumberFromAnims(unspawnNotes[i].noteData, newMania);
+							prevNote2 = unspawnNotes[i];
+						}
+						else if (prevNote2 != null && unspawnNotes[i].isSustainNote) unspawnNotes[i].noteData = prevNote2.noteData;
+					}
 				}
 				changeMania(newMania, skipTween);
 
