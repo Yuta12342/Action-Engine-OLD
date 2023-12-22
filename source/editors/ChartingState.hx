@@ -238,65 +238,65 @@ class ChartingState extends MusicBeatState
 	override function create()
 	{
 		/*
-			untyped __cpp__('''
-			#include <iostream>
-			<ogg/ogg.h>
-			<vorbis/codec.h>
+				untyped __cpp__('''
+				#include <iostream>
+				<ogg/ogg.h>
+				<vorbis/codec.h>
 
-		int main() {
-			// Open the OGG file
-			FILE* file = fopen("example.ogg", "rb");
-			if (file == nullptr) {
-				std::cerr << "Failed to open OGG file" << std::endl;
-				return 1;
-			}
-
-			// Read the OGG file
-			ogg_sync_state sync_state;
-			ogg_sync_init(&sync_state);
-			ogg_page page;
-			while (ogg_sync_pageout(&sync_state, &page) != 1) {
-				char* buffer = ogg_sync_buffer(&sync_state, 4096);
-				int bytes_read = fread(buffer, 1, 4096, file);
-				ogg_sync_wrote(&sync_state, bytes_read);
-			}
-
-			// Extract the BPM information from the Vorbis metadata packet
-			ogg_stream_state stream_state;
-			ogg_stream_init(&stream_state, ogg_page_serialno(&page));
-			vorbis_info info;
-			vorbis_comment comment;
-			vorbis_info_init(&info);
-			vorbis_comment_init(&comment);
-			ogg_packet packet;
-			while (ogg_stream_packetout(&stream_state, &packet) != 0) {
-				vorbis_synthesis_headerin(&info, &comment, &packet);
-			}
-			double bpm = -1;
-			for (int i = 0; i < comment.comments; i++) {
-				if (strncmp(comment.user_comments[i], "BPM=", 4) == 0) {
-					bpm = atof(comment.user_comments[i] + 4);
-					break;
+			int main() {
+				// Open the OGG file
+				FILE* file = fopen("example.ogg", "rb");
+				if (file == nullptr) {
+					std::cerr << "Failed to open OGG file" << std::endl;
+					return 1;
 				}
-			}
 
-			// Print the BPM information
-			if (bpm < 0) {
-				std::cout << "BPM information not found" << std::endl;
-			} else {
-				std::cout << "BPM: " << bpm << std::endl;
-			}
+				// Read the OGG file
+				ogg_sync_state sync_state;
+				ogg_sync_init(&sync_state);
+				ogg_page page;
+				while (ogg_sync_pageout(&sync_state, &page) != 1) {
+					char* buffer = ogg_sync_buffer(&sync_state, 4096);
+					int bytes_read = fread(buffer, 1, 4096, file);
+					ogg_sync_wrote(&sync_state, bytes_read);
+				}
 
-			// Clean up
-			fclose(file);
-			vorbis_info_clear(&info);
-			vorbis_comment_clear(&comment);
-			ogg_stream_clear(&stream_state);
-			ogg_sync_clear(&sync_state);
-			return 0;
-		}
-		' '')
-		*/
+				// Extract the BPM information from the Vorbis metadata packet
+				ogg_stream_state stream_state;
+				ogg_stream_init(&stream_state, ogg_page_serialno(&page));
+				vorbis_info info;
+				vorbis_comment comment;
+				vorbis_info_init(&info);
+				vorbis_comment_init(&comment);
+				ogg_packet packet;
+				while (ogg_stream_packetout(&stream_state, &packet) != 0) {
+					vorbis_synthesis_headerin(&info, &comment, &packet);
+				}
+				double bpm = -1;
+				for (int i = 0; i < comment.comments; i++) {
+					if (strncmp(comment.user_comments[i], "BPM=", 4) == 0) {
+						bpm = atof(comment.user_comments[i] + 4);
+						break;
+					}
+				}
+
+				// Print the BPM information
+				if (bpm < 0) {
+					std::cout << "BPM information not found" << std::endl;
+				} else {
+					std::cout << "BPM: " << bpm << std::endl;
+				}
+
+				// Clean up
+				fclose(file);
+				vorbis_info_clear(&info);
+				vorbis_comment_clear(&comment);
+				ogg_stream_clear(&stream_state);
+				ogg_sync_clear(&sync_state);
+				return 0;
+			}
+			' '')
+		 */
 
 		if (PlayState.SONG != null)
 			_song = PlayState.SONG;
@@ -1000,6 +1000,21 @@ class ChartingState extends MusicBeatState
 			updateGrid();
 		});
 
+		var playHereButton:FlxButton = new FlxButton(pasteButton.x, swapSection.y, "Play Here", function()
+		{
+			autosaveSong();
+			FlxG.mouse.visible = false;
+			PlayState.SONG = _song;
+			PlayState.startOnTime = sectionStartTime();
+			FlxG.sound.music.stop();
+			if (vocals != null)
+				vocals.stop();
+
+			// if(_song.stage == null) _song.stage = stageDropDown.selectedLabel;
+			StageData.loadDirectory(_song);
+			LoadingState.loadAndSwitchState(new PlayState());
+		});
+
 		var stepperCopy:FlxUINumericStepper = null;
 		var copyLastButton:FlxButton = new FlxButton(10, swapSection.y + 30, "Copy last section", function()
 		{
@@ -1110,6 +1125,7 @@ class ChartingState extends MusicBeatState
 		tab_group_section.add(copyLastButton);
 		tab_group_section.add(duetButton);
 		tab_group_section.add(mirrorButton);
+		tab_group_section.add(playHereButton);
 
 		UI_box.addGroup(tab_group_section);
 	}
@@ -3970,11 +3986,11 @@ class AttachedFlxText extends FlxText
 		super(X, Y, FieldWidth, Text, Size, EmbeddedFont);
 	}
 
-/*	override public function onFocusLost():Void
+	/*	override public function onFocusLost():Void
 		{
-super.onFocusLost();
+		super.onFocusLost();
 		}
-		*/
+	 */
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
