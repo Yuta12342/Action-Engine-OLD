@@ -56,6 +56,9 @@
 	<define name="PSYCH_WATERMARKS"/>
 	<define name="TITLE_SCREEN_EASTER_EGG"/>
 	<define name="CRASH_HANDLER" if="desktop release" />
+	<defome name="HXCPP_GC_BIG_BLOCKS"/>
+	<define name="HXCPP_GC_MOVING"/>
+	<define name="HXCPP_GC_SUMMARY"/>
 
 	<assets path="assets/preload" rename="assets" exclude="*.ogg" if="web"/>
 	<assets path="assets/preload" rename="assets" exclude="*.mp3"  unless="web"/>
