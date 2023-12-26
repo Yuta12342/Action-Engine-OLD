@@ -129,8 +129,6 @@ public static var initialState:Class<FlxState> = TitleState; // The FlxState the
 
 	static public function setExitHandler(func:Void->Void):Void {
 		FlxG.save.data.safeExit = true;
-		FlxG.save.data.closeDuringOverRide = true;
-		FlxG.save.flush();
 	    #if openfl_legacy
 	    openfl.Lib.current.stage.onQuit = function() {
 	        func();
@@ -141,7 +139,6 @@ public static var initialState:Class<FlxState> = TitleState; // The FlxState the
 	        func();
 	    });
 	    #end
-		if (FlxG.save.data.closeDuringOverRide) trace("YOUR SINS WON'T BE FORGOTTEN");
 	}
 
 	private static function onStateSwitch(state:FlxState):Void {
