@@ -35,6 +35,10 @@ class DialogueBox extends FlxSpriteGroup
 	var handSelect:FlxSprite;
 	var bgFade:FlxSprite;
 
+	//DDTP go krazy
+	var canFullSkip:Bool = true;
+	var skipText:FlxText;
+
 	public function new(talkingRight:Bool = true, ?dialogueList:Array<String>)
 	{
 		super();
@@ -53,6 +57,14 @@ class DialogueBox extends FlxSpriteGroup
 		bgFade.scrollFactor.set();
 		bgFade.alpha = 0;
 		add(bgFade);
+
+		skipText = new FlxText(5, 695, 640, 'Press' + InputFormatter.getKeyName(ClientPrefs.keyBinds.get('back')[0]) + ' or ' + InputFormatter.getKeyName(ClientPrefs.keyBinds.get('back')[1]) + 'To Skip The Dialouge.', 40);
+		skipText.scrollFactor.set(0, 0);
+		skipText.setFormat('Pixel Arial 11 Bold', 20, FlxColor.WHITE, FlxTextAlign.LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		skipText.borderSize = 2;
+		skipText.borderQuality = 1;
+		skipText.antialiasing = ClientPrefs.globalAntialiasing;
+		add(skipText);
 
 		new FlxTimer().start(0.83, function(tmr:FlxTimer)
 		{
@@ -176,6 +188,33 @@ class DialogueBox extends FlxSpriteGroup
 		{
 			startDialogue();
 			dialogueStarted = true;
+		}
+
+		if(PlayerSettings.player1.controls.BACK && canFullSkip && dialogueStarted)
+		{
+			isEnding = true;
+			FlxG.sound.play(Paths.sound('clickText'), 0.8);	
+
+			if (PlayState.SONG.song.toLowerCase() == 'senpai' || PlayState.SONG.song.toLowerCase() == 'thorns')
+				FlxG.sound.music.fadeOut(1.5, 0);
+
+			new FlxTimer().start(0.2, function(tmr:FlxTimer)
+			{
+				box.alpha -= 1 / 5;
+				bgFade.alpha -= 1 / 5 * 0.7;
+				portraitLeft.visible = false;
+				portraitRight.visible = false;
+				swagDialogue.alpha -= 1 / 5;
+				handSelect.alpha -= 1 / 5;
+				dropText.alpha = swagDialogue.alpha;
+				skipText.alpha = swagDialogue.alpha;
+			}, 5);
+
+			new FlxTimer().start(1.5, function(tmr:FlxTimer)
+			{
+				finishThing();
+				kill();
+			});
 		}
 
 		if(PlayerSettings.player1.controls.ACCEPT)
