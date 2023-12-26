@@ -40,6 +40,11 @@ class PauseSubState extends MusicBeatSubstate
 	public function new(x:Float, y:Float)
 	{
 		super();
+		if (PlayState.instance.justOverRide || FlxG.save.data.manualOverride) 
+		{
+			menuItemsOG.remove('Change Difficulty');
+			menuItemsOG.remove('Exit to menu');
+		}
 		if(CoolUtil.difficulties.length < 2) menuItemsOG.remove('Change Difficulty'); //No need to change difficulty if there is only one!
 
 		if(PlayState.chartingMode)
