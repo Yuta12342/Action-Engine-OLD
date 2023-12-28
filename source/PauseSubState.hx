@@ -40,7 +40,7 @@ class PauseSubState extends MusicBeatSubstate
 	public function new(x:Float, y:Float)
 	{
 		super();
-		if (PlayState.instance.justOverRide || FlxG.save.data.manualOverride) 
+		if (FlxG.save.data.manualOverride != null && FlxG.save.data.manualOverride == true) 
 		{
 			menuItemsOG.remove('Change Difficulty');
 			menuItemsOG.remove('Exit to menu');

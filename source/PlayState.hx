@@ -464,7 +464,7 @@ class PlayState extends MusicBeatState
 	var effectArray:Array<String> = [
 		'colorblind', 'blur', 'lag', 'mine', 'warning', 'heal', 'spin', 'songslower', 'songfaster', 'scrollswitch', 'scrollfaster', 'scrollslower', 'rainbow',
 		'cover', 'ghost', 'flashbang', 'nostrum', 'jackspam', 'spam', 'sever', 'shake', 'poison', 'dizzy', 'noise', 'flip', 'invuln',
-		'desync', 'mute', 'ice', 'randomize', 'fakeheal', 'spell', 'terminate', 'lowpass'
+		'desync', 'mute', 'ice', 'randomize', 'fakeheal', 'spell', 'terminate', 'lowpass', 'songSwitch'
 	];
 	var curEffect:Int = 0;
 
@@ -501,6 +501,7 @@ class PlayState extends MusicBeatState
 	override public function create()
 	{
 		if (FlxG.save.data.closeDuringOverRide == null) FlxG.save.data.closeDuringOverRide = false;
+		if (FlxG.save.data.manualOverride == null) FlxG.save.data.manualOverride = false;
 		if(lastDifficultyName == '')
 		{
 			lastDifficultyName = CoolUtil.defaultDifficulty;
@@ -660,7 +661,7 @@ class PlayState extends MusicBeatState
 		practiceMode = ClientPrefs.getGameplaySetting('practice', false);
 		cpuControlled = ClientPrefs.getGameplaySetting('botplay', false);
 		chartModifier = ClientPrefs.getGameplaySetting('chartModifier', 'Normal');
-		archMode = ClientPrefs.getGameplaySetting('archMode', false);
+		archMode = (ClientPrefs.getGameplaySetting('archMode', false) && !FlxG.save.data.manualOverride);
 		itemAmount = ClientPrefs.getGameplaySetting('itemAmount', 69);
 
 		if (archMode)
@@ -1820,7 +1821,14 @@ class PlayState extends MusicBeatState
 		}
 		else
 		{
-			startCountdown();
+			trace('Start at: ' + FlxG.save.data.songPos);
+			trace('Starting the song at: ' + startOnTime);
+			if (daSong != 'tutorial') 
+			{
+				startCountdownSwitch(FlxG.save.data.songPos);
+				FlxG.save.data.songPos = null;
+			}
+			else startCountdown();
 		}
 		RecalculateRating();
 
@@ -2721,7 +2729,7 @@ class PlayState extends MusicBeatState
 
 			if (stuck)
 			{
-				if (PlayState.SONG.song.toLowerCase().contains('resistance') || PlayState.SONG.song.toLowerCase() == 'resistalovania')
+				if (PlayState.SONG.player1.toLowerCase().contains('zenetta') || PlayState.SONG.player2.toLowerCase().contains('zenetta') || PlayState.SONG.gfVersion.toLowerCase().contains('zenetta'))
 				{
 					itemAmount = 69;
 					trace("RESISTANCE OVERRIDE!");
@@ -3497,7 +3505,7 @@ class PlayState extends MusicBeatState
 		{
 			setSongTime(startOnTime - 500);
 		}
-		startOnTime = 0;
+		else startOnTime = 0;
 
 		if (paused)
 		{
@@ -3544,18 +3552,18 @@ class PlayState extends MusicBeatState
 		{
 			randoTimer.start(FlxG.random.float(5, 10), function(tmr:FlxTimer)
 			{
-				if (curEffect <= 36) doEffect(effectArray[curEffect]);
+				if (curEffect <= 37) doEffect(effectArray[curEffect]);
 				else if (curEffect >= 37 && archMode)
 				{
 					switch (curEffect)
 					{
-						case 37:
+						case 38:
 							activeItems[0] += 1;
 							ArchPopup.startPopupCustom('You Got an Item!', '+1 Shield ( ' + activeItems[0] + ' Left)', 'Color');
-						case 38:
+						case 39:
 							activeItems[1] = 1;
 							ArchPopup.startPopupCustom('You Got an Item!', "Blue Ball's Curse", 'Color');
-						case 39:
+						case 40:
 							activeItems[2] += 1;
 							ArchPopup.startPopupCustom('You Got an Item!', "Max HP Up!", 'Color');
 					}
@@ -4791,9 +4799,11 @@ class PlayState extends MusicBeatState
 		trace("Generating Checks...");
 		if (archMode)
 		{
-			if (PlayState.SONG.song.toLowerCase().contains('resistance') || PlayState.SONG.song.toLowerCase() == 'resistalovania')
+			if (PlayState.SONG.player1.toLowerCase().contains('zenetta') || PlayState.SONG.player2.toLowerCase().contains('zenetta') || PlayState.SONG.gfVersion.toLowerCase().contains('zenetta'))
+			{
 				itemAmount = 69;
-			trace("RESISTANCE OVERRIDE!"); // what are the chances
+				trace("RESISTANCE OVERRIDE!"); // what are the chances
+			}
 			// Check if there are any mustPress notes available
 			if (unspawnNotes.filter(function(note:Note):Bool
 			{
@@ -6618,7 +6628,6 @@ class PlayState extends MusicBeatState
 					FlxG.save.data.manualOverride = true;
 				else if (FlxG.save.data.manualOverride != null && FlxG.save.data.manualOverride == true) 
 					FlxG.save.data.manualOverride = false;
-				else FlxG.save.data.manualOverride = true;
 
 				trace('MANUAL OVERRIDE: ' + FlxG.save.data.manualOverride);
 
@@ -6634,7 +6643,7 @@ class PlayState extends MusicBeatState
 				}
 
 				//Then make a hostile takeover
-				if (FlxG.save.data.manualOverride && !justOverRide)
+				if (FlxG.save.data.manualOverride)
 				{
 					//playBackRate = 1;
 					PlayState.storyWeek = 0;
@@ -6680,61 +6689,6 @@ class PlayState extends MusicBeatState
 					PlayState.SONG = Song.loadFromJson(Highscore.formatSong('tutorial', curDifficulty), Paths.formatToSongPath('tutorial'));
 					PlayState.isStoryMode = false;
 					PlayState.storyDifficulty = curDifficulty;
-					FlxG.save.flush();
-					justOverRide = true;
-				}
-				else
-				{
-					PlayState.storyWeek = FlxG.save.data.storyWeek;
-					Paths.currentModDirectory = FlxG.save.data.currentModDirectory;
-					var diffStr:String = WeekData.getCurrentWeek().difficulties;
-					if(diffStr != null) diffStr = diffStr.trim(); //Fuck you HTML5
-
-					if(diffStr != null && diffStr.length > 0)
-					{
-						var diffs:Array<String> = diffStr.split(',');
-						var i:Int = diffs.length - 1;
-						while (i > 0)
-						{
-							if(diffs[i] != null)
-							{
-								diffs[i] = diffs[i].trim();
-								if(diffs[i].length < 1) diffs.remove(diffs[i]);
-							}
-							--i;
-						}
-
-						if(diffs.length > 0 && diffs[0].length > 0)
-						{
-							CoolUtil.difficulties = diffs;
-						}
-					}
-					if(CoolUtil.difficulties.contains(CoolUtil.defaultDifficulty))
-					{
-						curDifficulty = Math.round(Math.max(0, CoolUtil.defaultDifficulties.indexOf(CoolUtil.defaultDifficulty)));
-					}
-					else
-					{
-						curDifficulty = 0;
-					}
-
-					var newPos:Int = CoolUtil.difficulties.indexOf(lastDifficultyName);
-					//trace('Pos of ' + lastDifficultyName + ' is ' + newPos);
-					if(newPos > -1)
-					{
-						curDifficulty = newPos;
-					}
-					CoolUtil.difficulties = CoolUtil.defaultDifficulties.copy();
-					PlayState.SONG = FlxG.save.data.SONG;
-					PlayState.isStoryMode = false;
-					PlayState.storyDifficulty = FlxG.save.data.storyDifficulty;
-					startCountdownSwitch(FlxG.save.data.songPos);
-					FlxG.save.data.storyWeek = null;
-					FlxG.save.data.currentModDirectory = null;
-					FlxG.save.data.difficulties = null; // just in case
-					FlxG.save.data.SONG = null;
-					FlxG.save.data.storyDifficulty = null;
-					FlxG.save.data.songPos = null;
 					FlxG.save.flush();
 				}
 				MusicBeatState.resetState();
@@ -7066,7 +7020,7 @@ class PlayState extends MusicBeatState
 
 		camNotes.zoom = camHUD.zoom;
 
-		curEffect = FlxG.random.int(0, 39);
+		curEffect = FlxG.random.int(0, 40);
 
 		if (songPercent == 1 && (notes.length <= 0 || unspawnNotes.length <= 0) || songStarted && !FlxG.sound.music.playing) endSong(); //FOR THE LOVE OF GOD JUST END THE GOD DANG SONG
 
@@ -7096,7 +7050,7 @@ class PlayState extends MusicBeatState
 			iconP1.swapOldIcon();
 		}
 
-		if (FlxG.keys.justPressed.H)
+		/*if (FlxG.keys.justPressed.H)
 		{
 			doEffect('songSwitch');
 		}
@@ -7104,7 +7058,7 @@ class PlayState extends MusicBeatState
 		if (FlxG.keys.justPressed.F)
 		{
 			doEffect('lowpass');
-		}
+		}*/
 
 		if (chartModifier == '4K Only' && mania != 3)
 		{
@@ -8633,14 +8587,55 @@ class PlayState extends MusicBeatState
 			}
 			playbackRate = 1;
 
-			if (FlxG.save.data.manualOverride || justOverRide)
+			if (FlxG.save.data.manualOverride)
 			{
 				trace('Switch Back');
-				doEffect('songSwitch');
-				persistentUpdate = false;
-				paused = true;
-				cancelMusicFadeTween();
-				MusicBeatState.resetState();
+				PlayState.storyWeek = FlxG.save.data.storyWeek;
+				Paths.currentModDirectory = FlxG.save.data.currentModDirectory;
+				var diffStr:String = WeekData.getCurrentWeek().difficulties;
+				if(diffStr != null) diffStr = diffStr.trim(); //Fuck you HTML5
+
+				if(diffStr != null && diffStr.length > 0)
+				{
+					var diffs:Array<String> = diffStr.split(',');
+					var i:Int = diffs.length - 1;
+					while (i > 0)
+					{
+						if(diffs[i] != null)
+						{
+							diffs[i] = diffs[i].trim();
+							if(diffs[i].length < 1) diffs.remove(diffs[i]);
+						}
+						--i;
+					}
+
+					if(diffs.length > 0 && diffs[0].length > 0)
+					{
+						CoolUtil.difficulties = diffs;
+					}
+				}
+				if(CoolUtil.difficulties.contains(CoolUtil.defaultDifficulty))
+				{
+					curDifficulty = Math.round(Math.max(0, CoolUtil.defaultDifficulties.indexOf(CoolUtil.defaultDifficulty)));
+				}
+				else
+				{
+					curDifficulty = 0;
+				}
+
+				var newPos:Int = CoolUtil.difficulties.indexOf(lastDifficultyName);
+				//trace('Pos of ' + lastDifficultyName + ' is ' + newPos);
+				if(newPos > -1)
+				{
+					curDifficulty = newPos;
+				}
+				CoolUtil.difficulties = CoolUtil.defaultDifficulties.copy();
+				PlayState.SONG = FlxG.save.data.SONG;
+				PlayState.isStoryMode = false;
+				PlayState.storyDifficulty = FlxG.save.data.storyDifficulty;
+				FlxG.save.data.manualOverride = false;
+				FlxG.save.flush();
+				FlxG.resetState();
 				return;
 			}
 
